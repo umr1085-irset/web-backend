@@ -1,0 +1,7 @@
+# PostgreSQL
+# ------------------------------------------------------------------------------
+POSTGRES_HOST=postgres
+POSTGRES_PORT=5432
+POSTGRES_DB=scilicium_django_react
+POSTGRES_USER=DrVVpIZknpXKoKUrsasfjkeEdDMXNFVx
+POSTGRES_PASSWORD=LjGc7XAezUR05wyy7WP1MsFVaixZNlvCGh4y94d9jVHyhzQ0gAkAOEuMq1UjooEn
