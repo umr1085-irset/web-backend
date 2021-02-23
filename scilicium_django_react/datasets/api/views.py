@@ -112,8 +112,9 @@ class DataGetCellCount(APIView):
 
     """
     # Allow anyone to access
+    # For test only
     permission_classes = (permissions.AllowAny,)
-    #authentication_classes = ()
+    authentication_classes = ()
 
     def get(self, request, *args, **kw):
 
@@ -122,23 +123,24 @@ class DataGetCellCount(APIView):
         # you can skip this part
 
         data_id = request.GET.get('id', None)
-
+        #data_id=1
         # Get data
+        print("DATA ID     " + str(data_id))
         data = get_object_or_404(Dataset,id=data_id)
 
         # Data status check + user ownership
-        if data.status == "PRIVATE" and data.created_by != self.request.user :
-            response = Response({"msg":"You are not allowed to access this ressource"}, status=status.HTTP_403_FORBIDDEN)
-            return response
+        #if data.status == "PRIVATE" and data.created_by != self.request.user :
+        #    response = Response({"msg":"You are not allowed to access this ressource"}, status=status.HTTP_403_FORBIDDEN)
+        #    return response
         
         
         response_data = dict()
         response_data["name"] = data.name
 
         # Fonction according data type
-        if data.data_type.name == "Loom" :
-            loom_file = data.upload.path
-            response_data["count"] = getCellCount(loom_file)
+        #if data.data_type.name == "Loom" :
+        #    loom_file = data.upload.path
+        #    response_data["count"] = getCellCount(loom_file)
 
         response = Response(response_data, status=status.HTTP_200_OK)
         return response
