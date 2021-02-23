@@ -139,8 +139,11 @@ class DataGetCellCount(APIView):
 
         # Fonction according data type
         #if data.data_type.name == "Loom" :
+
+        #START HERE#
         #    loom_file = data.upload.path
         #    response_data["count"] = getCellCount(loom_file)
+        response_data['chart'] = json_component(data.upload.path,style='pie',attrs=['cell type'],returnjson=True)
 
         response = Response(response_data, status=status.HTTP_200_OK)
         return response
