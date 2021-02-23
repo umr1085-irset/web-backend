@@ -1,5 +1,5 @@
-SciLicium Django React
-======================
+Irset Web Backend by SciLicium
+==============================
 
 Behold My Awesome Project!
 

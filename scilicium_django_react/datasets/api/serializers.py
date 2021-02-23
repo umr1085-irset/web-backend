@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
-from scilicium_django_react.datasets.models import Dataset, Data
+from scilicium_django_react.datasets.models import Dataset, Study
 
 
 class DatasetSerializer(serializers.ModelSerializer):
@@ -8,7 +8,7 @@ class DatasetSerializer(serializers.ModelSerializer):
         model = Dataset
         fields = "__all__"
 
-class DataSerializer(serializers.ModelSerializer):
+class StudyHudeCaSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Data
+        model = Study
         fields = "__all__"

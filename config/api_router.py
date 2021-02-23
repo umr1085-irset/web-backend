@@ -15,8 +15,8 @@ else:
 
 router.register("users", UserViewSet)
 router.register("v1/projects", ProjectViewSet, basename="projects")
-router.register("v1/datasets", DatasetViewSet, basename="datasets")
-router.register("v1/data", DataViewSet, basename="datasets")
+router.register("v1/studies", StudyViewSet, basename="datasets")
+router.register("v1/data", DatasetViewSet, basename="datasets")
 
 
 
@@ -27,7 +27,7 @@ urlpatterns += [
     url(r'^v1/', include('djoser.urls.authtoken')),
     url(r'^auth/users/activate/(?P<uid>[\w-]+)/(?P<token>[\w-]+)/$', UserActivationView.as_view()),
     url(r'^v1/view_data', DataFormatPlotView.as_view(), name='view_data'),
-    url(r'^v1/datasets/public', DatasetAllViewSet.as_view(), name='public_datasets'),
+    url(r'^v1/studies/public', StudyAllViewSet.as_view(), name='public_datasets'),
 ]
 
 # Route associated to data processing
