@@ -49,7 +49,7 @@ class Genome(models.Model):
     def __str__(self):
         return self.version
 
-class Data(models.Model):
+class Dataset(models.Model):
     DATA_STATUS = (
         ('PENDING', 'Pending approval'),
         ('PUBLIC', 'Public'),
@@ -59,20 +59,20 @@ class Data(models.Model):
 
     name = models.CharField(max_length=200)
     slug = models.SlugField()
-    genome = models.ForeignKey(Genome, on_delete=models.CASCADE, related_name='from_genome_version')
-    data_type = models.ForeignKey(DataType,on_delete=models.CASCADE, related_name='data_as_type')
+    genome = models.ForeignKey(Genome, on_delete=models.CASCADE, related_name='from_genome_version', blank=True, null=True)
+    data_type = models.ForeignKey(DataType,on_delete=models.CASCADE, related_name='data_as_type', blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True, auto_now=False)
     created_by = models.ForeignKey(settings.AUTH_USER_MODEL, blank=True, null=True, on_delete=models.CASCADE, related_name='data_upload_created_by')
-    upload = models.FileField(upload_to='datasets/%Y/%m/%d/')
+    upload = models.FileField(upload_to='datasets/%Y/%m/%d/', blank=True, null=True)
     status = models.CharField(max_length=50, choices=DATA_STATUS, default="PRIVATE")
-    display_types = models.ManyToManyField(VisualizationType, related_name='display_as',blank=True)
+    display_types = models.ManyToManyField(VisualizationType, related_name='display_as', blank=True)
     default_display = models.ForeignKey(VisualizationType, blank=True, null=True, on_delete=models.SET_NULL, related_name='default_display_as')
     config_page = JSONField(null=True, blank=True)
 
     def __str__(self):
         return self.name
 
-class Dataset(models.Model):
+class Study(models.Model):
 
     DATASET_STATUS = (
         ('PENDING', 'Pending approval'),
@@ -81,14 +81,17 @@ class Dataset(models.Model):
         ('RESTRICTED', 'Restricted'),
     )
 
-    name = models.CharField(max_length=200)
+    title = models.CharField(max_length=200)
     slug = models.SlugField()
     description = models.TextField("description", blank=True)
-    data = models.ManyToManyField(Data, related_name='in_dataset',blank=True)
+    author = models.CharField(max_length=200, blank=True)
+    publication = models.IntegerField(blank=True, null=True)
+    pmid = models.CharField(max_length=200, blank=True)
+    data = models.ManyToManyField(Dataset, related_name='in_dataset',blank=True)
     status = models.CharField(max_length=50, choices=DATASET_STATUS, default="PRIVATE")
     created_at = models.DateTimeField(auto_now_add=True, auto_now=False)
     created_by = models.ForeignKey(settings.AUTH_USER_MODEL, blank=True, null=True, on_delete=models.CASCADE, related_name='dataset_created_by')
     
 
     def __str__(self):
-        return self.name
+        return self.title
