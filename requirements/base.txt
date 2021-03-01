@@ -21,10 +21,13 @@ django-allauth==0.44.0  # https://github.com/pennersr/django-allauth
 django-crispy-forms==1.10.0  # https://github.com/django-crispy-forms/django-crispy-forms
 django-compressor==2.4  # https://github.com/django-compressor/django-compressor
 django-redis==4.12.1  # https://github.com/jazzband/django-redis
+django-better-admin-arrayfield==1.0.4
+
 # Django REST Framework
 djangorestframework==3.11.2  # https://github.com/encode/django-rest-framework
 django-cors-headers==3.6.0 # https://github.com/adamchainz/django-cors-headers
 djangorestframework-simplejwt==4.6.0 # https://hackernoon.com/110percent-complete-jwt-authentication-with-django-and-react-2020-iejq34ta
+
 markdown==3.3 
 django-filter==2.4.0
 djoser==2.0.5

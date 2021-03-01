@@ -9,25 +9,13 @@ from django.shortcuts import get_object_or_404
 
 from django.db.models import Q
 
-from scilicium_django_react.datasets.models import Dataset, Study
-from scilicium_django_react.datasets.api.serializers import DatasetSerializer, StudyHudeCaSerializer
+from scilicium_django_react.datasets.models import Dataset
+from scilicium_django_react.datasets.api.serializers import DatasetSerializer
 from scilicium_django_react.users.models import User
 from scilicium_django_react.utils.loom_reader import *
 from scilicium_django_react.utils.chartjsCreator import *
 from scilicium_django_react.utils.plotlyCreator import *
 
-
-
-class StudyViewSet(viewsets.ModelViewSet):
-
-    serializer_class = StudyHudeCaSerializer
-    queryset = Study.objects.all()
-
-    def perform_create(self, serializer):
-        serializer.save(created_by=self.request.user)
-
-    def get_queryset(self):
-        return self.queryset.filter(created_by=self.request.user)
 
 class DatasetViewSet(viewsets.ModelViewSet):
 
@@ -39,17 +27,6 @@ class DatasetViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         return self.queryset.filter(Q(created_by=self.request.user) |Q( status="PUBLIC" ) )
-
-
-class StudyAllViewSet(APIView):
-    permission_classes = (permissions.AllowAny,)
-    authentication_classes = ()
-    queryset = Study.objects.all()
-    serializer_class = StudyHudeCaSerializer
-
-    def get(self,request):
-        serializer = StudyHudeCaSerializer(self.queryset.filter(status="PUBLIC"), many=True)
-        return JsonResponse(serializer.data, safe=False)
 
 class DataFormatPlotView(APIView):
 
