@@ -16,7 +16,7 @@ class Author(models.Model):
     affiliation = models.ManyToManyField(Institute, related_name='author_from', blank=True)
 
     def __str__(self):
-        return self.name
+        return self.fullName
 
 class Article(models.Model):
 

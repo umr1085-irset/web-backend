@@ -78,3 +78,12 @@ class Tissue(models.Model):
 
     def __str__(self):
         return self.name.capitalize()
+
+class DevStage(models.Model):
+    name = models.TextField(verbose_name='Ontology name')
+    synonyms =  models.TextField("Synonyms", blank=True, default="")
+    onto_id = models.CharField(max_length=200)
+    as_children =  models.TextField("Children", blank=True, default="") #all parents
+
+    def __str__(self):
+        return self.name.capitalize()
