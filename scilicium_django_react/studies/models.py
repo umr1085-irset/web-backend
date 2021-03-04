@@ -55,7 +55,7 @@ class Project(models.Model):
     def save(self, *args, **kwargs):
         force = kwargs.pop('force', False)
         super(Project, self).save(*args, **kwargs)
-        self.projectId = "HUP" + str(self.id)
+        self.projectId = "hup" + str(self.id)
         super(Project, self).save()
 
 
@@ -74,7 +74,7 @@ class Study(models.Model):
     )
 
     title = models.CharField(max_length=200)
-    studyId = models.CharField(max_length=200)
+    studyId = models.SlugField(max_length=200)
     description = models.TextField("description", blank=True)
     status = models.CharField(max_length=50, choices=STUDY_STATUS, default="PRIVATE")
     created_at = models.DateTimeField(auto_now_add=True, auto_now=False)
@@ -91,5 +91,5 @@ class Study(models.Model):
     def save(self, *args, **kwargs):
         force = kwargs.pop('force', False)
         super(Study, self).save(*args, **kwargs)
-        self.studyId = "HUS" + str(self.id)
+        self.studyId = "hus" + str(self.id)
         super(Study, self).save()

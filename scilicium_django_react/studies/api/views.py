@@ -1,5 +1,5 @@
 from rest_framework import viewsets 
-
+from rest_framework.response import Response
 from scilicium_django_react.studies.models import Project, Study
 from scilicium_django_react.studies.api.serializers import *
 from rest_framework import generics
@@ -18,9 +18,11 @@ class ProjectViewSet(viewsets.ModelViewSet):
     serializer_class = ProjectSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
-    @action(detail=True, methods=['get'],permission_classes=[permissions.AllowAny])
+    @action(detail=False, permission_classes=[permissions.AllowAny],url_path='public', url_name='public')
     def public(self, request, *args, **kwargs):
-        return self.queryset.filter(status="PUBLIC")
+        public = self.queryset.filter(status="PUBLIC")
+        serializer = ProjectSerializer(public, many=True)
+        return Response(serializer.data)
 
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)
@@ -34,11 +36,14 @@ class StudyViewSet(viewsets.ModelViewSet):
     """
     queryset = Study.objects.all()
     serializer_class = StudySerializer
+    lookup_field = 'studyId'
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
-    @action(detail=True, methods=['get'],permission_classes=[permissions.AllowAny])
+    @action(detail=False, permission_classes=[permissions.AllowAny],url_path='public', url_name='public')
     def public(self, request, *args, **kwargs):
-        return self.queryset.filter(status="PUBLIC")
+        public = self.queryset.filter(status="PUBLIC")
+        serializer = StudySerializer(public, many=True)
+        return Response(serializer.data)
 
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)

@@ -7,6 +7,7 @@ from django_better_admin_arrayfield.models.fields import ArrayField
 # Create your models here.
 from django.contrib.auth.models import  User
 from scilicium_django_react.studies.models import Study
+from scilicium_django_react.ontologies.models import CellLine, Cell, Species, Tissue
 from django.utils.text import slugify
 
 
@@ -18,22 +19,27 @@ def get_upload_path(instance, filename):
 
     path =  os.path.join("datasets/loom/{}/{}/{}/{}/".format(user_type, instance.loomId), filename)
     return path
+        
+class biomaterialMeta(models.Model):
+    BIO_TYPE = (
+        ('ORGAN','Organ'),
+        ('TISSUE','Tissue'),
+        ('CELL','Cell'),
+    )
 
-class Species(models.Model):
-    name = models.CharField(max_length=200)
-    slug = models.SlugField(unique=True)
-    description = models.TextField( blank=True, null=True)
+    GENDER = (
+        ('MALE','Male'),
+        ('FEMALE','Female'),
+        ('MIXED','Mixed'),
+        ('OTHER','Other'),
+    )
+    tissue = models.ManyToManyField(Tissue, related_name='as_tissue', blank=True)
+    species = models.ManyToManyField(Species, related_name='as_species', blank=True)
+    cell = models.ManyToManyField(Cell, related_name='as_cell', blank=True)
+    cell_Line = models.ManyToManyField(CellLine, related_name='as_cellLine', blank=True)
+    gender = models.CharField(max_length=100, choices=GENDER, default="MALE")
+    bioType = models.CharField(max_length=100, choices=BIO_TYPE, default="ORGAN")
 
-    def __str__(self):
-        return self.name
-
-class Genome(models.Model):
-    version = models.CharField(max_length=200,unique=True)
-    species = models.ForeignKey(Species, on_delete=models.CASCADE, related_name='version_of')
-    description = models.TextField()
-
-    def __str__(self):
-        return self.version
 
 class sopMeta(models.Model):
     OMICS_VALUES = (
@@ -104,7 +110,7 @@ class Loom(models.Model):
     def save(self, *args, **kwargs):
         force = kwargs.pop('force', False)
         super(Loom, self).save(*args, **kwargs)
-        self.loomId = "HUL" + str(self.id)
+        self.loomId = "hus" + str(self.id)
         super(Loom, self).save()
 
 
@@ -125,6 +131,7 @@ class Dataset(models.Model):
     loom = models.ManyToManyField(Loom, related_name='as_loom', blank=True)
     status = models.CharField(max_length=50, choices=DATA_STATUS, default="PRIVATE")
     study = models.ForeignKey(Study, blank=True, null=True, on_delete=models.SET_NULL, related_name='dataset_of')
+    sop = models.ForeignKey(sopMeta, blank=True, null=True, on_delete=models.SET_NULL, related_name='dataset_sop')
     
 
     def __str__(self):
@@ -134,5 +141,5 @@ class Dataset(models.Model):
     def save(self, *args, **kwargs):
         force = kwargs.pop('force', False)
         super(Dataset, self).save(*args, **kwargs)
-        self.datasetId = "HUL" + str(self.id)
+        self.datasetId = "hud" + str(self.id)
         super(Dataset, self).save()
