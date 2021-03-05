@@ -6,6 +6,7 @@ import plotly.graph_objects as go
 import plotly.express as px
 import plotly.io as pio
 import json
+from matplotlib import pyplot as plt
 
 def random_color(NbColors):
     pi = 3.14159265359
@@ -476,6 +477,137 @@ def json_scatter(loom_path,color=None,returnjson=True):
     if color!=None:
         color = check_color(loom_path,color)
     fig = scatter_figure_gl(df,color)
+    
+    if returnjson:
+        return json.loads(pio.to_json(fig, validate=True, pretty=False, remove_uids=True))
+    else:
+        return fig
+
+def get_hexbin_attributes(hexbin):
+    '''
+    Extract hexagons attributes from Matplotlib hexbin object
+    
+    Params
+    ------
+    hexbin: Matplotlib hexbin
+    
+    Return
+    ------
+    hexagon, offsets, facecolors, values
+    '''
+    paths = hexbin.get_paths()
+    points_codes = list(paths[0].iter_segments())#path[0].iter_segments() is a generator 
+    prototypical_hexagon = [item[0] for item in points_codes]
+    return prototypical_hexagon, hexbin.get_offsets(), hexbin.get_facecolors(), hexbin.get_array()
+
+def make_hexagon(prototypical_hex, offset, fillcolor, linecolor=None):
+    new_hex_vertices = [vertex + offset for vertex in prototypical_hex]
+    vertices = np.asarray(new_hex_vertices[:-1])
+    # hexagon center
+    center=np.mean(vertices, axis=0)
+    if linecolor is None:
+        linecolor = fillcolor
+    #define the SVG-type path:    
+    path = 'M '
+    for vert in new_hex_vertices:
+        path +=  f'{vert[0]}, {vert[1]} L' 
+    return  dict(type='path',
+                 line=dict(color=linecolor, 
+                           width=0.5),
+                 path=  path[:-2],
+                 fillcolor=fillcolor, 
+                ), center 
+
+def pl_cell_color(mpl_facecolors):
+    '''
+    From matplotlib facecolors to plotly cell colors
+    '''
+    return [ f'rgb({int(R*255)}, {int(G*255)}, {int(B*255)})' for (R, G, B, A) in mpl_facecolors]
+
+def mpl_to_plotly(cmap, N):
+    h = 1.0/(N-1)
+    pl_colorscale = []
+    for k in range(N):
+        C = list(map(np.uint8, np.array(cmap(k*h)[:3])*255))
+        pl_colorscale.append([round(k*h,2), f'rgb({C[0]}, {C[1]}, {C[2]})'])
+    return pl_colorscale
+
+
+
+def json_hexbin(loom_path,cmap=plt.cm.Greys,background='white',returnjson=True):
+    '''
+    Generate hexbin plot from X,Y scatter coordinates
+    
+    Params
+    ------
+    loom_path: str
+        Path to a loom file
+    cmap: Matplotlib Pyplot colormap
+        Colormap from pyplot.cm collection
+    background: str
+        background of hexbin plot
+    returnjson: bool
+        Return Plotly figure or its JSON form
+    
+    Return
+    ------
+    Plotly figure or its JSON form
+    '''
+    df = get_dataframe(loom_path,['X','Y'])
+    x = df['X'].values
+    y = df['Y'].values
+    HB = plt.hexbin(x,y,gridsize=20,cmap=cmap)
+    xx = plt.draw()
+
+    hexagon_vertices, offsets, mpl_facecolors, counts = get_hexbin_attributes(HB)
+    cell_color = pl_cell_color(mpl_facecolors)
+
+    shapes = []
+    centers = []
+    for k in range(len(offsets)):
+        shape, center = make_hexagon(hexagon_vertices, offsets[k], cell_color[k])
+        shapes.append(shape)
+        centers.append(center)
+
+    xlocs, ylocs = zip(*centers)
+    cmapp = mpl_to_plotly(cmap, 11)
+    text = [f'x: {round(xlocs[k],2)}<br>y: {round(ylocs[k],2)}<br>counts: {int(counts[k])}' for k in range(len(xlocs))]
+    
+    fig = go.Figure()
+    fig.add_trace(
+        go.Scatter(
+             x=xlocs, 
+             y=ylocs, 
+             mode='markers',
+             marker=dict(size=0.5, 
+                         color=counts, 
+                         colorscale=cmapp, 
+                         showscale=True,
+                         colorbar=dict(
+                                     thickness=20,  
+                                     ticklen=4
+                                     )),
+           text=text,
+           hoverinfo='text'
+          )
+    )
+
+    axis = dict(
+        showgrid=False,
+        showline=False,
+        zeroline=False,
+        ticklen=4 
+    )
+
+    fig.update_layout(
+        width=530, height=550,
+        xaxis=axis,
+        yaxis=axis,
+        xaxis_title='UMAP1',
+        yaxis_title='UMAP2',
+        hovermode='closest',
+        shapes=shapes,
+        plot_bgcolor=background)
     
     if returnjson:
         return json.loads(pio.to_json(fig, validate=True, pretty=False, remove_uids=True))
