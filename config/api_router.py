@@ -6,6 +6,7 @@ from rest_framework.routers import DefaultRouter, SimpleRouter
 from scilicium_django_react.users.api.views import UserViewSet, UserActivationView
 from scilicium_django_react.studies.api.urls import *
 from scilicium_django_react.datasets.api.views import *
+from scilicium_django_react.studies.api.views import StudyViewSet, ProjectViewSet
 
 
 if settings.DEBUG:
@@ -15,6 +16,8 @@ else:
 
 router.register("users", UserViewSet)
 router.register("v1/data", DatasetViewSet, basename="datasets")
+router.register("v1/studies", StudyViewSet, basename="studies")
+router.register("v1/projects", ProjectViewSet, basename="studies")
 
 
 
@@ -34,15 +37,5 @@ urldata = [
     url(r'^v1/data/cellcountbygroup', DataCellCountbyCluster.as_view(), name='cellcout_group'),
 ]
 
-urlstudies = [
-    url(r'^v1/projects/', projects_list, name='projects-list'),
-    url(r'^v1/projects/<str:projectId>', projects_detail, name='projects-detail'),
-    url(r'^v1/projects/public', projects_public, name='projects-public'),
-    url(r'^v1/studies/', studies_list, name='projects-list'),
-    url(r'^v1/studies/<str:studyId>', studies_detail, name='projects-detail'),
-    url(r'^v1/studies/public', studies_public, name='projects-public'),
-    
-]
 
 urlpatterns += urldata
-urlpatterns += urlstudies
