@@ -31,3 +31,8 @@ class DatasetSerializer(serializers.ModelSerializer):
     class Meta:
         model = Dataset
         fields = "__all__"
+
+        lookup_field = 'datasetId'
+        extra_kwargs = {
+            'url': {'lookup_field': 'datasetId'}
+        }

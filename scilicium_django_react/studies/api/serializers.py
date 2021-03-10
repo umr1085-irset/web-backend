@@ -2,6 +2,7 @@ from rest_framework import serializers
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from scilicium_django_react.studies.models import *
 from scilicium_django_react.datasets.api.serializers import DatasetSerializer
+from scilicium_django_react.users.api.serializers import GetFullUserSerializer
 
 
 class AffiliationSerializer(serializers.ModelSerializer):
@@ -45,10 +46,12 @@ class ArticleSerializer(serializers.ModelSerializer):
             "volume",
             "releaseDate",
             "author",
+            "pmid"
 
         )
 
 class ProjectSerializer(serializers.ModelSerializer):
+    created_by = GetFullUserSerializer(many=False, read_only=True)
     class Meta:
         model = Project
         read_only_fields = (
@@ -77,7 +80,7 @@ class StudySerializer(serializers.ModelSerializer):
     project = ProjectSerializer(many=False, read_only=True)
     article = ArticleSerializer(many=True, read_only=True)
     dataset_of = DatasetSerializer(many=True, read_only=True)
-
+    created_by = GetFullUserSerializer(many=False, read_only=True)
 
     class Meta:
         model = Study
@@ -106,6 +109,7 @@ class StudyPublicSerializer(serializers.ModelSerializer):
     dev_stage = serializers.SerializerMethodField('get_dev_stage')
     tissues = serializers.SerializerMethodField('get_tissues')
     gender = serializers.SerializerMethodField('get_gender')
+    created_by = GetFullUserSerializer(many=False, read_only=True)
 
     def get_technology(self, study):
         technology = []

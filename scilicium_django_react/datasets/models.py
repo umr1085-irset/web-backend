@@ -9,7 +9,7 @@ from django.contrib.auth.models import  User
 from scilicium_django_react.studies.models import Study
 from scilicium_django_react.ontologies.models import CellLine, Cell, Species, Tissue, DevStage
 from django.utils.text import slugify
-
+from scilicium_django_react.utils.loom_reader import *
 
 def get_upload_path(instance, filename):
 
@@ -109,6 +109,8 @@ class Loom(models.Model):
     created_by = models.ForeignKey(settings.AUTH_USER_MODEL, blank=True, null=True, on_delete=models.CASCADE, related_name='loom_upload_created_by')
     rowEntity = ArrayField(models.CharField(max_length=200, blank=True), default=list)
     colEntity = ArrayField(models.CharField(max_length=200, blank=True), default=list)
+    cellNumber =  models.IntegerField(blank=True, null=True)
+    classes = ArrayField(models.CharField(max_length=200, blank=True), default=list)
     file = models.FileField(upload_to=get_upload_path, blank=True, null=True)
 
     def __str__(self):
@@ -118,6 +120,10 @@ class Loom(models.Model):
     def save(self, *args, **kwargs):
         force = kwargs.pop('force', False)
         super(Loom, self).save(*args, **kwargs)
+        loomattr = extract_attr_keys(self.file.path)
+        self.rowEntity = loomattr['row_attr_keys']
+        self.colEntity = loomattr['col_attr_keys']
+        self.classes = get_classes(self.file.path)
         self.loomId = "hul" + str(self.id)
         super(Loom, self).save()
 
