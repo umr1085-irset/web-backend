@@ -18,6 +18,18 @@ from scilicium_django_react.utils.chartjsCreator import *
 from scilicium_django_react.utils.plotlyCreator import *
 
 
+
+class StudyViewSet(viewsets.ModelViewSet):
+
+    serializer_class = StudyHudeCaSerializer
+    queryset = Study.objects.all()
+
+    def perform_create(self, serializer):
+        serializer.save(created_by=self.request.user)
+
+    def get_queryset(self):
+        return self.queryset.filter(created_by=self.request.user)
+
 class DatasetViewSet(viewsets.ModelViewSet):
 
     serializer_class = DatasetSerializer
