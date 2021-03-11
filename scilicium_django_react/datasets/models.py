@@ -41,8 +41,6 @@ class biomaterialMeta(models.Model):
     gender = models.CharField(max_length=100, choices=GENDER, default="MALE")
     bioType = models.CharField(max_length=100, choices=BIO_TYPE, default="ORGAN")
 
-    def __str__(self):
-        return self.id
 
 
 class sopMeta(models.Model):
@@ -99,9 +97,6 @@ class sopMeta(models.Model):
     technoGrain = models.CharField(max_length=100, choices=TECHNO_GRAIN, default="BULK")
     technology = models.CharField(max_length=100, choices=TECHNO, default="RNA-SEQ")
     expProcess = models.CharField(max_length=100, choices=EXP_VALUE, default="EXPOSURE")
-
-    def __str__(self):
-        return self.id
 
 class Loom(models.Model):
     name = models.CharField(max_length=200,unique=True)

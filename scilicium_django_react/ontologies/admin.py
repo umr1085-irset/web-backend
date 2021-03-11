@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.contrib.auth import admin as auth_admin
 from django.contrib.auth import get_user_model
 
-from scilicium_django_react.ontologies.models import Biological, Cell, CellLine, Chemical, Disease, Experiment, Species, Tissue
+from scilicium_django_react.ontologies.models import Biological, Cell, CellLine, Chemical, Disease, Experiment, Species, Tissue, DevStage
 
 class OntoAdmin(admin.ModelAdmin):
     fieldsets = [
@@ -19,4 +19,5 @@ admin.site.register(Disease, OntoAdmin)
 admin.site.register(Experiment, OntoAdmin)
 admin.site.register(Species, OntoAdmin)
 admin.site.register(Tissue, OntoAdmin)
+admin.site.register(DevStage, OntoAdmin)
 
