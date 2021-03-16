@@ -8,6 +8,52 @@ import plotly.io as pio
 import json
 from matplotlib import pyplot as plt
 
+def n_colors(n):
+    l = ['#8bc34a','#ffc107','#3f51b5','#e91e63','#03a9f4','#ff5722','#9c27b0','#795548','#607d8b','#009688','#2196f3','#cddc39',
+    '#c5e1a5','#ffe082','#9fa8da','#f48fb1','#81d4fa','#ffcc80','#ce93d8','#bcaaa4','#b0bec5','#80cbc4','#90caf9','#e6ee9c',
+    '#558b2f','#ff8f00','#283593','#ad1457','#0277bd','#ef6c00','#6a1b9a','#4e342e','#37474f','#00695c','#1565c0','#9e9d24']
+    return l[:n]
+
+def json_component_chartjs(loom_path,style='pie',attrs=[]):
+    '''
+    Compute JSON for ChartJs figure
+    Params
+    ------
+    loom_path: str
+        path to Loom file
+    style: str
+        plot style. Must be pie or bar
+    attrs: list
+        List of up to two attributes to plot
+    Return
+    ------
+    JSON
+    '''
+    if style not in ['pie','bar']:
+        raise Exception('style must be one of [pie,bar]')
+    if attrs==[]:
+        raise Exception('empty attributes list given')
+    if len(attrs)>2:
+        raise Exception('attributes list contains more than two elements')
+    if not is_valid_attrs_list(loom_path,attrs):
+        raise Exception('attributes list must only contain valid attributes')
+    df = get_dataframe(loom_path,attrs)
+    col = attrs[0]
+    lbls,vals = np.unique(df[col].values,return_counts=True)
+    idx = np.argsort(vals)[::-1]
+    lbls = lbls[idx]
+    vals = vals[idx]
+    res = dict()
+    chart = dict()
+    datasets=dict()
+    datasets['data'] = vals.tolist()
+    datasets['backgroundColor'] = n_colors(len(vals))
+    chart['datasets'] = [datasets]
+    chart['labels'] = lbls.tolist()
+    res['chart'] = chart
+    res['style'] = style
+    return json.dumps(res)
+
 def extract_attr_keys(loom_path):
     '''
     Extract column and row attribute keys from a Loom file in a dictionary

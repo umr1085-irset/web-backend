@@ -105,6 +105,7 @@ class Loom(models.Model):
     rowEntity = ArrayField(models.CharField(max_length=200, blank=True), default=list)
     colEntity = ArrayField(models.CharField(max_length=200, blank=True), default=list)
     cellNumber =  models.IntegerField(blank=True, null=True)
+    geneNumber = models.IntegerField(blank=True, null=True)
     classes = ArrayField(models.CharField(max_length=200, blank=True), default=list)
     file = models.FileField(upload_to=get_upload_path, blank=True, null=True)
 
@@ -116,9 +117,12 @@ class Loom(models.Model):
         force = kwargs.pop('force', False)
         super(Loom, self).save(*args, **kwargs)
         loomattr = extract_attr_keys(self.file.path)
+        shape = get_shape(self.file.path)
         self.rowEntity = loomattr['row_attr_keys']
         self.colEntity = loomattr['col_attr_keys']
         self.classes = get_classes(self.file.path)
+        self.cellNumber = shape[1]
+        self.geneNumber = shape[0]
         self.loomId = "hul" + str(self.id)
         super(Loom, self).save()
 
@@ -137,7 +141,7 @@ class Dataset(models.Model):
     created_at = models.DateTimeField(auto_now_add=True, auto_now=False)
     created_by = models.ForeignKey(settings.AUTH_USER_MODEL, blank=True, null=True, on_delete=models.CASCADE, related_name='data_upload_created_by')
     updated_at = models.DateTimeField(auto_now=True, null=True)
-    loom = models.ManyToManyField(Loom, related_name='as_loom', blank=True)
+    loom = models.ForeignKey(Loom, on_delete=models.SET_NULL, null=True, related_name='as_loom', blank=True)
     status = models.CharField(max_length=50, choices=DATA_STATUS, default="PRIVATE")
     study = models.ForeignKey(Study, blank=True, null=True, on_delete=models.SET_NULL, related_name='dataset_of')
     sop = models.ForeignKey(sopMeta, blank=True, null=True, on_delete=models.SET_NULL, related_name='dataset_sop')

@@ -92,11 +92,14 @@ class GetLoomPlots(APIView):
             attrs = [attrs]
         if style =="scatter":
             response_data['chart'] = json_scatter(data.file.path)
+            response_data['style'] = "scatter"
 
             response = Response(response_data, status=status.HTTP_200_OK)
             return response
         else :
-            response_data['chart'] = json_component(data.file.path,style=style,attrs=attrs,returnjson=True)
+            data = json.loads(json_component_chartjs(data.file.path,style=style,attrs=attrs))
+            response_data['chart'] = data["chart"]
+            response_data['style'] = data["style"]
 
             response = Response(response_data, status=status.HTTP_200_OK)
             return response
