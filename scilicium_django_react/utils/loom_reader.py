@@ -368,7 +368,7 @@ def get_shape(loom_path):
     df.close()
     return shape
 
-def get_ra(loom_path,key='Symbol'):
+def get_ra(loom_path,key='Symbol',unique=False):
     '''
     Extract row attribute data from loom file
     Params
@@ -384,9 +384,12 @@ def get_ra(loom_path,key='Symbol'):
     df = loompy.connect(loom_path) # open loom connection
     labels = df.ra[key]
     df.close()
-    return labels
-
-def get_ca(loom_path,key='Sample'):
+    if unique:
+        return np.unique(labels)
+    else:
+        return labels
+        
+def get_ca(loom_path,key='Sample',unique=False):
     '''
     Extract column attribute data from loom file
     Params
@@ -402,7 +405,10 @@ def get_ca(loom_path,key='Sample'):
     df = loompy.connect(loom_path) # open loom connection
     labels = df.ca[key]
     df.close()
-    return labels
+    if unique:
+        return np.unique(labels)
+    else:
+        return labels
 
 def get_classes(loom_path):
     '''

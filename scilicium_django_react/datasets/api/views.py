@@ -28,6 +28,26 @@ class DatasetViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         serializer.save(created_by=self.request.user)
 
+    @action(detail=True, permission_classes=[permissions.AllowAny],url_path='filters', url_name='filters')
+    def filters(self, request, *args, **kwargs):
+        dataset = self.get_object()
+        if dataset.status == "PUBLIC" or dataset.created_by == self.request.user:
+            key = request.GET.get('key', None)
+            value = request.GET.get('value', None)
+
+            data = get_object_or_404(Loom,id=dataset.loom.id)
+            if key == "row":
+                values = get_ra(data.file.path,key=value,unique=True)
+                return  Response({"values":values}, status=status.HTTP_200_OK)
+            if key == "col":
+                values = get_ca(data.file.path,key=value,unique=True)
+                return  Response({"values":values}, status=status.HTTP_200_OK)
+            else :
+                return Response('Key value not recognize', status=status.HTTP_403_FORBIDDEN)
+            return Response(serializer.data)
+        else :
+            return Response('Your are not allowed to access this ressource', status=status.HTTP_403_FORBIDDEN)
+
     @action(detail=True, permission_classes=[permissions.AllowAny],url_path='view', url_name='view')
     def view(self, request, *args, **kwargs):
         dataset = self.get_object()
@@ -36,6 +56,8 @@ class DatasetViewSet(viewsets.ModelViewSet):
             return Response(serializer.data)
         else :
             return Response('Your are not allowed to access this ressource', status=status.HTTP_403_FORBIDDEN)
+    
+    
 
 class LoomViewSet(viewsets.ModelViewSet):
     serializer_class = LoomSerializer

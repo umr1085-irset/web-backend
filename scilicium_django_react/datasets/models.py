@@ -106,6 +106,8 @@ class Loom(models.Model):
     colEntity = ArrayField(models.CharField(max_length=200, blank=True), default=list)
     cellNumber =  models.IntegerField(blank=True, null=True)
     geneNumber = models.IntegerField(blank=True, null=True)
+    row_name = models.CharField(max_length=200, blank=True, null=True)
+    col_name = models.CharField(max_length=200, blank=True, null=True)
     classes = ArrayField(models.CharField(max_length=200, blank=True), default=list)
     file = models.FileField(upload_to=get_upload_path, blank=True, null=True)
 
