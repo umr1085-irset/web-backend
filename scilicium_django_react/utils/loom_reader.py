@@ -50,6 +50,10 @@ def json_component_chartjs(loom_path,style='pie',attrs=[]):
     datasets['backgroundColor'] = n_colors(len(vals))
     chart['datasets'] = [datasets]
     chart['labels'] = lbls.tolist()
+    if style == "pie":
+        chart['options'] = {'legend':{ 'position': "left", 'align': "center"}}
+    if style == 'bar':
+        chart['options'] = {'legend':{ 'display': False}}
     res['chart'] = chart
     res['style'] = style
     return json.dumps(res)
@@ -347,6 +351,19 @@ def json_scatter(loom_path,color=None,returnjson=True):
         color = check_color(loom_path,color)
     fig = scatter_figure_gl(df,color)
     
+    fig.update_layout(
+        # background color white
+        paper_bgcolor='rgba(0,0,0,0)',
+        plot_bgcolor='rgba(0,0,0,0)',
+        margin=dict(
+            l=0,
+            r=0,
+            b=0,
+            t=0
+        )
+    )
+    fig.update_yaxes(showticklabels=False)
+    fig.update_xaxes(showticklabels=False)
     if returnjson:
         return json.loads(pio.to_json(fig, validate=True, pretty=False, remove_uids=True))
     else:

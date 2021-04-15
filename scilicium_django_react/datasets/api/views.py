@@ -85,15 +85,20 @@ class GetLoomPlots(APIView):
     permission_classes = (permissions.AllowAny,)
     authentication_classes = ()
 
-    def get(self, request, *args, **kw):
+    def post(self, request, *args, **kw):
 
         # Process any get params that you may need
         # If you don't need to process get params,
         # you can skip this part
 
-        data_id = request.GET.get('id', None)
-        attrs = request.GET.get('attrs', None)
-        style = request.GET.get('style', None)
+        post_data = request.data
+        data_id =post_data['id']
+        attrs = post_data['attrs']
+        style = post_data['style']
+        genes_menu = 'undefined'
+        if 'menu' in post_data:
+            genes_menu = post_data['menu']
+        filters = post_data['filters']
 
         # Get data
         data = get_object_or_404(Loom,id=data_id)
@@ -107,18 +112,20 @@ class GetLoomPlots(APIView):
         response_data = dict()
         response_data["name"] = data.name
         response_data["classes"] = data.classes
-
-        if attrs == 'undefined' :
-            attrs = [response_data["classes"][0]]
-        else:
-            attrs = [attrs]
+        if genes_menu != 'undefined':
+            response_data["genes_menu"] = get_ra(data.file.path,unique=True)
         if style =="scatter":
-            response_data['chart'] = json_scatter(data.file.path)
+            response_data['chart'] = json_scatter(data.file.path,color=attrs)
             response_data['style'] = "scatter"
 
             response = Response(response_data, status=status.HTTP_200_OK)
             return response
+
         else :
+            if attrs == 'undefined' :
+                attrs = [response_data["classes"][0]]
+            else:
+                attrs = [attrs]
             data = json.loads(json_component_chartjs(data.file.path,style=style,attrs=attrs))
             response_data['chart'] = data["chart"]
             response_data['style'] = data["style"]
