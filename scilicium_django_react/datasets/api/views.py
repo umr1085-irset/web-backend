@@ -92,16 +92,25 @@ class GetLoomPlots(APIView):
         # you can skip this part
 
         post_data = request.data
-        data_id =post_data['id']
+        data_id = post_data['id']
         attrs = post_data['attrs']
         style = post_data['style']
         genes_menu = 'undefined'
+        symbols = [] # rajouter dans le post
+        log = False # rajouter dans le post
+        scale = False # rajouter dans le post
         if 'menu' in post_data:
             genes_menu = post_data['menu']
         filters = post_data['filters']
 
         # Get data
         data = get_object_or_404(Loom,id=data_id)
+
+
+        if (filt['ca']!={}) or (filt['ra']=={}):
+            cidx_filter, ridx_filter = get_filter_indices(data.file.path,filters)
+        else:
+            cidx_filter, ridx_filter = (None,None)
 
         # Data status check + user ownership == TO DO check status from dataset
         #if data.status == "PRIVATE" and data.created_by != self.request.user :
@@ -113,11 +122,28 @@ class GetLoomPlots(APIView):
         response_data["name"] = data.name
         response_data["classes"] = data.classes
         if genes_menu != 'undefined':
-            response_data["genes_menu"] = get_ra(data.file.path,unique=True)
+            response_data["genes_menu"] = get_ra(data.file.path,unique=True,ridx_filter=ridx_filter)
         if style =="scatter":
-            response_data['chart'] = json_scatter(data.file.path,color=attrs)
+            response_data['chart'] = json_scatter(data.file.path,color=attrs,cidx_filter=cidx_filter)
             response_data['style'] = "scatter"
+            response = Response(response_data, status=status.HTTP_200_OK)
+            return response
 
+        elif style=='hexbin':
+            response_data['chart'] = json_hexbin(loom_path,cmap=plt.cm.Greys,background='white',cidx_filter=cidx_filter)
+            response_data['style'] = 'hexbin'
+            response = Response(response_data, status=status.HTTP_200_OK)
+            return response
+
+        elif style=='dot':
+            response_data['chart'] = dotplot_json(loom_path,attribute=attrs,symbols=symbols,cidx_filter=cidx_filter,ridx_filter=ridx_filter,log=log,scale=scale)
+            response_data['style'] = 'dot'
+            response = Response(response_data, status=status.HTTP_200_OK)
+            return response
+
+        elif style=='violin':
+            response_data['chart'] = violin_json(loom_path,attribute=attrs,symbol=symbols,cidx_filter=cidx_filter,log=log)
+            response_data['style'] = 'violin'
             response = Response(response_data, status=status.HTTP_200_OK)
             return response
 
@@ -126,7 +152,7 @@ class GetLoomPlots(APIView):
                 attrs = [response_data["classes"][0]]
             else:
                 attrs = [attrs]
-            data = json.loads(json_component_chartjs(data.file.path,style=style,attrs=attrs))
+            data = json.loads(json_component_chartjs(data.file.path,style=style,attrs=attrs,cidx_filter=cidx_filter))
             response_data['chart'] = data["chart"]
             response_data['style'] = data["style"]
 
