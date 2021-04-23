@@ -207,6 +207,12 @@ def json_component_chartjs(loom_path,style='pie',attrs=[],cidx_filter=None):
     datasets['backgroundColor'] = n_colors(len(vals))
     chart['datasets'] = [datasets]
     chart['labels'] = lbls.tolist()
+
+    if style == "pie":
+        chart['options'] = {'legend':{ 'position': "left", 'align': "center"}}
+    if style == 'bar':
+        chart['options'] = {'legend':{ 'display': False}}
+
     res['chart'] = chart
     res['style'] = style
 
@@ -323,6 +329,7 @@ def json_scatter(loom_path,color=None,returnjson=True,cidx_filter=None):
     fig.update_layout(
         # background color white
         paper_bgcolor='rgba(0,0,0,0)',
+        autosize=True,
         plot_bgcolor='rgba(0,0,0,0)',
         margin=dict(
             l=0,
@@ -706,6 +713,7 @@ def violin_json(loom_path,attribute='',symbols=[],cidx_filter=None,returnjson=Tr
     allsymbols = get_ra(loom_path,key='Symbol') # symbol list
     attr_values = get_ca(loom_path,key=attribute,unique=False,cidx_filter=cidx_filter) # get column attribute values
     symbol = symbols[0]
+    
     
     df = loompy.connect(loom_path)
     i = np.where(allsymbols==symbol)[0][0]

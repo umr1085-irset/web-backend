@@ -10,6 +10,7 @@ from rest_framework.decorators import action
 from rest_framework import permissions
 from django.db.models import Q
 
+from matplotlib import pyplot as plt
 from scilicium_django_react.datasets.models import Dataset, Loom
 from scilicium_django_react.datasets.api.serializers import DatasetSerializer, LoomSerializer
 from scilicium_django_react.users.models import User
@@ -66,7 +67,39 @@ class LoomViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         serializer.save(created_by=self.request.user)
-    
+
+class GetLoomStatistics(APIView):
+    permission_classes = (permissions.AllowAny,)
+    authentication_classes = ()
+
+    def post(self, request, *args, **kw):
+        post_data = request.data
+        data_id = post_data['id']
+        filters = post_data['filters']
+
+        # Get data
+        data = get_object_or_404(Loom,id=data_id)
+        response_data = dict()
+
+
+        if (filters['ca']!={}) or (filters['ra']=={}):
+            cidx_filter, ridx_filter = get_filter_indices(data.file.path,filters)
+        else:
+            cidx_filter, ridx_filter = (None,None)
+        
+        ngenes, ncells = get_shape(data.file.path)
+        try:
+            response_data['col_val'] = len(cidx_filter)
+        except:
+            response_data['col_val'] = ncells
+        try:
+            response_data['row_val'] = len(ridx_filter)
+        except:
+            response_data['row_val'] = ngenes
+        
+        response = Response(response_data, status=status.HTTP_200_OK)
+        return response
+
 class GetLoomPlots(APIView):
     """
         Associated view for the REACT CellCountComponent component
@@ -96,18 +129,17 @@ class GetLoomPlots(APIView):
         attrs = post_data['attrs']
         style = post_data['style']
         genes_menu = 'undefined'
-        symbols = [] # rajouter dans le post
+        symbols = ['Sox9'] # rajouter dans le post
         log = False # rajouter dans le post
         scale = False # rajouter dans le post
         if 'menu' in post_data:
             genes_menu = post_data['menu']
         filters = post_data['filters']
-
         # Get data
         data = get_object_or_404(Loom,id=data_id)
 
 
-        if (filt['ca']!={}) or (filt['ra']=={}):
+        if (filters['ca']!={}) or (filters['ra']=={}):
             cidx_filter, ridx_filter = get_filter_indices(data.file.path,filters)
         else:
             cidx_filter, ridx_filter = (None,None)
@@ -130,19 +162,19 @@ class GetLoomPlots(APIView):
             return response
 
         elif style=='hexbin':
-            response_data['chart'] = json_hexbin(loom_path,cmap=plt.cm.Greys,background='white',cidx_filter=cidx_filter)
+            response_data['chart'] = json_hexbin(data.file.path,cmap=plt.cm.Greys,background='white',cidx_filter=cidx_filter)
             response_data['style'] = 'hexbin'
             response = Response(response_data, status=status.HTTP_200_OK)
             return response
 
         elif style=='dot':
-            response_data['chart'] = dotplot_json(loom_path,attribute=attrs,symbols=symbols,cidx_filter=cidx_filter,ridx_filter=ridx_filter,log=log,scale=scale)
+            response_data['chart'] = dotplot_json(data.file.path,attribute=attrs,symbols=symbols,cidx_filter=cidx_filter,ridx_filter=ridx_filter,log=log,scale=scale)
             response_data['style'] = 'dot'
             response = Response(response_data, status=status.HTTP_200_OK)
             return response
 
         elif style=='violin':
-            response_data['chart'] = violin_json(loom_path,attribute=attrs,symbol=symbols,cidx_filter=cidx_filter,log=log)
+            response_data['chart'] = violin_json(data.file.path,attribute=attrs,symbols=symbols,cidx_filter=cidx_filter,log=log)
             response_data['style'] = 'violin'
             response = Response(response_data, status=status.HTTP_200_OK)
             return response

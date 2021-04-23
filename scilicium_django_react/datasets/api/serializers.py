@@ -38,14 +38,14 @@ class DatasetSerializer(serializers.ModelSerializer):
     rel_datasets = serializers.SerializerMethodField('get_relativedatasets')
     
     def get_metadata(self, dataset):
-        metadata = {'col_name':'','row_name':'','filters':[],'filters_keys':[]}
+        metadata = {'col_name':'','row_name':'','filters':{},'filters_keys':{'ca':[],'ra':[]}}
         for col in dataset.loom.classes :
-           metadata['filters'].append({'name':col,'values':get_ca(dataset.loom.file.path,key=col,unique=True),'attributes':'ca'})
-           metadata['filters_keys'].append(col)
+           metadata['filters'][col] = {'name':col,'values':get_ca(dataset.loom.file.path,key=col,unique=True),'attributes':'ca'}
+           metadata['filters_keys']['ca'].append(col)
 
         #Always add Chromosome on row attributes
-        metadata['filters'].append({'name':'Chromosome','values':get_ra(dataset.loom.file.path,key='Chromosome',unique=True),'attributes':'ra'})
-        
+        metadata['filters']['Chromosome'] = {'name':'Chromosome','values':get_ra(dataset.loom.file.path,key='Chromosome',unique=True),'attributes':'ra'}
+        metadata['filters_keys']['ra'].append('Chromosome')
         metadata['row_name'] = dataset.loom.row_name
         metadata['col_name'] = dataset.loom.col_name
         metadata['cell_number'] = dataset.loom.cellNumber
