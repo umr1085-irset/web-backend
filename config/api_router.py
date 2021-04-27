@@ -29,4 +29,5 @@ urlpatterns += [
     url(r'^auth/users/activate/(?P<uid>[\w-]+)/(?P<token>[\w-]+)/$', UserActivationView.as_view()),
     url(r'^v1/dataset/attributes/', GetLoomPlots.as_view(),name="dataset_attributes" ),
     url(r'^v1/dataset/statistics/', GetLoomStatistics.as_view(),name="dataset_statistics" ),
+     url(r'^v1/dataset/genes/', GetLoomGenes.as_view(),name="dataset_genes" ),
 ]

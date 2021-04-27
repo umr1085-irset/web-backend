@@ -100,6 +100,42 @@ class GetLoomStatistics(APIView):
         response = Response(response_data, status=status.HTTP_200_OK)
         return response
 
+class GetLoomGenes(APIView):
+    permission_classes = (permissions.AllowAny,)
+    authentication_classes = ()
+
+    def post(self, request, *args, **kw):
+        post_data = request.data
+        data_id = post_data['id']
+        filters = post_data['filters']
+        print(filters)
+        #Remove potential Symbol in filter
+        filters['ra'] = filters['ra'].pop('Symbol', None)
+
+        data = get_object_or_404(Loom,id=data_id)
+        response_data = dict()
+
+        if (filters['ca']!={}) or (filters['ra']=={}):
+            cidx_filter, ridx_filter = get_filter_indices(data.file.path,filters)
+        else:
+            cidx_filter, ridx_filter = (None,None)
+
+        if 'method' in post_data and post_data['method'] !='custom':
+            gene_selection = post_data['method']
+            print(gene_selection)
+            response_data["genes"] = auto_get_symbols(data.file.path,n=10,ridx_filter=ridx_filter,cidx_filter=cidx_filter,method=gene_selection)
+            print(response_data["genes"])
+            response = Response(response_data, status=status.HTTP_200_OK)
+            return response
+        else:
+            response_data["genes"] = get_ra(data.file.path,unique=True,ridx_filter=ridx_filter)
+            response = Response(response_data, status=status.HTTP_200_OK)
+            return response
+        
+
+        
+        
+
 class GetLoomPlots(APIView):
     """
         Associated view for the REACT CellCountComponent component
@@ -135,6 +171,7 @@ class GetLoomPlots(APIView):
         if 'menu' in post_data:
             genes_menu = post_data['menu']
         filters = post_data['filters']
+        
         # Get data
         data = get_object_or_404(Loom,id=data_id)
 

@@ -591,6 +591,49 @@ def most_variable_symbols(loom_path,n=10,ridx_filter=None,cidx_filter=None):
     labels = labels[idx] # trim synbol array
     return np.delete(labels, np.where(labels == 'nan')) # remove potential nan values and return
 
+def first_n_symbols(loom_path,n=10,ridx_filter=None):
+    '''
+    Retrieve first n genes
+    Params
+    ------
+    loom_path : str
+        Path to a .loom file
+    n : int
+        Number of genes to return
+    ridx_filter : array or None
+        Row indices to filter genes to use
+    Return
+    ------
+    Array of symbols
+    '''
+    labels = get_ra(loom_path,key='Symbol',unique=False,ridx_filter=ridx_filter)
+    return labels[:n]
+def auto_get_symbols(loom_path,n=10,ridx_filter=None,cidx_filter=None,method='first'):
+    '''
+    Get genes automatically, first n genes or n most variable genes
+    Params
+    ------
+    loom_path : str
+        Path to a .loom file
+    n : int
+        Number of genes to return
+    ridx_filter : array or None
+        Row indices to filter genes to use
+    cidx_filter : array or None
+        Column indices to filter cells to use
+    method: str
+        Either first or variance
+    Return
+    ------
+    Array of symbols
+    '''
+    if method=='first':
+        return first_n_symbols(loom_path,n=n,ridx_filter=ridx_filter)
+    elif method=='variance':
+        return most_variable_symbols(loom_path,n=n,ridx_filter=ridx_filter,cidx_filter=cidx_filter)
+    else:
+        raise Exception('method not recognized')
+
 def dotplot_json(loom_path,attribute='',symbols=[],cidx_filter=None,ridx_filter=None,returnjson=True,log=False,scale=False):
     '''
     Create dotplot figure
