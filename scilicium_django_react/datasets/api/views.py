@@ -108,7 +108,7 @@ class GetLoomGenes(APIView):
         post_data = request.data
         data_id = post_data['id']
         filters = post_data['filters']
-        print(filters)
+
         #Remove potential Symbol in filter
         filters['ra'] = filters['ra'].pop('Symbol', None)
 
@@ -122,9 +122,7 @@ class GetLoomGenes(APIView):
 
         if 'method' in post_data and post_data['method'] !='custom':
             gene_selection = post_data['method']
-            print(gene_selection)
-            response_data["genes"] = auto_get_symbols(data.file.path,n=10,ridx_filter=ridx_filter,cidx_filter=cidx_filter,method=gene_selection)
-            print(response_data["genes"])
+            response_data["genes"] = auto_get_symbols(data.file.path,n=11,ridx_filter=ridx_filter,cidx_filter=cidx_filter,method=gene_selection)
             response = Response(response_data, status=status.HTTP_200_OK)
             return response
         else:
@@ -165,21 +163,25 @@ class GetLoomPlots(APIView):
         attrs = post_data['attrs']
         style = post_data['style']
         genes_menu = 'undefined'
-        symbols = ['Sox9'] # rajouter dans le post
         log = False # rajouter dans le post
         scale = False # rajouter dans le post
         if 'menu' in post_data:
             genes_menu = post_data['menu']
         filters = post_data['filters']
+        symbols = []
         
         # Get data
         data = get_object_or_404(Loom,id=data_id)
-
 
         if (filters['ca']!={}) or (filters['ra']=={}):
             cidx_filter, ridx_filter = get_filter_indices(data.file.path,filters)
         else:
             cidx_filter, ridx_filter = (None,None)
+        
+        if 'ra' in filters :
+            if 'Symbol' in filters['ra'] and len(filters['ra']['Symbol'])> 0:
+                symbols = filters['ra']['Symbol']
+
 
         # Data status check + user ownership == TO DO check status from dataset
         #if data.status == "PRIVATE" and data.created_by != self.request.user :
