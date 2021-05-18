@@ -109,6 +109,7 @@ class StudyPublicSerializer(serializers.ModelSerializer):
     dev_stage = serializers.SerializerMethodField('get_dev_stage')
     tissues = serializers.SerializerMethodField('get_tissues')
     gender = serializers.SerializerMethodField('get_gender')
+    pmids = serializers.SerializerMethodField('get_pub_pmids')
     created_by = GetFullUserSerializer(many=False, read_only=True)
 
     def get_technology(self, study):
@@ -163,7 +164,7 @@ class StudyPublicSerializer(serializers.ModelSerializer):
             for author in article.author.all() :
                 if author.fullName not in authors:
                     authors.append(author.fullName)
-        return authors
+        return ','.join(authors)
     
     def get_pub_date(self, study):
         dates = [] 
@@ -172,6 +173,14 @@ class StudyPublicSerializer(serializers.ModelSerializer):
             if date not in dates:
                 dates.append(date)
         return dates
+    
+    def get_pub_pmids(self, study):
+        pmids = [] 
+        for article in study.article.all():
+            pmid = article.pmid
+            if pmid not in pmids:
+                pmids.append(pmid)
+        return pmids
 
     class Meta:
         model = Study
@@ -188,5 +197,6 @@ class StudyPublicSerializer(serializers.ModelSerializer):
             "dev_stage",
             "gender",
             "tissues",
+            "pmids",
         )
         fields = "__all__"

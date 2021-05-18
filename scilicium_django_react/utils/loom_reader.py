@@ -211,7 +211,7 @@ def json_component_chartjs(loom_path,style='pie',attrs=[],cidx_filter=None):
     if style == "pie":
         chart['options'] = {'legend':{ 'position': "left", 'align': "center"}}
     if style == 'bar':
-        chart['options'] = {'legend':{ 'display': False}}
+        chart['options'] = {'legend':{ 'display': False},'scales':{'xAxes':[{'ticks':{'beginAtZero':True}}]}}
 
     res['chart'] = chart
     res['style'] = style
