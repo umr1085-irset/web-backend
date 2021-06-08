@@ -1,18 +1,22 @@
+import os
+
 from rest_framework import viewsets 
 from rest_framework import status, permissions
 from rest_framework import generics
 from rest_framework.views import APIView
 from rest_framework.response import Response
 
-from django.http import HttpResponse, JsonResponse
+from django.core.files import File
+from django.http import HttpResponse, JsonResponse, FileResponse
 from django.shortcuts import get_object_or_404
 from rest_framework.decorators import action
 from rest_framework import permissions
 from django.db.models import Q
+from django.conf import settings
 
 from matplotlib import pyplot as plt
 from scilicium_django_react.datasets.models import Dataset, Loom
-from scilicium_django_react.datasets.api.serializers import DatasetSerializer, LoomSerializer
+from scilicium_django_react.datasets.api.serializers import DatasetSerializer, LoomSerializer, PublicDatasetSerializer
 from scilicium_django_react.users.models import User
 from scilicium_django_react.utils.loom_reader import *
 from scilicium_django_react.utils.chartjsCreator import *
@@ -45,7 +49,6 @@ class DatasetViewSet(viewsets.ModelViewSet):
                 return  Response({"values":values}, status=status.HTTP_200_OK)
             else :
                 return Response('Key value not recognize', status=status.HTTP_403_FORBIDDEN)
-            return Response(serializer.data)
         else :
             return Response('Your are not allowed to access this ressource', status=status.HTTP_403_FORBIDDEN)
 
@@ -57,6 +60,53 @@ class DatasetViewSet(viewsets.ModelViewSet):
             return Response(serializer.data)
         else :
             return Response('Your are not allowed to access this ressource', status=status.HTTP_403_FORBIDDEN)
+    
+    @action(detail=True, permission_classes=[permissions.AllowAny],url_path='download', url_name='download')
+    def download(self, request, *args, **kwargs):
+        dataset = self.get_object()
+        if dataset.status == "PUBLIC" or dataset.created_by == self.request.user:
+            print(dataset.loom.name)
+            from scilicium_django_react.utils.utils import zip_results
+            user_type = "user"
+            if dataset.created_by and dataset.created_by.is_superuser:
+                user_type = "admin"
+
+            tmp_folder =  "{}/datasets/loom/{}/{}/".format(settings.MEDIA_ROOT,user_type, dataset.loom.id)
+            if not os.path.exists(tmp_folder + 'archive.zip'):
+                zip_results(tmp_folder)
+
+            response = FileResponse(open(tmp_folder +'archive.zip', 'rb'))
+            response['Content-Type'] = "application/zip"
+            response['Content-Disposition'] = 'attachment; filename={}_archive.zip'.format(dataset.datasetId)
+            response['Content-Transfer-Encoding'] = "binary"
+            response['Content-Length'] = os.path.getsize(tmp_folder +'archive.zip')
+
+            return response
+
+
+
+
+
+
+
+
+
+
+
+            f = open(path_to_file, 'rb')
+            loomFile = File(f)
+            response = HttpResponse(loomFile.read())
+            response['Content-Disposition'] = 'attachment';
+            return response
+        else :
+            return Response('Your are not allowed to download this ressource', status=status.HTTP_403_FORBIDDEN)
+    
+    @action(detail=False, permission_classes=[permissions.AllowAny],url_path='public', url_name='public')
+    def public(self, request, *args, **kwargs):
+        public = self.queryset.filter(status="PUBLIC")
+        serializer = PublicDatasetSerializer(public, many=True)
+        return Response(serializer.data)
+        
     
     
 

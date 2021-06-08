@@ -30,6 +30,44 @@ class DatasetUnrelatedSerializer(serializers.ModelSerializer):
         model = Loom
         fields = "__all__"
 
+class PublicDatasetSerializer(serializers.ModelSerializer):
+    loom = LoomSerializer(many=False, read_only=True)
+    technology = serializers.SerializerMethodField('getTechnologies')
+    type = serializers.SerializerMethodField('getType')
+    gender = serializers.SerializerMethodField('getGender')
+    devStage = serializers.SerializerMethodField('getDevStage')
+    tissue = serializers.SerializerMethodField('getTissues')
+
+    def getTechnologies(self, dataset):
+        return dataset.sop.technology
+    
+    def getType(self, dataset):
+        return dataset.sop.omics
+
+    def getGender(self, dataset):
+        return dataset.bioMeta.gender
+
+    def getTissues(self, dataset):
+        tissues = list()
+        for tissue in dataset.bioMeta.tissue.all() :
+            tissues.append(tissue.name) if tissue.name not in tissues else tissues
+        return tissues
+    
+    def getDevStage(self, dataset):
+        devStage = list()
+        for stage in dataset.bioMeta.dev_stage.all() :
+            devStage.append(stage.name) if stage.name not in devStage else tissdevStageues
+        return devStage
+
+    class Meta:
+        model = Dataset
+        fields = "__all__"
+
+        lookup_field = 'datasetId'
+        extra_kwargs = {
+            'url': {'lookup_field': 'datasetId'}
+        }
+
 class DatasetSerializer(serializers.ModelSerializer):
     loom = LoomSerializer(many=False, read_only=True)
     sop = sopMetaSerializer(many=False, read_only=True)

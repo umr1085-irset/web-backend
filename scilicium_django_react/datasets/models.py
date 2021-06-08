@@ -17,7 +17,7 @@ def get_upload_path(instance, filename):
     if instance.created_by and instance.created_by.is_superuser:
         user_type = "admin"
 
-    path =  os.path.join("datasets/loom/{}/{}/".format(user_type, instance.loomId), filename)
+    path =  os.path.join("datasets/loom/{}/{}/".format(user_type, instance.id), filename)
     return path
         
 class biomaterialMeta(models.Model):
@@ -38,7 +38,7 @@ class biomaterialMeta(models.Model):
     cell = models.ManyToManyField(Cell, related_name='as_cell', blank=True)
     dev_stage = models.ManyToManyField(DevStage, related_name='as_dev_stage', blank=True)
     cell_Line = models.ManyToManyField(CellLine, related_name='as_cellLine', blank=True)
-    gender = models.CharField(max_length=100, choices=GENDER, default="MALE")
+    gender = ArrayField(models.CharField(max_length=32, blank=True, choices=GENDER),default=list,blank=True)
     bioType = models.CharField(max_length=100, choices=BIO_TYPE, default="ORGAN")
 
 

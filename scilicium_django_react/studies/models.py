@@ -1,7 +1,13 @@
 from django.db import models
 from django.conf import settings
+from django.utils import timezone 
 # Create your models here.
 from django.contrib.auth.models import  User
+
+
+class AutoDateTimeField(models.DateTimeField):
+    def pre_save(self, model_instance, add):
+        return timezone.now()
 
 class Institute(models.Model):
 
@@ -79,7 +85,7 @@ class Study(models.Model):
     status = models.CharField(max_length=50, choices=STUDY_STATUS, default="PRIVATE")
     created_at = models.DateTimeField(auto_now_add=True, auto_now=False)
     created_by = models.ForeignKey(settings.AUTH_USER_MODEL, blank=True, null=True, on_delete=models.CASCADE, related_name='study_created_by')
-    updated_at = models.DateTimeField(auto_now=True, null=True)
+    updated_at = AutoDateTimeField(default=timezone.now)
     topics = models.CharField(max_length=100, choices=STUDY_TOPICS, default="PRIVATE")
     project = models.ForeignKey(Project, blank=True, null=True, on_delete=models.SET_NULL, related_name='study_of')
     article = models.ManyToManyField(Article, related_name='study_from', blank=True)

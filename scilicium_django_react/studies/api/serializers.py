@@ -164,7 +164,7 @@ class StudyPublicSerializer(serializers.ModelSerializer):
             for author in article.author.all() :
                 if author.fullName not in authors:
                     authors.append(author.fullName)
-        return ','.join(authors)
+        return authors
     
     def get_pub_date(self, study):
         dates = [] 
