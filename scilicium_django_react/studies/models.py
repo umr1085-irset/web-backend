@@ -3,6 +3,8 @@ from django.conf import settings
 from django.utils import timezone 
 # Create your models here.
 from django.contrib.auth.models import  User
+from django_better_admin_arrayfield.models.fields import ArrayField
+
 
 
 class AutoDateTimeField(models.DateTimeField):
@@ -24,10 +26,20 @@ class Author(models.Model):
     def __str__(self):
         return self.fullName
 
+class Viewer(models.Model):
+
+    name = models.CharField(max_length=200)
+    description = models.TextField("description", blank=True)
+    url = models.CharField(max_length=200)
+    def __str__(self):
+        return self.name
+
 class Article(models.Model):
 
     title = models.CharField(max_length=200)
-    pmid = models.CharField(max_length=200, blank=True, null=True)
+    pmid = ArrayField(models.CharField(max_length=200, blank=True), default=list)
+    doid = ArrayField(models.CharField(max_length=200, blank=True), default=list)
+    keyword = ArrayField(models.CharField(max_length=200, blank=True), default=list)
     abstract = models.TextField("description", blank=True)
     journal = models.CharField(max_length=200, blank=True, null=True)
     volume = models.IntegerField(blank=True, null=True)
@@ -89,6 +101,7 @@ class Study(models.Model):
     topics = models.CharField(max_length=100, choices=STUDY_TOPICS, default="PRIVATE")
     project = models.ForeignKey(Project, blank=True, null=True, on_delete=models.SET_NULL, related_name='study_of')
     article = models.ManyToManyField(Article, related_name='study_from', blank=True)
+    viewer = models.ManyToManyField(Viewer, related_name='as_study', blank=True)
 
     def __str__(self):
         return self.title
