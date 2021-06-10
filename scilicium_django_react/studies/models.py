@@ -37,9 +37,10 @@ class Viewer(models.Model):
 class Article(models.Model):
 
     title = models.CharField(max_length=200)
-    pmid = ArrayField(models.CharField(max_length=200, blank=True), default=list)
-    doid = ArrayField(models.CharField(max_length=200, blank=True), default=list)
-    keyword = ArrayField(models.CharField(max_length=200, blank=True), default=list)
+    pmid = ArrayField(models.CharField(max_length=200, blank=True), default=list, blank=True, null=True)
+    doid = ArrayField(models.CharField(max_length=200, blank=True), default=list, blank=True, null=True)
+    keyword = ArrayField(models.CharField(max_length=200, blank=True), default=list, blank=True, null=True)
+    topics = ArrayField(models.CharField(max_length=200, blank=True), default=list, blank=True, null=True)
     abstract = models.TextField("description", blank=True)
     journal = models.CharField(max_length=200, blank=True, null=True)
     volume = models.IntegerField(blank=True, null=True)
