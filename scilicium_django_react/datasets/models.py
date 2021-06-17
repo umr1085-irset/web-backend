@@ -7,7 +7,7 @@ from django_better_admin_arrayfield.models.fields import ArrayField
 # Create your models here.
 from django.contrib.auth.models import  User
 from scilicium_django_react.studies.models import Study
-from scilicium_django_react.ontologies.models import CellLine, Cell, Species, Tissue, DevStage
+from scilicium_django_react.ontologies.models import CellLine, Species, Tissue, DevStage, Organ, Chemical
 from django.utils.text import slugify
 from scilicium_django_react.utils.loom_reader import *
 
@@ -34,12 +34,15 @@ class biomaterialMeta(models.Model):
         ('OTHER','Other'),
     )
     tissue = models.ManyToManyField(Tissue, related_name='as_tissue', blank=True)
+    organ = models.ManyToManyField(Organ, related_name='as_organ', blank=True)
     species = models.ManyToManyField(Species, related_name='as_species', blank=True)
-    cell = models.ManyToManyField(Cell, related_name='as_cell', blank=True)
     dev_stage = models.ManyToManyField(DevStage, related_name='as_dev_stage', blank=True)
     cell_Line = models.ManyToManyField(CellLine, related_name='as_cellLine', blank=True)
     gender = ArrayField(models.CharField(max_length=32, blank=True, choices=GENDER),default=list,blank=True)
     bioType = models.CharField(max_length=100, choices=BIO_TYPE, default="ORGAN")
+    age_start = models.IntegerField(blank=True, null=True)
+    age_end = models.IntegerField(blank=True, null=True)
+    molecule_applied = models.ManyToManyField(Chemical, related_name='is_exposed', blank=True)
 
 
 
@@ -104,6 +107,7 @@ class Loom(models.Model):
     created_by = models.ForeignKey(settings.AUTH_USER_MODEL, blank=True, null=True, on_delete=models.CASCADE, related_name='loom_upload_created_by')
     rowEntity = ArrayField(models.CharField(max_length=200, blank=True), default=list)
     colEntity = ArrayField(models.CharField(max_length=200, blank=True), default=list)
+    reducions = ArrayField(models.CharField(max_length=200, blank=True), default=list)
     cellNumber =  models.IntegerField(blank=True, null=True)
     geneNumber = models.IntegerField(blank=True, null=True)
     row_name = models.CharField(max_length=200, blank=True, null=True)
@@ -120,6 +124,7 @@ class Loom(models.Model):
         super(Loom, self).save(*args, **kwargs)
         loomattr = extract_attr_keys(self.file.path)
         shape = get_shape(self.file.path)
+        self.reducions = get_available_reductions(self.file.path)
         self.rowEntity = loomattr['row_attr_keys']
         self.colEntity = loomattr['col_attr_keys']
         self.classes = get_classes(self.file.path)

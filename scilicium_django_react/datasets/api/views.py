@@ -83,21 +83,6 @@ class DatasetViewSet(viewsets.ModelViewSet):
 
             return response
 
-
-
-
-
-
-
-
-
-
-
-            f = open(path_to_file, 'rb')
-            loomFile = File(f)
-            response = HttpResponse(loomFile.read())
-            response['Content-Disposition'] = 'attachment';
-            return response
         else :
             return Response('Your are not allowed to download this ressource', status=status.HTTP_403_FORBIDDEN)
     

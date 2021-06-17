@@ -132,30 +132,27 @@ class StudyPublicSerializer(serializers.ModelSerializer):
         tissues = []
         for dataset in study.dataset_of.all():
             for x in dataset.bioMeta.tissue.all():
-                if x.name not in tissues:
-                    tissues.append(x.name)
-            for x in dataset.bioMeta.cell.all():
-                if x.name not in tissues:
-                    tissues.append(x.name)
+                if x.ontologyLabel not in tissues:
+                    tissues.append(x.ontologyLabel)
             for x in dataset.bioMeta.cell_Line.all():
-                if x.name not in tissues:
-                    tissues.append(x.name)
+                if x.ontologyLabel not in tissues:
+                    tissues.append(x.ontologyLabel)
         return tissues
     
     def get_species(self, study):
         species = []
         for dataset in study.dataset_of.all():
             for spe in dataset.bioMeta.species.all():
-                if spe.name not in species:
-                    species.append(spe.name)
+                if spe.ontologyLabel not in species:
+                    species.append(spe.ontologyLabel)
         return species
     
     def get_dev_stage(self, study):
         devstage = []
         for dataset in study.dataset_of.all():
             for dev in dataset.bioMeta.dev_stage.all():
-                if dev.name not in devstage:
-                    devstage.append(dev.name)
+                if dev.ontologyLabel not in devstage:
+                    devstage.append(dev.ontologyLabel)
         return devstage
 
     def get_authors(self, study):

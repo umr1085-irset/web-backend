@@ -6,6 +6,45 @@ import plotly.express as px
 import plotly.io as pio
 import numpy as np
 import json
+from copy import copy
+
+def get_available_reductions(loom_path):
+    '''
+    Return labels of available reduction as list
+    
+    Params
+    ------
+    loom_path : str
+        Path to a loom file
+        
+    Return
+    ------
+    list
+    '''
+    df = loompy.connect(loom_path)
+    red_json = json.loads(df.attrs['reductions'])
+    df.close()
+    return list(red_json.keys())
+
+def get_reduction_x_y(loom_path,reduction):
+    '''
+    Return reduction X,Y labels
+    
+    Params
+    ------
+    loom_path : str
+        Path to a .loom file
+    reduction: str
+        Name of reduction being used
+        
+    Return
+    ------
+    Tuple of X,Y labels
+    '''
+    df = loompy.connect(loom_path)
+    red_json = json.loads(df.attrs['reductions'])
+    df.close()
+    return red_json[reduction]
 
 def dict_to_json(d):
     '''
@@ -162,8 +201,7 @@ def get_dataframe(loom_path,attrs,cidx_filter=None):
 
 def n_colors(n):
     l = ['#8bc34a','#ffc107','#3f51b5','#e91e63','#03a9f4','#ff5722','#9c27b0','#795548','#607d8b','#009688','#2196f3','#cddc39',
-    '#c5e1a5','#ffe082','#9fa8da','#f48fb1','#81d4fa','#ffcc80','#ce93d8','#bcaaa4','#b0bec5','#80cbc4','#90caf9','#e6ee9c',
-    '#558b2f','#ff8f00','#283593','#ad1457','#0277bd','#ef6c00','#6a1b9a','#4e342e','#37474f','#00695c','#1565c0','#9e9d24']
+'#c5e1a5','#ffe082','#9fa8da','#f48fb1','#81d4fa','#ffcc80','#ce93d8','#bcaaa4','#b0bec5','#80cbc4','#90caf9','#e6ee9c','#558b2f','#ff8f00','#283593','#ad1457','#0277bd','#ef6c00','#6a1b9a','#4e342e','#37474f','#00695c','#1565c0','#9e9d24','#8bc34a','#ffc107','#3f51b5','#e91e63','#03a9f4','#ff5722','#9c27b0','#795548','#607d8b','#009688','#2196f3','#cddc39','#c5e1a5','#ffe082','#9fa8da','#f48fb1','#81d4fa','#ffcc80','#ce93d8','#bcaaa4','#b0bec5','#80cbc4','#90caf9','#e6ee9c','#558b2f','#ff8f00','#283593','#ad1457','#0277bd','#ef6c00','#6a1b9a','#4e342e','#37474f','#00695c','#1565c0','#9e9d24']
 
     return l[:n]
 
@@ -207,12 +245,6 @@ def json_component_chartjs(loom_path,style='pie',attrs=[],cidx_filter=None):
     datasets['backgroundColor'] = n_colors(len(vals))
     chart['datasets'] = [datasets]
     chart['labels'] = lbls.tolist()
-
-    if style == "pie":
-        chart['options'] = {'legend':{ 'position': "left", 'align': "center"}}
-    if style == 'bar':
-        chart['options'] = {'legend':{ 'display': False},'scales':{'xAxes':[{'ticks':{'beginAtZero':True}}]}}
-
     res['chart'] = chart
     res['style'] = style
 
@@ -244,6 +276,10 @@ def get_symbol_values(loom_path,symbol,cidx_filter=None):
     raise Exception('Input not a valid symbol name')
         
 def continuous_scatter_gl(x,y,color,tracename=''):
+    if tracename=='All cells':
+        hoverinfo='skip'
+    else:
+        hoverinfo=None
     trace=go.Scattergl(
         x = x, 
         y = y, 
@@ -252,14 +288,16 @@ def continuous_scatter_gl(x,y,color,tracename=''):
             color=color,
             colorscale='magma'
         ),
-        name=tracename
+        name=tracename,
+        hoverinfo=hoverinfo
     )
     return trace
 
 def discrete_scatter_gl(x,y,color):
     unique_classes = np.unique(color)
     traces=[]
-    for unique_class_ in unique_classes:
+    color_seq = n_colors(len(unique_classes))
+    for i,unique_class_ in enumerate(unique_classes):
         idx = np.where(color==unique_class_)[0]
         subX = x[idx]
         subY = y[idx]
@@ -267,7 +305,10 @@ def discrete_scatter_gl(x,y,color):
                 x=subX,
                 y=subY,
                 mode='markers',
-                name=unique_class_
+                name=unique_class_,
+                marker=dict(
+                    color=color_seq[i]
+                )
             )
         )
     return traces
@@ -283,7 +324,7 @@ def check_color(loom_path,color,cidx_filter=None):
         except:
             raise Exception(f'color must be None, a valid gene symbol or a valid data attribute')
             
-def json_scatter(loom_path,color=None,returnjson=True,cidx_filter=None):
+def json_scatter(loom_path,color=None,reduction=None,returnjson=True,cidx_filter=None):
     '''
     Compute JSON from Plotly figure
     
@@ -304,18 +345,21 @@ def json_scatter(loom_path,color=None,returnjson=True,cidx_filter=None):
     ------
     Plotly figure or its JSON form
     '''
+    if reduction==None:
+        reduction = get_available_reductions(loom_path)[0] # first reduction available
+    X,Y = get_reduction_x_y(loom_path,reduction)
+    
     fig = go.Figure()
-
     if isinstance(cidx_filter, np.ndarray): # if filter exists, draw all points first as background
-        df = get_dataframe(loom_path,['X','Y'],cidx_filter=None) # all points
-        x = df.X.values
-        y = df.Y.values
+        df = get_dataframe(loom_path,[X,Y],cidx_filter=None) # all points
+        x = df[X].values
+        y = df[Y].values
         tmpcolor = check_color(loom_path,None,cidx_filter=None) # None means default background color
         fig.add_trace(continuous_scatter_gl(x,y,tmpcolor,tracename='All cells'))
 
-    df = get_dataframe(loom_path,['X','Y'],cidx_filter=cidx_filter) # pandas dataframe
-    x = df.X.values
-    y = df.Y.values
+    df = get_dataframe(loom_path,[X,Y],cidx_filter=cidx_filter) # pandas dataframe
+    x = df[X].values
+    y = df[Y].values
     tmpcolor = check_color(loom_path,color,cidx_filter=cidx_filter) # numpy array
 
     if color!=None:
@@ -329,7 +373,6 @@ def json_scatter(loom_path,color=None,returnjson=True,cidx_filter=None):
     fig.update_layout(
         # background color white
         paper_bgcolor='rgba(0,0,0,0)',
-        autosize=True,
         plot_bgcolor='rgba(0,0,0,0)',
         margin=dict(
             l=0,
@@ -395,7 +438,7 @@ def mpl_to_plotly(cmap, N):
         pl_colorscale.append([round(k*h,2), f'rgb({C[0]}, {C[1]}, {C[2]})'])
     return pl_colorscale
 
-def json_hexbin(loom_path,cmap=plt.cm.Greys,background='white',returnjson=True,cidx_filter=None):
+def json_hexbin(loom_path,reduction=None,cmap=plt.cm.Greys,background='white',returnjson=True,cidx_filter=None):
     '''
     Generate hexbin plot from X,Y scatter coordinates
     
@@ -414,9 +457,13 @@ def json_hexbin(loom_path,cmap=plt.cm.Greys,background='white',returnjson=True,c
     ------
     Plotly figure or its JSON form
     '''
-    df = get_dataframe(loom_path,['X','Y'],cidx_filter=cidx_filter)
-    x = df['X'].values
-    y = df['Y'].values
+    if reduction==None:
+        reduction = get_available_reductions(loom_path)[0] # first reduction available
+    X,Y = get_reduction_x_y(loom_path,reduction)
+    
+    df = get_dataframe(loom_path,[X,Y],cidx_filter=cidx_filter)
+    x = df[X].values
+    y = df[Y].values
     HB = plt.hexbin(x,y,gridsize=20,cmap=cmap)
     xx = plt.draw()
 
@@ -575,6 +622,10 @@ def most_variable_symbols(loom_path,n=10,ridx_filter=None,cidx_filter=None):
         Number of genes to return
     ridx_filter : array or None
         Row indices to filter genes to use
+        
+    Return
+    ------
+    Array of symbols
     '''
     labels = get_ra(loom_path,key='Symbol',unique=False,ridx_filter=ridx_filter) # get symbols (filter applied)
     df = loompy.connect(loom_path)
@@ -594,6 +645,7 @@ def most_variable_symbols(loom_path,n=10,ridx_filter=None,cidx_filter=None):
 def first_n_symbols(loom_path,n=10,ridx_filter=None):
     '''
     Retrieve first n genes
+    
     Params
     ------
     loom_path : str
@@ -602,15 +654,18 @@ def first_n_symbols(loom_path,n=10,ridx_filter=None):
         Number of genes to return
     ridx_filter : array or None
         Row indices to filter genes to use
+        
     Return
     ------
     Array of symbols
     '''
     labels = get_ra(loom_path,key='Symbol',unique=False,ridx_filter=ridx_filter)
     return labels[:n]
+
 def auto_get_symbols(loom_path,n=10,ridx_filter=None,cidx_filter=None,method='first'):
     '''
     Get genes automatically, first n genes or n most variable genes
+    
     Params
     ------
     loom_path : str
@@ -623,6 +678,7 @@ def auto_get_symbols(loom_path,n=10,ridx_filter=None,cidx_filter=None,method='fi
         Column indices to filter cells to use
     method: str
         Either first or variance
+        
     Return
     ------
     Array of symbols
@@ -690,8 +746,8 @@ def dotplot_json(loom_path,attribute='',symbols=[],cidx_filter=None,ridx_filter=
     i_coords, j_coords = np.meshgrid(range(c), range(r), indexing='ij')
     x = i_coords.flatten()
     y = j_coords.flatten()
-    
-    fig = px.scatter(x=x, y=y,size=sizes.values.T.flatten(),color=colors.values.T.flatten(),color_continuous_scale="reds")
+    cs = [[0.0, "#EBC89B"], [0.5,"#FB6404"],[1, "#67000C"]]
+    fig = px.scatter(x=x, y=y,size=sizes.values.T.flatten(),color=colors.values.T.flatten(),color_continuous_scale=cs)
     
     fig.update_layout(
         # background color white
@@ -757,7 +813,6 @@ def violin_json(loom_path,attribute='',symbols=[],cidx_filter=None,returnjson=Tr
     attr_values = get_ca(loom_path,key=attribute,unique=False,cidx_filter=cidx_filter) # get column attribute values
     symbol = symbols[0]
     
-    
     df = loompy.connect(loom_path)
     i = np.where(allsymbols==symbol)[0][0]
     if isinstance(cidx_filter, np.ndarray):
@@ -770,12 +825,14 @@ def violin_json(loom_path,attribute='',symbols=[],cidx_filter=None,returnjson=Tr
 
     fig = go.Figure()
     unique_values = np.unique(attr_values)
-    for value in unique_values:
+    colors = n_colors(len(unique_values))
+    for i,value in enumerate(unique_values):
         idx = np.where(attr_values==value)[0]
         fig.add_trace(go.Violin(x=symbol_values[idx],
                                 name=value,
                                 box_visible=True,
-                                meanline_visible=True))
+                                meanline_visible=True,
+                                line=dict(color=colors[i])))
     
     fig.update_layout(
         # background color white
@@ -794,5 +851,95 @@ def violin_json(loom_path,attribute='',symbols=[],cidx_filter=None,returnjson=Tr
     
     if returnjson:
         return json.loads(pio.to_json(fig, validate=True, pretty=False, remove_uids=True))
+    else:
+        return fig
+    
+def density_ca(loom_path,X,Y,cidx_filter=None,ca=None):
+    df = get_dataframe(loom_path,[X,Y],cidx_filter=None) # pandas dataframe
+    fig = px.density_contour(df, x=X, y=Y)
+    fig['data'][0]['line']['color'] = '#D3D3D3'
+    
+    if isinstance(cidx_filter, np.ndarray):
+        df = get_dataframe(loom_path,[X,Y],cidx_filter=cidx_filter) # pandas dataframe    
+    
+    if ca!=None:
+        df[ca] = get_ca(loom_path,key=ca,cidx_filter=cidx_filter)
+        color_seq = n_colors(len(df[ca].unique()))
+        traces = px.density_contour(df, x=X, y=Y, color=ca, color_discrete_sequence=color_seq).data
+        fig.add_traces(traces)
+        lgd = {trace['name']:trace['line']['color'] for trace in traces}
+        print(lgd)
+    else:
+        traces = px.density_contour(df, x=X, y=Y).data
+        fig.add_traces(traces)
+        lgd = {}
+    
+    for i,trace in enumerate(fig['data']):
+        fig['data'][i]['ncontours'] = 20
+    return fig,lgd
+
+def density_symbols(loom_path,X,Y,symbols,cidx_filter=None):
+    df = get_dataframe(loom_path,[X,Y],cidx_filter=None) # pandas dataframe
+
+    fig = px.density_contour(df, x=X, y=Y)
+    fig['data'][0]['line']['color'] = '#D3D3D3'
+    for i,trace in enumerate(fig['data']):
+        fig['data'][i]['ncontours'] = 20
+    
+    lgd = dict()
+    gene_colors = ['rgba(239,4,4,1)','rgba(239, 122, 4,1)','rgba(239, 239, 4,1)','rgba(122, 239, 4,1)','rgba(4, 239, 239,1)','rgba(4, 122, 239,1)','rgba(122, 4, 239,1)','rgba(239, 4, 239,1)','rgba(239, 4, 122,1)','rgba(4, 239, 4,1)']
+
+    traces=[]
+    if isinstance(cidx_filter, np.ndarray): # if filter exists
+        df = get_dataframe(loom_path,[X,Y],cidx_filter=cidx_filter) # pandas dataframe
+    for i,symbol in enumerate(symbols):
+        gene_color = gene_colors[i]
+        lgd[symbol] = gene_color
+        exp = get_symbol_values(loom_path,symbol,cidx_filter=cidx_filter)
+        trace = go.Histogram2dContour(
+            x = df[X].values,
+            y = df[Y].values,
+            z=exp,
+            colorscale=[[0,'rgba(255,255,255,0)'],[1,gene_color]],
+            histfunc='sum',
+            ncontours = 20,
+            contours = dict(
+                showlines=False
+            ),
+            hoverinfo='none'
+        )
+
+        traces.append(trace)
+    fig.add_traces(traces)
+        
+    return fig,lgd
+
+def json_density(loom_path,reduction=None,ca=None,symbols=[],returnjson=True,cidx_filter=None):
+    if reduction==None:
+        reduction = get_available_reductions(loom_path)[0] # first reduction available
+    X,Y = get_reduction_x_y(loom_path,reduction)
+    
+    if symbols==[]: # if no gene list provided
+        fig,lgd = density_ca(loom_path,X,Y,cidx_filter=cidx_filter,ca=ca) # plot simple density contour or with categorical column attribute
+    else:
+        fig,lgd = density_symbols(loom_path,X,Y,symbols,cidx_filter=cidx_filter)
+
+    fig.update_layout(
+        paper_bgcolor='rgba(0,0,0,0)',
+        plot_bgcolor='rgba(0,0,0,0)',
+        margin=dict(
+            l=0,
+            r=0,
+            b=0,
+            t=0
+        ),
+        xaxis_title='',
+        yaxis_title='',
+    )
+    fig.update_yaxes(showticklabels=False)
+    fig.update_xaxes(showticklabels=False)
+    
+    if returnjson:
+        return json.loads(pio.to_json(fig, validate=True, pretty=False, remove_uids=True)),lgd
     else:
         return fig
