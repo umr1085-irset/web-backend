@@ -7,7 +7,7 @@ from django_better_admin_arrayfield.models.fields import ArrayField
 # Create your models here.
 from django.contrib.auth.models import  User
 from scilicium_django_react.studies.models import Study
-from scilicium_django_react.ontologies.models import CellLine, Species, Tissue, DevStage, Organ, Chemical
+from scilicium_django_react.ontologies.models import CellLine, Species, Tissue, DevStage, Organ, Chemical, Omics, Granularity, Sequencing, ExperimentalProcess
 from django.utils.text import slugify
 from scilicium_django_react.utils.loom_reader import *
 
@@ -42,64 +42,17 @@ class biomaterialMeta(models.Model):
     bioType = models.CharField(max_length=100, choices=BIO_TYPE, default="ORGAN")
     age_start = models.IntegerField(blank=True, null=True)
     age_end = models.IntegerField(blank=True, null=True)
+    age_unit = models.CharField(max_length=100, default="")
     molecule_applied = models.ManyToManyField(Chemical, related_name='is_exposed', blank=True)
 
 
 
 class sopMeta(models.Model):
-    OMICS_VALUES = (
-        ('GENOMICS', 'Genomics'),
-        ('TRANSCRIPTOMICS', 'Transcriptomics'),
-        ('EPIGENOMICS', 'Epigenomics'),
-        ('REGULOMICS', 'Regulomics'),
-        ('PROTEOMICS', 'Proteomics'),
-        ('MULTIOMICS', 'Multiomics'),
-        ('OTHER', 'Other'),
-    )
-
-    TECHNO_GRAIN = (
-        ('BULK','Bulk'),
-        ('SINGLECELL','Single Cell'),
-        ('SINGLE NUCLEUS','Single Nucleus'),
-        ('SORTEDCELL','Sorted cells'),
-    )
-
-    TECHNO = (
-        ('RNA-SEQ','RNA-seq'),
-        ('ATAC-SEQ','ATAC-seq'),
-        ('SMART-SEQ','SMART-seq'),
-        ('BISULFITE-SEQ','Bisulfite-seq'),
-        ('RRBS','RRBS'),
-        ('CAGE','CAGE'),
-        ('CAP-SEQ','CAP-seq'),
-        ('CHIP-SEQ','ChIP-seq'),
-        ('DNASE-HYPERSNSITIVITY','DNase-Hypersensitivity'),
-        ('HI-C','Hi-C'),
-        ('HITS-CLIP','HITS-CLIP'),
-        ('HMEDIP-SEQ','hMeDIP-seq'),
-        ('MEDIP-SEQ','MeDIP-seq'),
-        ('MICROWELL-SEQ','Microwell-seq'),
-        ('MIRNA-SEQ','miRNA-seq'),
-        ('MNASE-SEQ','MNase-seq'),
-        ('MRE-SEQ','MRE-seq'),
-        ('NOME-SEQ','NOMe-seq'),
-        ('PAS-SEQ','PAS-seq'),
-        ('POLYA-SEQ','PolyA-seq'),
-        ('SMALLRNA-SEQ','smallRNA-seq'),
-        ('TAB-SEQ','TAB-seq'),
-        ('WGS','WGS'),
-
-    )
-
-    EXP_VALUE = (
-        ('EXPOSURE','Exposure'),
-        ('INVESTIGATION','Investigation'),
-        ('TREATMENT','Treatment'),
-    )
-    omics = models.CharField(max_length=100, choices=OMICS_VALUES, default="TRANSCRIPTOMICS")
-    technoGrain = models.CharField(max_length=100, choices=TECHNO_GRAIN, default="BULK")
-    technology = models.CharField(max_length=100, choices=TECHNO, default="RNA-SEQ")
-    expProcess = models.CharField(max_length=100, choices=EXP_VALUE, default="EXPOSURE")
+    
+    omics = models.ManyToManyField(Omics, related_name='as_omics', blank=True)
+    technoGrain = models.ManyToManyField(Granularity, related_name='as_granularity', blank=True)
+    technology = models.ManyToManyField(Sequencing, related_name='as_sequencing', blank=True)
+    expProcess = models.ManyToManyField(ExperimentalProcess, related_name='as_experimental', blank=True)
 
 class Loom(models.Model):
     name = models.CharField(max_length=200,unique=True)
@@ -107,7 +60,7 @@ class Loom(models.Model):
     created_by = models.ForeignKey(settings.AUTH_USER_MODEL, blank=True, null=True, on_delete=models.CASCADE, related_name='loom_upload_created_by')
     rowEntity = ArrayField(models.CharField(max_length=200, blank=True), default=list)
     colEntity = ArrayField(models.CharField(max_length=200, blank=True), default=list)
-    reducions = ArrayField(models.CharField(max_length=200, blank=True), default=list)
+    reductions = ArrayField(models.CharField(max_length=200, blank=True), default=list)
     cellNumber =  models.IntegerField(blank=True, null=True)
     geneNumber = models.IntegerField(blank=True, null=True)
     row_name = models.CharField(max_length=200, blank=True, null=True)
@@ -124,7 +77,7 @@ class Loom(models.Model):
         super(Loom, self).save(*args, **kwargs)
         loomattr = extract_attr_keys(self.file.path)
         shape = get_shape(self.file.path)
-        self.reducions = get_available_reductions(self.file.path)
+        self.reductions = get_available_reductions(self.file.path)
         self.rowEntity = loomattr['row_attr_keys']
         self.colEntity = loomattr['col_attr_keys']
         self.classes = get_classes(self.file.path)
