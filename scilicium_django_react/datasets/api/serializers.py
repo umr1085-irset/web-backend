@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from scilicium_django_react.datasets.models import Dataset, Loom, sopMeta, biomaterialMeta
-from scilicium_django_react.ontologies.api.serializers import TissueSerializer, CellLineSerializer, SpeciesSerializer
+from scilicium_django_react.ontologies.api.serializers import *
 from scilicium_django_react.utils.loom_reader import *
 from scilicium_django_react.studies.models import *
 
@@ -38,10 +38,10 @@ class PublicDatasetSerializer(serializers.ModelSerializer):
     tissue = serializers.SerializerMethodField('getTissues')
 
     def getTechnologies(self, dataset):
-        return dataset.sop.technology
+        return dataset.sop.technology.ontologyLabel
     
     def getType(self, dataset):
-        return dataset.sop.omics
+        return dataset.sop.omics.ontologyLabel
 
     def getGender(self, dataset):
         return dataset.bioMeta.gender
@@ -49,13 +49,13 @@ class PublicDatasetSerializer(serializers.ModelSerializer):
     def getTissues(self, dataset):
         tissues = list()
         for tissue in dataset.bioMeta.tissue.all() :
-            tissues.append(tissue.name) if tissue.name not in tissues else tissues
+            tissues.append(tissue.ontologyLabel) if tissue.ontologyLabel not in tissues else tissues
         return tissues
     
     def getDevStage(self, dataset):
         devStage = list()
         for stage in dataset.bioMeta.dev_stage.all() :
-            devStage.append(stage.name) if stage.name not in devStage else tissdevStageues
+            devStage.append(stage.ontologyLabel) if stage.ontologyLabel not in devStage else devStage
         return devStage
 
     class Meta:

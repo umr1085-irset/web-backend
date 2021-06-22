@@ -115,7 +115,7 @@ class StudyPublicSerializer(serializers.ModelSerializer):
     def get_technology(self, study):
         technology = []
         for dataset in study.dataset_of.all():
-            techno = dataset.sop.technology
+            techno = dataset.sop.technology.ontologyLabel
             if techno not in technology:
                 technology.append(techno)
         return technology
