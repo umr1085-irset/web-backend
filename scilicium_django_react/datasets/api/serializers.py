@@ -9,12 +9,18 @@ class biomaterialMetaSerializer(serializers.ModelSerializer):
     tissue = TissueSerializer(many=True, read_only=True)
     species = SpeciesSerializer(many=True, read_only=True)
     cell_line = CellLineSerializer(many=True, read_only=True)
+    organ = OrganSerializer(many=True, read_only=True)
+    dev_stage = DevStageSerializer(many=True, read_only=True)
     
     class Meta:
         model = biomaterialMeta
         fields = "__all__"
 
 class sopMetaSerializer(serializers.ModelSerializer):
+    omics= TissueSerializer(many=True, read_only=True)
+    technoGrain = GranularitySerializer(many=True, read_only=True)
+    technology = OmicsSerializer(many=True, read_only=True)
+    expProcess = ExperimentalProcessSerializer(many=True, read_only=True)
     class Meta:
         model = sopMeta
         fields = "__all__"

@@ -252,6 +252,12 @@ class GetLoomPlots(APIView):
             response_data['style'] = 'violin'
             response = Response(response_data, status=status.HTTP_200_OK)
             return response
+        
+        elif style=='density':
+            response_data['chart'],response_data['legend'] = json_density(data.file.path,ca=attrs,symbols=symbols,cidx_filter=cidx_filter)
+            response_data['style'] = 'density'
+            response = Response(response_data, status=status.HTTP_200_OK)
+            return response
 
         else :
             if attrs == 'undefined' :
