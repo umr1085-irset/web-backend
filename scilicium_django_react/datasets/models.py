@@ -67,6 +67,7 @@ class Loom(models.Model):
     col_name = models.CharField(max_length=200, blank=True, null=True)
     classes = ArrayField(models.CharField(max_length=200, blank=True), default=list)
     file = models.FileField(upload_to=get_upload_path, blank=True, null=True)
+    default_display = models.CharField(max_length=200, blank=True, null=True)
 
     def __str__(self):
         return self.name

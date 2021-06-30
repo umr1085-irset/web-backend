@@ -79,7 +79,19 @@ class DatasetSerializer(serializers.ModelSerializer):
     bioMeta = biomaterialMetaSerializer(many=False, read_only=True)
     metadata = serializers.SerializerMethodField('get_metadata')
     rel_datasets = serializers.SerializerMethodField('get_relativedatasets')
+    reductions = serializers.SerializerMethodField('get_reduction')
+    default_display = serializers.SerializerMethodField('get_default_display')
     
+    def get_reduction(self, dataset):
+        reductions = dataset.loom.reductions
+        return reductions
+    
+    def get_default_display(self, dataset):
+        if dataset.loom.default_display :
+            return dataset.loom.default_display
+        else :
+            return dataset.loom.reductions[0]
+            
     def get_metadata(self, dataset):
         metadata = {'col_name':'','row_name':'','filters':{},'filters_keys':{'ca':[],'ra':[]}}
         for col in dataset.loom.classes :
