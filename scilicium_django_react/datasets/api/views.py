@@ -204,7 +204,8 @@ class GetLoomPlots(APIView):
             genes_menu = post_data['menu']
         filters = post_data['filters']
         symbols = []
-
+        if 'symbols' in post_data :
+            symbols=post_data['symbols']
         reduction = None
         if 'reduction' in filters :
             if filters["reduction"] != '':
@@ -219,7 +220,7 @@ class GetLoomPlots(APIView):
             cidx_filter, ridx_filter = (None,None)
         
         if 'ra' in filters :
-            if 'Symbol' in filters['ra'] and len(filters['ra']['Symbol'])> 0:
+            if 'Symbol' in filters['ra'] and len(filters['ra']['Symbol'])> 0 and len(symbols)==0:
                 symbols = filters['ra']['Symbol']
 
 
