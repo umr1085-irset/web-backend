@@ -6,7 +6,7 @@ from django_better_admin_arrayfield.models.fields import ArrayField
 
 # Create your models here.
 from django.contrib.auth.models import  User
-from scilicium_django_react.studies.models import Study
+from scilicium_django_react.studies.models import Study, Contributor
 from scilicium_django_react.ontologies.models import CellLine, Species, Tissue, DevStage, Organ, Chemical, Omics, Granularity, Sequencing, ExperimentalProcess
 from django.utils.text import slugify
 from scilicium_django_react.utils.loom_reader import *
@@ -102,11 +102,14 @@ class Dataset(models.Model):
     created_at = models.DateTimeField(auto_now_add=True, auto_now=False)
     created_by = models.ForeignKey(settings.AUTH_USER_MODEL, blank=True, null=True, on_delete=models.CASCADE, related_name='data_upload_created_by')
     updated_at = models.DateTimeField(auto_now=True, null=True)
+    keywords = ArrayField(models.CharField(max_length=200, blank=True), default=list, blank=True, null=True)
     loom = models.ForeignKey(Loom, on_delete=models.SET_NULL, null=True, related_name='as_loom', blank=True)
     status = models.CharField(max_length=50, choices=DATA_STATUS, default="PRIVATE")
     study = models.ForeignKey(Study, blank=True, null=True, on_delete=models.SET_NULL, related_name='dataset_of')
     sop = models.ForeignKey(sopMeta, blank=True, null=True, on_delete=models.SET_NULL, related_name='dataset_sop')
     bioMeta = models.ForeignKey(biomaterialMeta, blank=True, null=True, on_delete=models.SET_NULL, related_name='dataset_biometa')
+    contributor = models.ManyToManyField(Contributor, related_name='as_dataset', blank=True)
+    readyPhase = models.CharField(max_length=200, blank=True, null=True)
     
 
     def __str__(self):

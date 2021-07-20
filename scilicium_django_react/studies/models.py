@@ -34,13 +34,25 @@ class Viewer(models.Model):
     def __str__(self):
         return self.name
 
+class Contributor(models.Model):
+
+    name = models.CharField(max_length=200)
+    team = models.TextField("description", blank=True)
+    email = models.CharField(max_length=200)
+    def __str__(self):
+        return self.name
+
 class Article(models.Model):
 
-    title = models.CharField(max_length=200)
-    pmid = ArrayField(models.CharField(max_length=200, blank=True), default=list, blank=True, null=True)
-    doid = ArrayField(models.CharField(max_length=200, blank=True), default=list, blank=True, null=True)
+    title = models.CharField(max_length=200, blank=True, null=True)
+    pmid = models.CharField(max_length=200, blank=True, null=True)
+    doid = models.CharField(max_length=200, blank=True, null=True)
+    bioStudies  = models.CharField(max_length=200, blank=True, null=True)
+    bioRxiv = models.CharField(max_length=200, blank=True, null=True)
+    pmc = models.CharField(max_length=200, blank=True, null=True)
     keyword = ArrayField(models.CharField(max_length=200, blank=True), default=list, blank=True, null=True)
     topics = ArrayField(models.CharField(max_length=200, blank=True), default=list, blank=True, null=True)
+    shorthand =  models.TextField("shorthand", blank=True)
     abstract = models.TextField("description", blank=True)
     journal = models.CharField(max_length=200, blank=True, null=True)
     volume = models.IntegerField(blank=True, null=True)
@@ -102,7 +114,8 @@ class Study(models.Model):
     topics = models.CharField(max_length=100, choices=STUDY_TOPICS, default="PRIVATE")
     project = models.ForeignKey(Project, blank=True, null=True, on_delete=models.SET_NULL, related_name='study_of')
     article = models.ManyToManyField(Article, related_name='study_from', blank=True)
-    viewer = models.ManyToManyField(Viewer, related_name='as_study', blank=True)
+    scope = models.ManyToManyField(Viewer, related_name='as_study', blank=True)
+    contributor = models.ManyToManyField(Contributor, related_name='as_study', blank=True)
 
     def __str__(self):
         return self.title
