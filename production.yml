@@ -45,10 +45,7 @@ services:
       - "0.0.0.0:5555:5555"
 
   redis:
-    build:
-      context: .
-      dockerfile: ./compose/production/redis/Dockerfile
-    image: scilicium/geno_app_redis:dev
+    image: redis:5.0
 
   celeryworker:
     <<: *django
