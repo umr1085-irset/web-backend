@@ -10,7 +10,7 @@ services:
     build:
       context: .
       dockerfile: ./compose/production/django/Dockerfile
-    image: scilicium_django_react_production_django
+    image: scilicium/geno_app_django:dev
     depends_on:
       - postgres
       - redis
@@ -23,7 +23,7 @@ services:
     build:
       context: .
       dockerfile: ./compose/production/postgres/Dockerfile
-    image: scilicium_django_react_production_postgres
+    image: scilicium/geno_app_postgres:dev
     volumes:
       - production_postgres_data:/var/lib/postgresql/data:Z
       - production_postgres_data_backups:/backups:z
@@ -34,7 +34,7 @@ services:
     build:
       context: .
       dockerfile: ./compose/production/traefik/Dockerfile
-    image: scilicium_django_react_production_traefik
+    image: scilicium/geno_app_traefik:dev
     depends_on:
       - django
     volumes:
@@ -49,17 +49,17 @@ services:
 
   celeryworker:
     <<: *django
-    image: scilicium_django_react_production_celeryworker
+    image: scilicium/geno_app_celeryworker:dev
     command: /start-celeryworker
 
   celerybeat:
     <<: *django
-    image: scilicium_django_react_production_celerybeat
+    image: scilicium/geno_app_celerybeat:dev
     command: /start-celerybeat
 
   flower:
     <<: *django
-    image: scilicium_django_react_production_flower
+    image: scilicium/geno_app_flower:dev
     command: /start-flower
 
   
