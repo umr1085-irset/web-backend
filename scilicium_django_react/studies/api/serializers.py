@@ -2,6 +2,7 @@ from rest_framework import serializers
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from scilicium_django_react.studies.models import *
 from scilicium_django_react.datasets.api.serializers import DatasetSerializer
+from scilicium_django_react.users.api.serializers import GetFullUserSerializer
 
 
 class AffiliationSerializer(serializers.ModelSerializer):
@@ -45,10 +46,12 @@ class ArticleSerializer(serializers.ModelSerializer):
             "volume",
             "releaseDate",
             "author",
+            "pmid"
 
         )
 
 class ProjectSerializer(serializers.ModelSerializer):
+    created_by = GetFullUserSerializer(many=False, read_only=True)
     class Meta:
         model = Project
         read_only_fields = (
@@ -77,7 +80,7 @@ class StudySerializer(serializers.ModelSerializer):
     project = ProjectSerializer(many=False, read_only=True)
     article = ArticleSerializer(many=True, read_only=True)
     dataset_of = DatasetSerializer(many=True, read_only=True)
-
+    created_by = GetFullUserSerializer(many=False, read_only=True)
 
     class Meta:
         model = Study
@@ -106,13 +109,15 @@ class StudyPublicSerializer(serializers.ModelSerializer):
     dev_stage = serializers.SerializerMethodField('get_dev_stage')
     tissues = serializers.SerializerMethodField('get_tissues')
     gender = serializers.SerializerMethodField('get_gender')
+    pmids = serializers.SerializerMethodField('get_pub_pmids')
+    created_by = GetFullUserSerializer(many=False, read_only=True)
 
     def get_technology(self, study):
         technology = []
         for dataset in study.dataset_of.all():
-            techno = dataset.sop.technology
-            if techno not in technology:
-                technology.append(techno)
+            for x in dataset.sop.technology.all():
+                if x.ontologyLabel not in technology:
+                    technology.append(x.ontologyLabel)
         return technology
     
     def get_gender(self, study):
@@ -127,30 +132,27 @@ class StudyPublicSerializer(serializers.ModelSerializer):
         tissues = []
         for dataset in study.dataset_of.all():
             for x in dataset.bioMeta.tissue.all():
-                if x.name not in tissues:
-                    tissues.append(x.name)
-            for x in dataset.bioMeta.cell.all():
-                if x.name not in tissues:
-                    tissues.append(x.name)
+                if x.ontologyLabel not in tissues:
+                    tissues.append(x.ontologyLabel)
             for x in dataset.bioMeta.cell_Line.all():
-                if x.name not in tissues:
-                    tissues.append(x.name)
+                if x.ontologyLabel not in tissues:
+                    tissues.append(x.ontologyLabel)
         return tissues
     
     def get_species(self, study):
         species = []
         for dataset in study.dataset_of.all():
             for spe in dataset.bioMeta.species.all():
-                if spe.name not in species:
-                    species.append(spe.name)
+                if spe.ontologyLabel not in species:
+                    species.append(spe.ontologyLabel)
         return species
     
     def get_dev_stage(self, study):
         devstage = []
         for dataset in study.dataset_of.all():
             for dev in dataset.bioMeta.dev_stage.all():
-                if dev.name not in devstage:
-                    devstage.append(dev.name)
+                if dev.ontologyLabel not in devstage:
+                    devstage.append(dev.ontologyLabel)
         return devstage
 
     def get_authors(self, study):
@@ -168,6 +170,14 @@ class StudyPublicSerializer(serializers.ModelSerializer):
             if date not in dates:
                 dates.append(date)
         return dates
+    
+    def get_pub_pmids(self, study):
+        pmids = [] 
+        for article in study.article.all():
+            pmid = article.pmid
+            if pmid not in pmids:
+                pmids.append(pmid)
+        return pmids
 
     class Meta:
         model = Study
@@ -184,5 +194,6 @@ class StudyPublicSerializer(serializers.ModelSerializer):
             "dev_stage",
             "gender",
             "tissues",
+            "pmids",
         )
         fields = "__all__"

@@ -1,7 +1,15 @@
 from django.db import models
 from django.conf import settings
+from django.utils import timezone 
 # Create your models here.
 from django.contrib.auth.models import  User
+from django_better_admin_arrayfield.models.fields import ArrayField
+
+
+
+class AutoDateTimeField(models.DateTimeField):
+    def pre_save(self, model_instance, add):
+        return timezone.now()
 
 class Institute(models.Model):
 
@@ -18,10 +26,33 @@ class Author(models.Model):
     def __str__(self):
         return self.fullName
 
+class Viewer(models.Model):
+
+    name = models.CharField(max_length=200)
+    description = models.TextField("description", blank=True)
+    url = models.CharField(max_length=200)
+    def __str__(self):
+        return self.name
+
+class Contributor(models.Model):
+
+    name = models.CharField(max_length=200)
+    team = models.TextField("description", blank=True)
+    email = models.CharField(max_length=200)
+    def __str__(self):
+        return self.name
+
 class Article(models.Model):
 
-    title = models.CharField(max_length=200)
+    title = models.CharField(max_length=200, blank=True, null=True)
     pmid = models.CharField(max_length=200, blank=True, null=True)
+    doid = models.CharField(max_length=200, blank=True, null=True)
+    bioStudies  = models.CharField(max_length=200, blank=True, null=True)
+    bioRxiv = models.CharField(max_length=200, blank=True, null=True)
+    pmc = models.CharField(max_length=200, blank=True, null=True)
+    keyword = ArrayField(models.CharField(max_length=200, blank=True), default=list, blank=True, null=True)
+    topics = ArrayField(models.CharField(max_length=200, blank=True), default=list, blank=True, null=True)
+    shorthand =  models.TextField("shorthand", blank=True)
     abstract = models.TextField("description", blank=True)
     journal = models.CharField(max_length=200, blank=True, null=True)
     volume = models.IntegerField(blank=True, null=True)
@@ -79,10 +110,12 @@ class Study(models.Model):
     status = models.CharField(max_length=50, choices=STUDY_STATUS, default="PRIVATE")
     created_at = models.DateTimeField(auto_now_add=True, auto_now=False)
     created_by = models.ForeignKey(settings.AUTH_USER_MODEL, blank=True, null=True, on_delete=models.CASCADE, related_name='study_created_by')
-    updated_at = models.DateTimeField(auto_now=True, null=True)
+    updated_at = AutoDateTimeField(default=timezone.now)
     topics = models.CharField(max_length=100, choices=STUDY_TOPICS, default="PRIVATE")
     project = models.ForeignKey(Project, blank=True, null=True, on_delete=models.SET_NULL, related_name='study_of')
     article = models.ManyToManyField(Article, related_name='study_from', blank=True)
+    scope = models.ManyToManyField(Viewer, related_name='as_study', blank=True)
+    contributor = models.ManyToManyField(Contributor, related_name='as_study', blank=True)
 
     def __str__(self):
         return self.title

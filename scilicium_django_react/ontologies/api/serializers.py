@@ -1,44 +1,68 @@
 from rest_framework import serializers
-from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
-from scilicium_django_react.ontologies.models import Species, Cell, CellLine, Tissue, DevStage
+from scilicium_django_react.ontologies.models import Topics,Keyword, ExperimentalProcess, Granularity, Sequencing, Omics, Species, Organ, Tissue, CellLine, DevStage, Pathology, Chemical
 
 
 class TissueSerializer(serializers.ModelSerializer):
     class Meta:
         model = Tissue
-        fields = (
-            "id",
-            "name"
-        )
-
-class CellSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Cell
-        fields = (
-            "id",
-            "name"
-        )
+        fields = "__all__"
 
 class CellLineSerializer(serializers.ModelSerializer):
     class Meta:
         model = CellLine
-        fields = (
-            "id",
-            "name"
-        )
+        fields = "__all__"
 
 class SpeciesSerializer(serializers.ModelSerializer):
     class Meta:
         model = Species
-        fields = (
-            "id",
-            "name"
-        )
+        fields = "__all__"
 
 class DevStageSerializer(serializers.ModelSerializer):
     class Meta:
         model = DevStage
-        fields = (
-            "id",
-            "name"
-        )
+        fields = "__all__"
+
+class OrganSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Organ
+        fields = "__all__"
+
+class PathologySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Pathology
+        fields = "__all__"
+
+class ChemicalSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Chemical
+        fields = "__all__"
+
+class OmicsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Omics
+        fields = "__all__"
+
+class SequencingSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Sequencing
+        fields = "__all__"
+
+class GranularitySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Granularity
+        fields = "__all__"
+
+class ExperimentalProcessSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ExperimentalProcess
+        fields = "__all__"
+
+class KeywordSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Keyword
+        fields = "__all__"
+
+class TopicsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Topics
+        fields = "__all__"
