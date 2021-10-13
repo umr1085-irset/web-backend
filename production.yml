@@ -25,6 +25,8 @@ services:
     networks:
       - web
       - genoapp
+    ports:
+      - "8000:8000"
 
 
   postgres:
@@ -32,6 +34,7 @@ services:
       context: .
       dockerfile: ./compose/production/postgres/Dockerfile
     image: scilicium/geno_app_postgres:dev
+    container_name: postgres
     volumes:
       - production_postgres_data:/var/lib/postgresql/data:Z
       - production_postgres_data_backups:/backups:z
