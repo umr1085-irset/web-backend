@@ -18,6 +18,17 @@ services:
       - ./.envs/.production/.django
       - ./.envs/.production/.postgres
     command: /start
+   
+  
+  traefik:
+    build:
+      context: .
+      dockerfile: ./compose/production/traefik/Dockerfile
+    image: scilicium_django_react_production_traefik
+    depends_on:
+      - django
+    volumes:
+      - production_traefik:/etc/traefik/acme:z
     labels:
       - traefik.enable=true
       - traefik.http.routers.genoapp-front-static-prod.entrypoints=websecure
