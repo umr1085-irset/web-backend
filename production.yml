@@ -31,8 +31,8 @@ services:
       - production_traefik:/etc/traefik/acme:z
     labels:
       - traefik.enable=true
-      - traefik.http.routers.genoapp-front-static-prod.entrypoints=websecure
-      - traefik.http.routers.genoapp-front-static-prod.rule=Host(`admin-genoapp.scilicium.com`)
+      - traefik.http.routers.genoapp-back-static-prod.entrypoints=websecure
+      - traefik.http.routers.genoapp-back-static-prod.rule=Host(`admin-genoapp.scilicium.com`)
     networks:
       - web
       - genoapp
