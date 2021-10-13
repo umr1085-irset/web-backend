@@ -18,6 +18,14 @@ services:
       - ./.envs/.production/.django
       - ./.envs/.production/.postgres
     command: /start
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.genoapp-front-static-prod.entrypoints=websecure
+      - traefik.http.routers.genoapp-front-static-prod.rule=Host(`admin-genoapp.scilicium.com`)
+    networks:
+      - web
+      - genoapp
+
 
   postgres:
     build:
@@ -61,5 +69,5 @@ services:
 networks:
   web:
     external: true
-  internal:
-    internal: true
+  genoapp:
+    external: true
