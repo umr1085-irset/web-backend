@@ -25,6 +25,8 @@ services:
     networks:
       - web
       - genoapp
+    expose:  # new
+      - 5000
 
 
   postgres:
@@ -33,6 +35,8 @@ services:
       dockerfile: ./compose/production/postgres/Dockerfile
     image: scilicium/geno_app_postgres:dev
     container_name: postgres
+    expose:
+      - 5432
     volumes:
       - production_postgres_data:/var/lib/postgresql/data:Z
       - production_postgres_data_backups:/backups:z
