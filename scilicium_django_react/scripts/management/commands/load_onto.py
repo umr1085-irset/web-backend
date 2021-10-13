@@ -3,6 +3,8 @@ from django.apps import apps
 
 from django.core.management.base import BaseCommand, CommandError
 
+from scilicium_django_react.ontologies.models import *
+
 
 def launch_import() :
     print('Start import ontologies')
