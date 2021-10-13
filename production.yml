@@ -18,17 +18,6 @@ services:
       - ./.envs/.production/.django
       - ./.envs/.production/.postgres
     command: /start
-   
-  
-  traefik:
-    build:
-      context: .
-      dockerfile: ./compose/production/traefik/Dockerfile
-    image: scilicium_django_react_production_traefik
-    depends_on:
-      - django
-    volumes:
-      - production_traefik:/etc/traefik/acme:z
     labels:
       - traefik.enable=true
       - traefik.http.routers.genoapp-back-static-prod.entrypoints=websecure
@@ -49,24 +38,39 @@ services:
       - production_postgres_data_backups:/backups:z
     env_file:
       - ./.envs/.production/.postgres
+    networks:
+      - web
+      - genoapp
 
   redis:
     image: redis:5.0
+    networks:
+      - web
+      - genoapp
 
   celeryworker:
     <<: *django
     image: scilicium/geno_app_celeryworker:dev
     command: /start-celeryworker
+    networks:
+      - web
+      - genoapp
 
   celerybeat:
     <<: *django
     image: scilicium/geno_app_celerybeat:dev
     command: /start-celerybeat
+    networks:
+      - web
+      - genoapp
 
   flower:
     <<: *django
     image: scilicium/geno_app_flower:dev
     command: /start-flower
+    networks:
+      - web
+      - genoapp
 
 
 networks:
