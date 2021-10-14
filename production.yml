@@ -20,8 +20,10 @@ services:
     command: /start
     labels:
       - traefik.enable=true
-      - traefik.http.routers.genoapp-back-static-prod.entrypoints=websecure
+      - traefik.http.services.genoapp-back-static-prod.loadbalancer.server.port=5000
       - traefik.http.routers.genoapp-back-static-prod.rule=Host(`admin-genoapp.scilicium.com`)
+      - traefik.http.routers.genoapp-back-static-prod.entryPoints=websecure
+
     networks:
       - web
       - genoapp
