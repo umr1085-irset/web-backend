@@ -7,7 +7,7 @@ volumes:
 
 services:
   django: &django
-     build:
+    build:
       context: .
       dockerfile: ./compose/production/django/Dockerfile
     image: scilicium/geno_app_django:dev
