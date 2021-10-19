@@ -7,6 +7,9 @@ volumes:
 
 services:
   django: &django
+     build:
+      context: .
+      dockerfile: ./compose/production/django/Dockerfile
     image: scilicium/geno_app_django:dev
     depends_on:
       - postgres
@@ -20,6 +23,9 @@ services:
       - genoapp
 
   postgres:
+    build :
+      context: .
+      dockerfile: ./compose/production/postgres/Dockerfile
     image: scilicium/geno_app_postgres:dev
     container_name: postgres
     expose:
