@@ -16,7 +16,7 @@ SECRET_KEY = env("DJANGO_SECRET_KEY")
 # https://docs.djangoproject.com/en/dev/ref/settings/#allowed-hosts
 ALLOWED_HOSTS = env.list("DJANGO_ALLOWED_HOSTS", default=["scilicium.com"])
 ALLOWED_HOSTS += ['django']
-CSRF_TRUSTED_ORIGINS = ["test-192-168-101-113.vm.openstack.genouest.org","django-192-168-101-113.vm.openstack.genouest.org"]
+CSRF_TRUSTED_ORIGINS = ["test-192-168-101-113.vm.openstack.genouest.org"]
 DEBUG = True
 # DATABASES
 # ------------------------------------------------------------------------------
