@@ -21,7 +21,7 @@ def get_available_reductions(loom_path):
     ------
     list
     '''
-    df = loompy.connect(loom_path)
+    df = loompy.connect(loom_path,'r')
     red_json = json.loads(df.attrs['reductions'])
     df.close()
     return list(red_json.keys())
@@ -41,7 +41,7 @@ def get_reduction_x_y(loom_path,reduction):
     ------
     Tuple of X,Y labels
     '''
-    df = loompy.connect(loom_path)
+    df = loompy.connect(loom_path,'r')
     red_json = json.loads(df.attrs['reductions'])
     df.close()
     return red_json[reduction]
@@ -74,7 +74,7 @@ def extract_attr_keys(loom_path):
     ------
     dictionary
     '''
-    df = loompy.connect(loom_path) # open loom connection
+    df = loompy.connect(loom_path,'r') # open loom connection
     attr_keys = {'col_attr_keys':df.ca.keys(),'row_attr_keys':df.ra.keys()}
     df.close() # close loom connection
     return attr_keys
@@ -95,7 +95,7 @@ def extract_attrs(loom_path):
     col_attrs = dict() # empty dictionary to populate future column attributes dataframe
     row_attrs = dict() # empty dictionary to populate future gene attributes dataframe
     
-    df = loompy.connect(loom_path) # open loom connection
+    df = loompy.connect(loom_path,'r') # open loom connection
     for key in df.ca.keys(): # for each column attribute
         col_attrs[key] = df.ca[key] # store attribute array
         
@@ -123,7 +123,7 @@ def is_valid_attrs_list(loom_path,attrs):
     ------
     bool
     '''
-    df = loompy.connect(loom_path)
+    df = loompy.connect(loom_path,'r')
     valid = df.ca.keys()
     df.close()
     for attr in attrs:
@@ -153,7 +153,7 @@ def get_filter_indices(loom_path,filt):
     column indices, row indices matching filter
     '''
     
-    df = loompy.connect(loom_path) # open loom file
+    df = loompy.connect(loom_path,'r') # open loom file
 
     try:
         cidx_filter = [] # empty list to store indices of columns
@@ -190,7 +190,7 @@ def get_dataframe(loom_path,attrs,cidx_filter=None):
     Pandas DataFrame
     '''
     d = dict()
-    df = loompy.connect(loom_path)
+    df = loompy.connect(loom_path,'r')
     for attr in attrs:
         if isinstance(cidx_filter, np.ndarray):
             d[attr] = df.ca[attr][cidx_filter]
@@ -260,7 +260,7 @@ def get_symbol_values(loom_path,symbol,cidx_filter=None):
     symbol: str
         Potential symbol
     '''
-    df = loompy.connect(loom_path)
+    df = loompy.connect(loom_path,'r')
     symbols = df.ra['Symbol']
     set_symbols = set(symbols)
     if symbol in set_symbols:
@@ -534,7 +534,7 @@ def get_classes(loom_path):
     ------
     list
     '''
-    df = loompy.connect(loom_path) # open loom connection
+    df = loompy.connect(loom_path,'r') # open loom connection
     classes = df.attrs.Classes.split(',')
     df.close()
     return classes
@@ -554,7 +554,7 @@ def get_ra(loom_path,key='Symbol',unique=False,ridx_filter=None):
     ------
     arr
     '''
-    df = loompy.connect(loom_path) # open loom connection
+    df = loompy.connect(loom_path,'r') # open loom connection
     if isinstance(ridx_filter, np.ndarray):
         labels = df.ra[key][ridx_filter]
     else:
@@ -580,7 +580,7 @@ def get_ca(loom_path,key='Sample',unique=False,cidx_filter=None):
     ------
     arr
     '''
-    df = loompy.connect(loom_path) # open loom connection
+    df = loompy.connect(loom_path,'r') # open loom connection
     if isinstance(cidx_filter, np.ndarray):
         labels = df.ca[key][cidx_filter]
     else:
@@ -604,7 +604,7 @@ def get_shape(loom_path):
     ------
     tuple
     '''
-    df = loompy.connect(loom_path) # open loom connection
+    df = loompy.connect(loom_path,'r') # open loom connection
     shape = df.shape
     df.close()
     return shape
@@ -627,7 +627,7 @@ def most_variable_symbols(loom_path,n=10,ridx_filter=None,cidx_filter=None):
     Array of symbols
     '''
     labels = get_ra(loom_path,key='Symbol',unique=False,ridx_filter=ridx_filter) # get symbols (filter applied)
-    df = loompy.connect(loom_path)
+    df = loompy.connect(loom_path,'r')
     if isinstance(ridx_filter, np.ndarray) and isinstance(cidx_filter, np.ndarray):
         v = np.var(df[ridx_filter, cidx_filter],axis=1) # compute variances
     elif isinstance(ridx_filter, np.ndarray):
@@ -721,7 +721,7 @@ def dotplot_json(loom_path,attribute='',symbols=[],cidx_filter=None,ridx_filter=
     vals = dict()
     vals[attribute] = get_ca(loom_path,key=attribute,unique=False,cidx_filter=cidx_filter) # get column attribute values
     
-    df = loompy.connect(loom_path)
+    df = loompy.connect(loom_path,'r')
     for s in symbols:
         i = np.where(allsymbols==s)[0][0]
         if isinstance(cidx_filter, np.ndarray):
@@ -812,7 +812,7 @@ def violin_json(loom_path,attribute='',symbols=[],cidx_filter=None,returnjson=Tr
     attr_values = get_ca(loom_path,key=attribute,unique=False,cidx_filter=cidx_filter) # get column attribute values
     symbol = symbols[0]
     
-    df = loompy.connect(loom_path)
+    df = loompy.connect(loom_path,'r')
     i = np.where(allsymbols==symbol)[0][0]
     if isinstance(cidx_filter, np.ndarray):
         symbol_values = df[i,cidx_filter]
