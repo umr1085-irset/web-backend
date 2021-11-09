@@ -25,6 +25,7 @@ class biomaterialMeta(models.Model):
         ('ORGAN','Organ'),
         ('TISSUE','Tissue'),
         ('CELL','Cell'),
+        ('BLOOD','Blood'),
     )
 
     GENDER = (
@@ -33,26 +34,29 @@ class biomaterialMeta(models.Model):
         ('MIXED','Mixed'),
         ('OTHER','Other'),
     )
+    biomaterialCollectedFrom = models.CharField(max_length=100, default="",blank=True, null=True)
     tissue = models.ManyToManyField(Tissue, related_name='as_tissue', blank=True)
     organ = models.ManyToManyField(Organ, related_name='as_organ', blank=True)
     species = models.ManyToManyField(Species, related_name='as_species', blank=True)
-    dev_stage = models.ManyToManyField(DevStage, related_name='as_dev_stage', blank=True)
-    cell_Line = models.ManyToManyField(CellLine, related_name='as_cellLine', blank=True)
-    gender = ArrayField(models.CharField(max_length=32, blank=True, choices=GENDER),default=list,blank=True)
-    bioType = models.CharField(max_length=100, choices=BIO_TYPE, default="ORGAN")
+    developmentStage = models.ManyToManyField(DevStage, related_name='as_dev_stage', blank=True)
+    #cell_Line = models.ManyToManyField(CellLine, related_name='as_cellLine', blank=True)
+    sex = ArrayField(models.CharField(max_length=32, blank=True, choices=GENDER),default=list,blank=True)
+    biomaterialType = models.CharField(max_length=100, choices=BIO_TYPE, default="ORGAN")
     age_start = models.IntegerField(blank=True, null=True)
     age_end = models.IntegerField(blank=True, null=True)
-    age_unit = models.CharField(max_length=100, default="")
-    molecule_applied = models.ManyToManyField(Chemical, related_name='is_exposed', blank=True)
+    age_unit = models.CharField(max_length=100, default="",blank=True, null=True)
+    diseaseStage = models.CharField(max_length=100, default="",blank=True, null=True)
 
 
 
 class sopMeta(models.Model):
     
     omics = models.ManyToManyField(Omics, related_name='as_omics', blank=True)
-    technoGrain = models.ManyToManyField(Granularity, related_name='as_granularity', blank=True)
+    resolution = models.ManyToManyField(Granularity, related_name='as_granularity', blank=True)
     technology = models.ManyToManyField(Sequencing, related_name='as_sequencing', blank=True)
-    expProcess = models.ManyToManyField(ExperimentalProcess, related_name='as_experimental', blank=True)
+    techno_description = models.TextField("description", blank=True, null=True)
+    experimentalDesign = models.ManyToManyField(ExperimentalProcess, related_name='as_experimental', blank=True)
+    molecule_applied = models.ManyToManyField(Chemical, related_name='is_exposed', blank=True)
 
 class Loom(models.Model):
     name = models.CharField(max_length=200,unique=True)
@@ -98,6 +102,7 @@ class Dataset(models.Model):
 
     title = models.CharField(max_length=200)
     datasetId = models.CharField(max_length=200,unique=True)
+    autoNbID = models.CharField(max_length=200, blank=True, null=True)
     description = models.TextField("description", blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True, auto_now=False)
     created_by = models.ForeignKey(settings.AUTH_USER_MODEL, blank=True, null=True, on_delete=models.CASCADE, related_name='data_upload_created_by')
@@ -109,7 +114,6 @@ class Dataset(models.Model):
     sop = models.ForeignKey(sopMeta, blank=True, null=True, on_delete=models.SET_NULL, related_name='dataset_sop')
     bioMeta = models.ForeignKey(biomaterialMeta, blank=True, null=True, on_delete=models.SET_NULL, related_name='dataset_biometa')
     contributor = models.ManyToManyField(Contributor, related_name='as_dataset', blank=True)
-    readyPhase = models.CharField(max_length=200, blank=True, null=True)
     
 
     def __str__(self):

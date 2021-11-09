@@ -5,12 +5,19 @@ from django_better_admin_arrayfield.admin.mixins import DynamicArrayMixin
 
 class bioMaterialAdmin(admin.ModelAdmin, DynamicArrayMixin):
     fieldsets = [
-        (None,               {'fields': ['tissue','species', 'dev_stage', 'cell_Line', 'gender', 'bioType']
+        (None,               {'fields': ['biomaterialCollectedFrom','tissue','organ','species', 'developmentStage', 'sex', 'biomaterialType','age_start','age_end','age_unit','diseaseStage']
                              }
         ),
     ]
 
-admin.site.register(Dataset)
+class datasetAdmin(admin.ModelAdmin, DynamicArrayMixin):
+    fieldsets = [
+        (None,               {'fields': ['title','datasetId','autoNbID','description', 'developmentStage', 'created_at', 'created_by','updated_at','keywords','loom','status','study','sop','bioMeta']
+                             }
+        ),
+    ]
+
+admin.site.register(Dataset,datasetAdmin)
 admin.site.register(Loom)
 admin.site.register(sopMeta)
 admin.site.register(biomaterialMeta,bioMaterialAdmin)

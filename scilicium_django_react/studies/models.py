@@ -106,16 +106,18 @@ class Study(models.Model):
 
     title = models.CharField(max_length=200)
     studyId = models.SlugField(max_length=200)
-    description = models.TextField("description", blank=True)
+    description = models.TextField("description", blank=True, null=True)
     status = models.CharField(max_length=50, choices=STUDY_STATUS, default="PRIVATE")
     created_at = models.DateTimeField(auto_now_add=True, auto_now=False)
     created_by = models.ForeignKey(settings.AUTH_USER_MODEL, blank=True, null=True, on_delete=models.CASCADE, related_name='study_created_by')
     updated_at = AutoDateTimeField(default=timezone.now)
     topics = models.CharField(max_length=100, choices=STUDY_TOPICS, default="PRIVATE")
-    project = models.ForeignKey(Project, blank=True, null=True, on_delete=models.SET_NULL, related_name='study_of')
-    article = models.ManyToManyField(Article, related_name='study_from', blank=True)
-    scope = models.ManyToManyField(Viewer, related_name='as_study', blank=True)
-    contributor = models.ManyToManyField(Contributor, related_name='as_study', blank=True)
+    collection = models.ForeignKey(Project, blank=True, null=True, on_delete=models.SET_NULL, related_name='study_of')
+    article = models.ManyToManyField(Article, related_name='study_from', blank=True,null=True)
+    viewer = models.ManyToManyField(Viewer, related_name='as_study', blank=True,null=True)
+    contributor = models.ManyToManyField(Contributor, related_name='as_study', blank=True,null=True)
+    dataCurators = models.CharField(max_length=200,null=True,blank=True)
+    externalID = models.TextField("externalIDs", blank=True, null=True)
 
     def __str__(self):
         return self.title
