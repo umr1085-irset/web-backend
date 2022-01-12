@@ -12,7 +12,7 @@ class bioMaterialAdmin(admin.ModelAdmin, DynamicArrayMixin):
 
 class datasetAdmin(admin.ModelAdmin, DynamicArrayMixin):
     fieldsets = [
-        (None,               {'fields': ['title','datasetId','autoNbID','description', 'developmentStage', 'created_at', 'created_by','updated_at','keywords','loom','status','study','sop','bioMeta']
+        (None,               {'fields': ['title','datasetId','autoNbID','description', 'created_by','keywords','loom','status','study','sop','bioMeta']
                              }
         ),
     ]

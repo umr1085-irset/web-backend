@@ -16,6 +16,18 @@ class AffiliationSerializer(serializers.ModelSerializer):
             "name",
         )
 
+class ContributorSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Contributor
+        read_only_fields = (
+            "id",
+        )
+        fields = (
+            "id",
+            "name",
+            "team",
+        )
+
 class AuthorSerializer(serializers.ModelSerializer):
     affiliation = AffiliationSerializer(many=True, read_only=True)
     class Meta:
@@ -77,10 +89,11 @@ class ProjectSerializer(serializers.ModelSerializer):
 
 class StudySerializer(serializers.ModelSerializer):
 
-    project = ProjectSerializer(many=False, read_only=True)
+    collection = ProjectSerializer(many=False, read_only=True)
     article = ArticleSerializer(many=True, read_only=True)
     dataset_of = DatasetSerializer(many=True, read_only=True)
     created_by = GetFullUserSerializer(many=False, read_only=True)
+    contributor = ContributorSerializer(many=False, read_only=True)
 
     class Meta:
         model = Study
@@ -91,6 +104,7 @@ class StudySerializer(serializers.ModelSerializer):
             "created_by",
             "updated_at",
             "project",
+            "contributor",
             "article",
             "dataset_of",
         )
@@ -123,7 +137,7 @@ class StudyPublicSerializer(serializers.ModelSerializer):
     def get_gender(self, study):
         genders = []
         for dataset in study.dataset_of.all():
-            gender = dataset.bioMeta.gender
+            gender = dataset.bioMeta.sex
             if gender not in genders:
                 genders.append(gender)
         return genders
@@ -134,7 +148,7 @@ class StudyPublicSerializer(serializers.ModelSerializer):
             for x in dataset.bioMeta.tissue.all():
                 if x.ontologyLabel not in tissues:
                     tissues.append(x.ontologyLabel)
-            for x in dataset.bioMeta.cell_Line.all():
+            for x in dataset.bioMeta.organ.all():
                 if x.ontologyLabel not in tissues:
                     tissues.append(x.ontologyLabel)
         return tissues
@@ -150,7 +164,7 @@ class StudyPublicSerializer(serializers.ModelSerializer):
     def get_dev_stage(self, study):
         devstage = []
         for dataset in study.dataset_of.all():
-            for dev in dataset.bioMeta.dev_stage.all():
+            for dev in dataset.bioMeta.developmentStage.all():
                 if dev.ontologyLabel not in devstage:
                     devstage.append(dev.ontologyLabel)
         return devstage

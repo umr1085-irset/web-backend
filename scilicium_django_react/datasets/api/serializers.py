@@ -8,9 +8,8 @@ from scilicium_django_react.studies.models import *
 class biomaterialMetaSerializer(serializers.ModelSerializer):
     tissue = TissueSerializer(many=True, read_only=True)
     species = SpeciesSerializer(many=True, read_only=True)
-    cell_line = CellLineSerializer(many=True, read_only=True)
     organ = OrganSerializer(many=True, read_only=True)
-    dev_stage = DevStageSerializer(many=True, read_only=True)
+    developmentStage = DevStageSerializer(many=True, read_only=True)
     
     class Meta:
         model = biomaterialMeta
@@ -50,7 +49,7 @@ class PublicDatasetSerializer(serializers.ModelSerializer):
         return dataset.sop.omics.ontologyLabel
 
     def getGender(self, dataset):
-        return dataset.bioMeta.gender
+        return dataset.bioMeta.sex
 
     def getTissues(self, dataset):
         tissues = list()
@@ -60,7 +59,7 @@ class PublicDatasetSerializer(serializers.ModelSerializer):
     
     def getDevStage(self, dataset):
         devStage = list()
-        for stage in dataset.bioMeta.dev_stage.all() :
+        for stage in dataset.bioMeta.developmentStage.all() :
             devStage.append(stage.ontologyLabel) if stage.ontologyLabel not in devStage else devStage
         return devStage
 

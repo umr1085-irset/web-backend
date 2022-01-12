@@ -113,7 +113,7 @@ class Dataset(models.Model):
     study = models.ForeignKey(Study, blank=True, null=True, on_delete=models.SET_NULL, related_name='dataset_of')
     sop = models.ForeignKey(sopMeta, blank=True, null=True, on_delete=models.SET_NULL, related_name='dataset_sop')
     bioMeta = models.ForeignKey(biomaterialMeta, blank=True, null=True, on_delete=models.SET_NULL, related_name='dataset_biometa')
-    contributor = models.ManyToManyField(Contributor, related_name='as_dataset', blank=True)
+    contributor = models.ManyToManyField(Contributor, related_name='contributor_dataset', blank=True)
     
 
     def __str__(self):

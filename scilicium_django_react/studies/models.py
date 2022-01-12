@@ -113,9 +113,9 @@ class Study(models.Model):
     updated_at = AutoDateTimeField(default=timezone.now)
     topics = models.CharField(max_length=100, choices=STUDY_TOPICS, default="PRIVATE")
     collection = models.ForeignKey(Project, blank=True, null=True, on_delete=models.SET_NULL, related_name='study_of')
-    article = models.ManyToManyField(Article, related_name='study_from', blank=True,null=True)
-    viewer = models.ManyToManyField(Viewer, related_name='as_study', blank=True,null=True)
-    contributor = models.ManyToManyField(Contributor, related_name='as_study', blank=True,null=True)
+    article = models.ManyToManyField(Article, related_name='study_from', blank=True)
+    viewer = models.ManyToManyField(Viewer, related_name='as_study', blank=True)
+    contributor = models.ManyToManyField(Contributor, related_name='as_study', blank=True)
     dataCurators = models.CharField(max_length=200,null=True,blank=True)
     externalID = models.TextField("externalIDs", blank=True, null=True)
 
