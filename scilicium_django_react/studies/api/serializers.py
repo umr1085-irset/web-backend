@@ -28,6 +28,17 @@ class ContributorSerializer(serializers.ModelSerializer):
             "team",
         )
 
+class ViewerSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Viewer
+        read_only_fields = (
+            "id",
+        )
+        fields = (
+            "id",
+            "name",
+        )
+
 class AuthorSerializer(serializers.ModelSerializer):
     affiliation = AffiliationSerializer(many=True, read_only=True)
     class Meta:
@@ -94,7 +105,7 @@ class StudySerializer(serializers.ModelSerializer):
     dataset_of = DatasetSerializer(many=True, read_only=True)
     created_by = GetFullUserSerializer(many=False, read_only=True)
     contributor = ContributorSerializer(many=False, read_only=True)
-
+    viewer = ViewerSerializer(many=True, read_only=True)
     class Meta:
         model = Study
         read_only_fields = (
@@ -107,6 +118,7 @@ class StudySerializer(serializers.ModelSerializer):
             "contributor",
             "article",
             "dataset_of",
+            "viewer"
         )
         fields = "__all__"
         lookup_field = 'studyId'
@@ -125,6 +137,8 @@ class StudyPublicSerializer(serializers.ModelSerializer):
     gender = serializers.SerializerMethodField('get_gender')
     pmids = serializers.SerializerMethodField('get_pub_pmids')
     created_by = GetFullUserSerializer(many=False, read_only=True)
+    viewer = ViewerSerializer(many=True, read_only=True)
+
 
     def get_technology(self, study):
         technology = []
@@ -209,5 +223,6 @@ class StudyPublicSerializer(serializers.ModelSerializer):
             "gender",
             "tissues",
             "pmids",
+            'viewer'
         )
         fields = "__all__"

@@ -5,7 +5,7 @@ from django_better_admin_arrayfield.admin.mixins import DynamicArrayMixin
 
 class bioMaterialAdmin(admin.ModelAdmin, DynamicArrayMixin):
     fieldsets = [
-        (None,               {'fields': ['biomaterialCollectedFrom','tissue','organ','species', 'developmentStage', 'sex', 'biomaterialType','age_start','age_end','age_unit','diseaseStage']
+        (None,               {'fields': ['name','tissue','organ','species', 'developmentStage', 'sex', 'biomaterialType','age_start','age_end','age_unit','diseaseStage']
                              }
         ),
     ]

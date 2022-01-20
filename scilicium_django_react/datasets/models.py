@@ -34,7 +34,7 @@ class biomaterialMeta(models.Model):
         ('MIXED','Mixed'),
         ('OTHER','Other'),
     )
-    biomaterialCollectedFrom = models.CharField(max_length=100, default="",blank=True, null=True)
+    name = models.CharField(max_length=100, default="",blank=True, null=True)
     tissue = models.ManyToManyField(Tissue, related_name='as_tissue', blank=True)
     organ = models.ManyToManyField(Organ, related_name='as_organ', blank=True)
     species = models.ManyToManyField(Species, related_name='as_species', blank=True)
@@ -47,16 +47,20 @@ class biomaterialMeta(models.Model):
     age_unit = models.CharField(max_length=100, default="",blank=True, null=True)
     diseaseStage = models.CharField(max_length=100, default="",blank=True, null=True)
 
-
+    def __str__(self):
+        return self.name
 
 class sopMeta(models.Model):
-    
+    name = models.CharField(max_length=100, default="",blank=True, null=True)
     omics = models.ManyToManyField(Omics, related_name='as_omics', blank=True)
     resolution = models.ManyToManyField(Granularity, related_name='as_granularity', blank=True)
     technology = models.ManyToManyField(Sequencing, related_name='as_sequencing', blank=True)
     techno_description = models.TextField("description", blank=True, null=True)
     experimentalDesign = models.ManyToManyField(ExperimentalProcess, related_name='as_experimental', blank=True)
     molecule_applied = models.ManyToManyField(Chemical, related_name='is_exposed', blank=True)
+    
+    def __str__(self):
+        return self.name
 
 class Loom(models.Model):
     name = models.CharField(max_length=200,unique=True)

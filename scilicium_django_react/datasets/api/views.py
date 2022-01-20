@@ -273,6 +273,7 @@ class GetLoomPlots(APIView):
             data = json.loads(json_component_chartjs(data.file.path,style=style,attrs=attrs,cidx_filter=cidx_filter))
             response_data['chart'] = data["chart"]
             response_data['style'] = data["style"]
+            response_data['options'] = data["options"]
 
             response = Response(response_data, status=status.HTTP_200_OK)
             return response

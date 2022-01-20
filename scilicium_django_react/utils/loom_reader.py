@@ -240,12 +240,17 @@ def json_component_chartjs(loom_path,style='pie',attrs=[],cidx_filter=None):
     res = dict()
     chart = dict()
     datasets=dict()
+    plugins=dict()
+    res['options']=dict()
     datasets['data'] = vals.tolist()
     datasets['backgroundColor'] = n_colors(len(vals))
     chart['datasets'] = [datasets]
     chart['labels'] = lbls.tolist()
+    if style=='bar':
+        plugins['legend']={'display':False}
     res['chart'] = chart
     res['style'] = style
+    res['options']['plugins'] = plugins
 
     return json.dumps(res)
 
