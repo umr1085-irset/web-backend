@@ -247,7 +247,10 @@ def json_component_chartjs(loom_path,style='pie',attrs=[],cidx_filter=None):
     chart['datasets'] = [datasets]
     chart['labels'] = lbls.tolist()
     if style=='bar':
-        plugins['legend']={'display':False}
+        res['options']['legend']={'display':False}
+    if style=='pie':
+        res['options']['legend']={'position':'left','maxWidth':120,'labels':{'boxWidth':10,'padding':4,'font':{'size':8,'lineHeight':1}}}
+    
     res['chart'] = chart
     res['style'] = style
     res['options']['plugins'] = plugins
@@ -290,7 +293,8 @@ def continuous_scatter_gl(x,y,color,tracename=''):
         mode='markers',
         marker=dict(
             color=color,
-            colorscale='magma'
+            colorscale='magma',
+            size=4
         ),
         name=tracename,
         hoverinfo=hoverinfo
@@ -311,8 +315,10 @@ def discrete_scatter_gl(x,y,color):
                 mode='markers',
                 name=unique_class_,
                 marker=dict(
-                    color=color_seq[i]
-                )
+                    color=color_seq[i],
+                    size=4
+                ),
+                showlegend=True
             )
         )
     return traces
@@ -543,6 +549,27 @@ def get_classes(loom_path):
     classes = df.attrs.Classes.split(',')
     df.close()
     return classes
+
+def check_ra(loom_path,key):
+    '''
+    Check if the row metadata exists
+
+    Params
+    ------
+    loom_path : str
+        Path to a .loom file
+
+    key : str
+        Name of the metadata 
+
+    Return
+    ------
+    True or False
+    '''
+    df = loompy.connect(loom_path,'r')
+    if key in df.ra :
+        return True
+    return False
 
 def get_ra(loom_path,key='Symbol',unique=False,ridx_filter=None):
     '''
