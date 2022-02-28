@@ -98,8 +98,12 @@ class DatasetSerializer(serializers.ModelSerializer):
            metadata['filters_keys']['ca'].append(col)
 
         #Always add Chromosome on row attributes
-        metadata['filters']['Chromosome'] = {'name':'Chromosome','values':get_ra(dataset.loom.file.path,key='Chromosome',unique=True),'attributes':'ra'}
-        metadata['filters_keys']['ra'].append('Chromosome')
+        if check_ra(dataset.loom.file.path,'Chromosome'):
+            metadata['filters']['Chromosome'] = {'name':'Chromosome','values':get_ra(dataset.loom.file.path,key='Chromosome',unique=True),'attributes':'ra'}
+            metadata['filters_keys']['ra'].append('Chromosome')
+        if check_ra(dataset.loom.file.path,'Symbol'):
+            metadata['filters']['Symbol'] = {'name':'Symbol','values':get_ra(dataset.loom.file.path,key='Symbol',unique=True),'attributes':'ra'}
+            metadata['filters_keys']['ra'].append('Symbol')
         metadata['row_name'] = dataset.loom.row_name
         metadata['col_name'] = dataset.loom.col_name
         metadata['cell_number'] = dataset.loom.cellNumber
