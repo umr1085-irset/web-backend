@@ -117,7 +117,7 @@ class GetLoomStatistics(APIView):
         response_data = dict()
 
 
-        if (filters['ca']!={}) or (filters['ra']=={}):
+        if (filters['ca']!={}) or (filters['ra']!={}):
             cidx_filter, ridx_filter = get_filter_indices(data.file.path,filters)
         else:
             cidx_filter, ridx_filter = (None,None)
