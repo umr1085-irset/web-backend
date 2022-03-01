@@ -661,7 +661,9 @@ def most_variable_symbols(loom_path,n=10,ridx_filter=None,cidx_filter=None):
     labels = get_ra(loom_path,key='Symbol',unique=False,ridx_filter=ridx_filter) # get symbols (filter applied)
     df = loompy.connect(loom_path,'r')
     if isinstance(ridx_filter, np.ndarray) and isinstance(cidx_filter, np.ndarray):
-        v = np.var(df[ridx_filter, cidx_filter],axis=1) # compute variances
+        tmp = df[ridx_filter,:] # can't slice both axes at once
+        tmp = tmp[:,cidx_filter]
+        v = np.var(tmp,axis=1) # computer variance
     elif isinstance(ridx_filter, np.ndarray):
         v = np.var(df[ridx_filter, :],axis=1) # compute variances
     elif isinstance(cidx_filter, np.ndarray):
