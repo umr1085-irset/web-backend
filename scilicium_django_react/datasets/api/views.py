@@ -214,7 +214,7 @@ class GetLoomPlots(APIView):
         # Get data
         data = get_object_or_404(Loom,id=data_id)
 
-        if (filters['ca']!={}) or (filters['ra']=={}):
+        if (filters['ca']!={}) or (filters['ra']!={}):
             cidx_filter, ridx_filter = get_filter_indices(data.file.path,filters)
         else:
             cidx_filter, ridx_filter = (None,None)
@@ -233,6 +233,8 @@ class GetLoomPlots(APIView):
         response_data = dict()
         response_data["name"] = data.name
         response_data["classes"] = data.classes
+        print(ridx_filter)
+        print(filters['ra'])
         if genes_menu != 'undefined':
             response_data["genes_menu"] = get_ra(data.file.path,unique=True,ridx_filter=ridx_filter)
         if style =="scatter":
@@ -242,7 +244,7 @@ class GetLoomPlots(APIView):
             return response
 
         elif style=='hexbin':
-            response_data['chart'] = json_hexbin(data.file.path,reduction=reduction,cmap=plt.cm.Greys,background='white',cidx_filter=cidx_filter)
+            response_data['chart'] = json_hexbin(data.file.path,reduction=reduction,cmap=plt.cm.Greys,background='white',cidx_filter=cidx_filter,ridx_filter=ridx_filter)
             response_data['style'] = 'hexbin'
             response = Response(response_data, status=status.HTTP_200_OK)
             return response
@@ -260,7 +262,7 @@ class GetLoomPlots(APIView):
             return response
         
         elif style=='density':
-            response_data['chart'],response_data['legend'] = json_density(data.file.path,reduction=reduction,ca=attrs,symbols=symbols,cidx_filter=cidx_filter)
+            response_data['chart'],response_data['legend'] = json_density(data.file.path,reduction=reduction,ca=attrs,symbols=symbols,cidx_filter=cidx_filter,ridx_filter=ridx_filter)
             response_data['style'] = 'density'
             response = Response(response_data, status=status.HTTP_200_OK)
             return response

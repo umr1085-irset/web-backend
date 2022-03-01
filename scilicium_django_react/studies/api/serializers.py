@@ -104,7 +104,7 @@ class StudySerializer(serializers.ModelSerializer):
     article = ArticleSerializer(many=True, read_only=True)
     dataset_of = DatasetSerializer(many=True, read_only=True)
     created_by = GetFullUserSerializer(many=False, read_only=True)
-    contributor = ContributorSerializer(many=False, read_only=True)
+    contributor = ContributorSerializer(many=True, read_only=True)
     viewer = ViewerSerializer(many=True, read_only=True)
     class Meta:
         model = Study
