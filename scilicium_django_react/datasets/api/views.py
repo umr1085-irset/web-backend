@@ -244,7 +244,7 @@ class GetLoomPlots(APIView):
             return response
 
         elif style=='hexbin':
-            response_data['chart'] = json_hexbin(data.file.path,reduction=reduction,cmap=plt.cm.Greys,background='white',cidx_filter=cidx_filter,ridx_filter=ridx_filter)
+            response_data['chart'] = json_hexbin(data.file.path,reduction=reduction,cmap=plt.cm.Greys,background='white',cidx_filter=cidx_filter)
             response_data['style'] = 'hexbin'
             response = Response(response_data, status=status.HTTP_200_OK)
             return response
@@ -262,7 +262,7 @@ class GetLoomPlots(APIView):
             return response
         
         elif style=='density':
-            response_data['chart'],response_data['legend'] = json_density(data.file.path,reduction=reduction,ca=attrs,symbols=symbols,cidx_filter=cidx_filter,ridx_filter=ridx_filter)
+            response_data['chart'],response_data['legend'] = json_density(data.file.path,reduction=reduction,ca=attrs,symbols=symbols,cidx_filter=cidx_filter)
             response_data['style'] = 'density'
             response = Response(response_data, status=status.HTTP_200_OK)
             return response
