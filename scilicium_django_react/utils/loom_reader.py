@@ -880,13 +880,15 @@ def violin_json(loom_path,attribute='',symbols=[],cidx_filter=None,returnjson=Tr
     colors = n_colors(len(unique_values))
     for i,value in enumerate(unique_values):
         idx = np.where(attr_values==value)[0]
+        # name are visible so no need to show legend
         fig.add_trace(go.Violin(x=symbol_values[idx],
                                 name=value,
                                 showlegend=False,
                                 box_visible=True,
                                 meanline_visible=True,
                                 line=dict(color=colors[i])))
-    
+
+
     fig.update_layout(
         # background color white
         paper_bgcolor='rgba(0,0,0,0)',
