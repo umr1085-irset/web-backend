@@ -550,6 +550,24 @@ def get_classes(loom_path):
     df.close()
     return classes
 
+def get_most_variable_genes(loom_path):
+    '''
+    Extract most variable genes stored in loom
+    
+    Params
+    ------
+    loom_path : str
+        Path to a .loom file
+
+    Return
+    ------
+    list
+    '''
+    df = loompy.connect(loom_path,'r') # open loom connection
+    genes = df.attrs.most_variable_genes.split(',')
+    df.close()
+    return genes
+
 def check_ra(loom_path,key):
     '''
     Check if the row metadata exists

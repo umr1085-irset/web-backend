@@ -29,10 +29,11 @@ class biomaterialMeta(models.Model):
     )
 
     GENDER = (
-        ('MALE','Male'),
-        ('FEMALE','Female'),
-        ('MIXED','Mixed'),
-        ('OTHER','Other'),
+        ('male','Male'),
+        ('female','Female'),
+        ('mixed','Mixed'),
+        ('other','Other'),
+        ('unknown','Unknown'),
     )
     name = models.CharField(max_length=100, default="",blank=True, null=True)
     tissue = models.ManyToManyField(Tissue, related_name='as_tissue', blank=True)
