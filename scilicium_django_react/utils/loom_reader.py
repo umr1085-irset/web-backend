@@ -293,7 +293,7 @@ def continuous_scatter_gl(x,y,color,tracename=''):
         mode='markers',
         marker=dict(
             color=color,
-            colorscale='magma',
+            colorscale='matter',
             size=4
         ),
         name=tracename,
@@ -780,6 +780,7 @@ def dotplot_json(loom_path,attribute='',symbols=[],cidx_filter=None,ridx_filter=
     x = i_coords.flatten()
     y = j_coords.flatten()
     cs = [[0.0, "#EBC89B"], [0.5,"#FB6404"],[1, "#67000C"]]
+    #cs = [[0.0,"#ebe7e1"],[0.5, "#c27a67"],[1, "#c27a67"]]
     fig = px.scatter(x=x, y=y,size=sizes.values.T.flatten(),color=colors.values.T.flatten(),color_continuous_scale=cs)
     
     fig.update_layout(
@@ -863,6 +864,7 @@ def violin_json(loom_path,attribute='',symbols=[],cidx_filter=None,returnjson=Tr
         idx = np.where(attr_values==value)[0]
         fig.add_trace(go.Violin(x=symbol_values[idx],
                                 name=value,
+                                showlegend=False,
                                 box_visible=True,
                                 meanline_visible=True,
                                 line=dict(color=colors[i])))
@@ -920,7 +922,7 @@ def density_symbols(loom_path,X,Y,symbols,cidx_filter=None):
         fig['data'][i]['ncontours'] = 20
     
     lgd = dict()
-    gene_colors = ['rgba(239,4,4,1)','rgba(239, 122, 4,1)','rgba(239, 239, 4,1)','rgba(122, 239, 4,1)','rgba(4, 239, 239,1)','rgba(4, 122, 239,1)','rgba(122, 4, 239,1)','rgba(239, 4, 239,1)','rgba(239, 4, 122,1)','rgba(4, 239, 4,1)']
+    gene_colors = ['rgba(214,121,5,1)','rgba(239, 122, 4,1)','rgba(239, 239, 4,1)','rgba(122, 239, 4,1)','rgba(4, 239, 239,1)','rgba(4, 122, 239,1)','rgba(122, 4, 239,1)','rgba(239, 4, 239,1)','rgba(239, 4, 122,1)','rgba(4, 239, 4,1)']
 
     traces=[]
     if isinstance(cidx_filter, np.ndarray): # if filter exists
