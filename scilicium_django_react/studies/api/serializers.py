@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from scilicium_django_react.studies.models import *
-from scilicium_django_react.datasets.api.serializers import DatasetSerializer
+from scilicium_django_react.datasets.api.serializers import DatasetSerializer, BasicDatasetSerializer
 from scilicium_django_react.users.api.serializers import GetFullUserSerializer
 
 
@@ -102,7 +102,7 @@ class StudySerializer(serializers.ModelSerializer):
 
     collection = ProjectSerializer(many=False, read_only=True)
     article = ArticleSerializer(many=True, read_only=True)
-    dataset_of = DatasetSerializer(many=True, read_only=True)
+    dataset_of = BasicDatasetSerializer(many=True, read_only=True)
     created_by = GetFullUserSerializer(many=False, read_only=True)
     contributor = ContributorSerializer(many=True, read_only=True)
     viewer = ViewerSerializer(many=True, read_only=True)

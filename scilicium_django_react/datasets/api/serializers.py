@@ -72,6 +72,22 @@ class PublicDatasetSerializer(serializers.ModelSerializer):
             'url': {'lookup_field': 'datasetId'}
         }
 
+
+class BasicDatasetSerializer(serializers.ModelSerializer):
+    loom = LoomSerializer(many=False, read_only=True)
+    sop = sopMetaSerializer(many=False, read_only=True)
+    bioMeta = biomaterialMetaSerializer(many=False, read_only=True)
+    
+    class Meta:
+        model = Dataset
+        fields = "__all__"
+
+        lookup_field = 'datasetId'
+        extra_kwargs = {
+            'url': {'lookup_field': 'datasetId'}
+        }
+
+
 class DatasetSerializer(serializers.ModelSerializer):
     loom = LoomSerializer(many=False, read_only=True)
     sop = sopMetaSerializer(many=False, read_only=True)

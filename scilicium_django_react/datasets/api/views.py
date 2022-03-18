@@ -16,7 +16,7 @@ from django.conf import settings
 
 from matplotlib import pyplot as plt
 from scilicium_django_react.datasets.models import Dataset, Loom
-from scilicium_django_react.datasets.api.serializers import DatasetSerializer, LoomSerializer, PublicDatasetSerializer
+from scilicium_django_react.datasets.api.serializers import DatasetSerializer, LoomSerializer, PublicDatasetSerializer, BasicDatasetSerializer
 from scilicium_django_react.users.models import User
 from scilicium_django_react.utils.loom_reader import *
 from scilicium_django_react.utils.chartjsCreator import *
@@ -61,6 +61,16 @@ class DatasetViewSet(viewsets.ModelViewSet):
         else :
             return Response('Your are not allowed to access this ressource', status=status.HTTP_403_FORBIDDEN)
     
+
+    @action(detail=True, permission_classes=[permissions.AllowAny],url_path='overview', url_name='overview')
+    def overview(self, request, *args, **kwargs):
+        dataset = self.get_object()
+        if dataset.status == "PUBLIC" or dataset.created_by == self.request.user:
+            serializer = BasicDatasetSerializer(dataset)
+            return Response(serializer.data)
+        else :
+            return Response('Your are not allowed to access this ressource', status=status.HTTP_403_FORBIDDEN)
+
     @action(detail=True, permission_classes=[permissions.AllowAny],url_path='download', url_name='download')
     def download(self, request, *args, **kwargs):
         dataset = self.get_object()
