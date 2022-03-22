@@ -374,6 +374,10 @@ def json_scatter(loom_path,color=None,reduction=None,returnjson=True,cidx_filter
 
     if color!=None:
         if np.issubdtype(tmpcolor.dtype, np.number): # if color is None or type of color array is numerical
+            idx = np.argsort(tmpcolor)
+            tmpcolor = tmpcolor[idx]
+            x = x[idx]
+            y = y[idx]
             fig.add_trace(continuous_scatter_gl(x,y,tmpcolor,tracename=color))
         else: # discrete
             fig.add_traces(discrete_scatter_gl(x,y,tmpcolor))
