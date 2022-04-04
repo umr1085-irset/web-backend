@@ -134,6 +134,7 @@ class StudyPublicSerializer(serializers.ModelSerializer):
     species = serializers.SerializerMethodField('get_species')
     dev_stage = serializers.SerializerMethodField('get_dev_stage')
     tissues = serializers.SerializerMethodField('get_tissues')
+    organs = serializers.SerializerMethodField('get_organs')
     gender = serializers.SerializerMethodField('get_gender')
     pmids = serializers.SerializerMethodField('get_pub_pmids')
     created_by = GetFullUserSerializer(many=False, read_only=True)
@@ -162,10 +163,15 @@ class StudyPublicSerializer(serializers.ModelSerializer):
             for x in dataset.bioMeta.tissue.all():
                 if x.ontologyLabel not in tissues:
                     tissues.append(x.ontologyLabel)
-            for x in dataset.bioMeta.organ.all():
-                if x.ontologyLabel not in tissues:
-                    tissues.append(x.ontologyLabel)
         return tissues
+    
+    def get_organs(self, study):
+        organs = []
+        for dataset in study.dataset_of.all():
+            for x in dataset.bioMeta.organ.all():
+                if x.ontologyLabel not in organs:
+                    organs.append(x.ontologyLabel)
+        return organs
     
     def get_species(self, study):
         species = []
@@ -222,6 +228,7 @@ class StudyPublicSerializer(serializers.ModelSerializer):
             "dev_stage",
             "gender",
             "tissues",
+            "organs",
             "pmids",
             'viewer'
         )
