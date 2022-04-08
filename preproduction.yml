@@ -1,0 +1,77 @@
+version: '3'
+
+volumes:
+  production_postgres_data: {}
+  production_postgres_data_backups: {}
+  production_traefik: {}
+
+services:
+  django: &django
+    build:
+      context: .
+      dockerfile: ./compose/production/django/Dockerfile
+    image: scilicium/geno_app_django:dev
+    depends_on:
+      - postgres
+      - redis
+    env_file:
+      - ./.envs/.production/.django
+      - ./.envs/.production/.postgres
+    command: /start
+    networks:
+      - web
+      - genoapp
+
+  postgres:
+    build :
+      context: .
+      dockerfile: ./compose/production/postgres/Dockerfile
+    image: scilicium/geno_app_postgres:dev
+    container_name: postgres
+    expose:
+      - 5432
+    volumes:
+      - production_postgres_data:/var/lib/postgresql/data:Z
+      - production_postgres_data_backups:/backups:z
+    env_file:
+      - ./.envs/.production/.postgres
+    networks:
+      - web
+      - genoapp
+
+  redis:
+    image: redis:5.0
+    networks:
+      - web
+      - genoapp
+
+  celeryworker:
+    <<: *django
+    image: scilicium/geno_app_celeryworker:dev
+    command: /start-celeryworker
+    networks:
+      - web
+      - genoapp
+
+  celerybeat:
+    <<: *django
+    image: scilicium/geno_app_celerybeat:dev
+    command: /start-celerybeat
+    networks:
+      - web
+      - genoapp
+
+  flower:
+    <<: *django
+    image: scilicium/geno_app_flower:dev
+    command: /start-flower
+    networks:
+      - web
+      - genoapp
+
+
+networks:
+  web:
+    external: true
+  genoapp:
+    external: true

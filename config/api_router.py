@@ -4,8 +4,9 @@ from django.conf.urls import url, include
 from rest_framework.routers import DefaultRouter, SimpleRouter
 
 from scilicium_django_react.users.api.views import UserViewSet, UserActivationView
-from scilicium_django_react.projects.api.views import ProjectViewSet
+from scilicium_django_react.studies.api.urls import *
 from scilicium_django_react.datasets.api.views import *
+from scilicium_django_react.studies.api.views import GetPublicStudies,StudyViewSet, ProjectViewSet
 
 
 if settings.DEBUG:
@@ -14,9 +15,9 @@ else:
     router = SimpleRouter()
 
 router.register("users", UserViewSet)
-router.register("v1/projects", ProjectViewSet, basename="projects")
-router.register("v1/studies", StudyViewSet, basename="datasets")
-router.register("v1/data", DatasetViewSet, basename="datasets")
+router.register("v1/datasets", DatasetViewSet, basename="datasets")
+router.register("v1/studies", StudyViewSet, basename="studies")
+router.register("v1/projects", ProjectViewSet, basename="studies")
 
 
 
@@ -26,16 +27,8 @@ urlpatterns += [
     url(r'^v1/', include('djoser.urls')),
     url(r'^v1/', include('djoser.urls.authtoken')),
     url(r'^auth/users/activate/(?P<uid>[\w-]+)/(?P<token>[\w-]+)/$', UserActivationView.as_view()),
-    url(r'^v1/view_data', DataFormatPlotView.as_view(), name='view_data'),
-    url(r'^v1/studies/public', StudyAllViewSet.as_view(), name='public_datasets'),
+    url(r'^v1/dataset/attributes/', GetLoomPlots.as_view(),name="dataset_attributes" ),
+    url(r'^v1/dataset/statistics/', GetLoomStatistics.as_view(),name="dataset_statistics" ),
+    url(r'^v1/dataset/genes/', GetLoomGenes.as_view(),name="dataset_genes" ),
+    url(r'^v1/public/studies/', GetPublicStudies.as_view(),name="public_studies" ),
 ]
-
-# Route associated to data processing
-urldata = [
-    url(r'^v1/data/count', DataGetCellCount.as_view(), name='data_count'),
-    url(r'^v1/data/sexrep', DataGetSexRepartition.as_view(), name='sex_rep'),
-    url(r'^v1/data/cellcountbygroup', DataCellCountbyCluster.as_view(), name='cellcout_group'),
-]
-
-
-urlpatterns += urldata

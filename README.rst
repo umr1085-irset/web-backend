@@ -124,4 +124,8 @@ See detailed `cookiecutter-django Docker documentation`_.
 .. _`cookiecutter-django Docker documentation`: http://cookiecutter-django.readthedocs.io/en/latest/deployment-with-docker.html
 
 
+Build Images
 
+docker build -t tdarde/geno_app_back:dev ./compose/production/django/Dockerfile
+docker build -t tdarde/geno_app_back_db:dev ./compose/production/postgres/Dockerfile
+docker build -t tdarde/geno_app_back_traefik:dev ./compose/production/traefik/Dockerfile

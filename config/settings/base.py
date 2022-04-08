@@ -74,12 +74,14 @@ THIRD_PARTY_APPS = [
     "rest_framework.authtoken",
     "djoser",
     "corsheaders",
+    "django_better_admin_arrayfield.apps.DjangoBetterAdminArrayfieldConfig",
 ]
 
 LOCAL_APPS = [
     "scilicium_django_react.users.apps.UsersConfig",
-    "scilicium_django_react.projects.apps.ProjectsConfig",
-    "scilicium_django_react.datasets.apps.DatasetsConfig",
+    "scilicium_django_react.ontologies.apps.OntologiesAppConfig",
+    "scilicium_django_react.studies.apps.StudiesConfig",
+    "scilicium_django_react.datasets.apps.DatasetsConfig"
     # Your stuff: custom apps go here
 ]
 # https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps

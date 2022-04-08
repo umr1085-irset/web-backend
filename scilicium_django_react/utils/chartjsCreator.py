@@ -62,7 +62,6 @@ def createBarChart(data):
         data: obj {label:label_value...}
         Return chartjs obj for pie chart
     """
-    print(data)
     bar_data = dict()
     bar_data["labels"] = []
     bar_data["datasets"] = list()

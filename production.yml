@@ -7,10 +7,7 @@ volumes:
 
 services:
   django: &django
-    build:
-      context: .
-      dockerfile: ./compose/production/django/Dockerfile
-    image: scilicium_django_react_production_django
+    image: scilicium/geno_app_django:dev
     depends_on:
       - postgres
       - redis
@@ -18,56 +15,66 @@ services:
       - ./.envs/.production/.django
       - ./.envs/.production/.postgres
     command: /start
+    labels:
+      - traefik.enable=true
+      - traefik.http.services.genoapp-back-static-prod.loadbalancer.server.port=5000
+      - traefik.http.routers.genoapp-back-static-prod.rule=Host(`admin-genoapp.scilicium.com`)
+      - traefik.http.routers.genoapp-back-static-prod.entryPoints=websecure
+
+    networks:
+      - web
+      - genoapp
+    expose:  # new
+      - 5000
+
 
   postgres:
-    build:
-      context: .
-      dockerfile: ./compose/production/postgres/Dockerfile
-    image: scilicium_django_react_production_postgres
+    image: scilicium/geno_app_postgres:dev
+    container_name: postgres
+    expose:
+      - 5432
     volumes:
       - production_postgres_data:/var/lib/postgresql/data:Z
       - production_postgres_data_backups:/backups:z
     env_file:
       - ./.envs/.production/.postgres
-
-  traefik:
-    build:
-      context: .
-      dockerfile: ./compose/production/traefik/Dockerfile
-    image: scilicium_django_react_production_traefik
-    depends_on:
-      - django
-    volumes:
-      - production_traefik:/etc/traefik/acme:z
-    ports:
-      - "0.0.0.0:80:80"
-      - "0.0.0.0:443:443"
-      - "0.0.0.0:5555:5555"
+    networks:
+      - web
+      - genoapp
 
   redis:
     image: redis:5.0
+    networks:
+      - web
+      - genoapp
 
   celeryworker:
     <<: *django
-    image: scilicium_django_react_production_celeryworker
+    image: scilicium/geno_app_celeryworker:dev
     command: /start-celeryworker
+    networks:
+      - web
+      - genoapp
 
   celerybeat:
     <<: *django
-    image: scilicium_django_react_production_celerybeat
+    image: scilicium/geno_app_celerybeat:dev
     command: /start-celerybeat
+    networks:
+      - web
+      - genoapp
 
   flower:
     <<: *django
-    image: scilicium_django_react_production_flower
+    image: scilicium/geno_app_flower:dev
     command: /start-flower
+    networks:
+      - web
+      - genoapp
 
-  
-  awscli:
-    build:
-      context: .
-      dockerfile: ./compose/production/aws/Dockerfile
-    env_file:
-      - ./.envs/.production/.django
-    volumes:
-      - production_postgres_data_backups:/backups:z
+
+networks:
+  web:
+    external: true
+  genoapp:
+    external: true
