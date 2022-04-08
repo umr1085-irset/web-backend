@@ -6,6 +6,7 @@ import plotly.express as px
 import plotly.io as pio
 import numpy as np
 import json
+import time
 from copy import copy
 
 def get_available_reductions(loom_path):
@@ -355,6 +356,7 @@ def json_scatter(loom_path,color=None,reduction=None,returnjson=True,cidx_filter
     ------
     Plotly figure or its JSON form
     '''
+    start = time.time()
     if reduction==None:
         reduction = get_available_reductions(loom_path)[0] # first reduction available
     X,Y = get_reduction_x_y(loom_path,reduction)
@@ -397,10 +399,16 @@ def json_scatter(loom_path,color=None,reduction=None,returnjson=True,cidx_filter
     )
     fig.update_yaxes(showticklabels=False)
     fig.update_xaxes(showticklabels=False)
-
+    end = time.time()
     if returnjson:
+        print('#######################')
+        print(end - start)
+        print('#######################')
         return json.loads(pio.to_json(fig, validate=True, pretty=False, remove_uids=True))
     else:
+        print('#######################')
+        print(end - start)
+        print('#######################')
         return fig
     
 def get_hexbin_attributes(hexbin):
@@ -931,7 +939,6 @@ def density_ca(loom_path,X,Y,cidx_filter=None,ca=None):
         traces = px.density_contour(df, x=X, y=Y, color=ca, color_discrete_sequence=color_seq).data
         fig.add_traces(traces)
         lgd = {trace['name']:trace['line']['color'] for trace in traces}
-        print(lgd)
     else:
         traces = px.density_contour(df, x=X, y=Y).data
         fig.add_traces(traces)
