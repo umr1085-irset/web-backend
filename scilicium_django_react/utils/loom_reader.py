@@ -680,8 +680,12 @@ def most_variable_symbols(loom_path,n=10,ridx_filter=None,cidx_filter=None):
     ------
     Array of symbols
     '''
+    
+    df = loompy.connect(loom_path)
+    if cidx_filter==None and ridx_filter==None and df.attrs.most_variable_genes:
+        return df.attrs.most_variable_genes.split(',')
+            
     labels = get_ra(loom_path,key='Symbol',unique=False,ridx_filter=ridx_filter) # get symbols (filter applied)
-    df = loompy.connect(loom_path,'r')
     if isinstance(ridx_filter, np.ndarray) and isinstance(cidx_filter, np.ndarray):
         tmp = df[ridx_filter,:] # can't slice both axes at once
         tmp = tmp[:,cidx_filter]
