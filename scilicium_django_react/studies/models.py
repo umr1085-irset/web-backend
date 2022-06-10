@@ -3,6 +3,7 @@ from django.conf import settings
 from django.utils import timezone 
 # Create your models here.
 from django.contrib.auth.models import  User
+from scilicium_django_react.ontologies.models import Topics
 from django_better_admin_arrayfield.models.fields import ArrayField
 
 
@@ -56,7 +57,7 @@ class Article(models.Model):
     abstract = models.TextField("description", blank=True)
     journal = models.CharField(max_length=200, blank=True, null=True)
     volume = models.IntegerField(blank=True, null=True)
-    releaseDate = models.DateTimeField(auto_now=False, null=True)
+    releaseDate = models.DateField(auto_now=False, null=True)
     author = models.ManyToManyField(Author, related_name='write_by', blank=True)
 
     def __str__(self):
@@ -76,7 +77,7 @@ class Project(models.Model):
     projectId = models.CharField(max_length=200)
     description = models.TextField("description", blank=True)
     status = models.CharField(max_length=50, choices=PROJECT_STATUS, default="PRIVATE")
-    created_at = models.DateTimeField(auto_now_add=True, auto_now=False)
+    created_at = models.DateField(auto_now_add=True, auto_now=False)
     created_by = models.ForeignKey(settings.AUTH_USER_MODEL, blank=True, null=True, on_delete=models.CASCADE, related_name='project_created_by')
 
     def __str__(self):
@@ -108,10 +109,10 @@ class Study(models.Model):
     studyId = models.SlugField(max_length=200)
     description = models.TextField("description", blank=True, null=True)
     status = models.CharField(max_length=50, choices=STUDY_STATUS, default="PRIVATE")
-    created_at = models.DateTimeField(auto_now_add=True, auto_now=False)
+    created_at = models.DateField(auto_now_add=True, auto_now=False)
     created_by = models.ForeignKey(settings.AUTH_USER_MODEL, blank=True, null=True, on_delete=models.CASCADE, related_name='study_created_by')
     updated_at = AutoDateTimeField(default=timezone.now)
-    topics = models.CharField(max_length=100, choices=STUDY_TOPICS, default="PRIVATE")
+    topics = models.ManyToManyField(Topics, related_name='have_topics', blank=True)
     collection = models.ForeignKey(Project, blank=True, null=True, on_delete=models.SET_NULL, related_name='study_of')
     article = models.ManyToManyField(Article, related_name='study_from', blank=True)
     viewer = models.ManyToManyField(Viewer, related_name='as_study', blank=True)
