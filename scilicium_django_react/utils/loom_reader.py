@@ -249,6 +249,7 @@ def json_component_chartjs(loom_path,style='pie',attrs=[],cidx_filter=None):
     chart['labels'] = lbls.tolist()
     if style=='bar':
         res['options']['legend']={'display':False}
+        #res['options']['scales']={'xAxes':[{'ticks':{'min':0}}]}
     if style=='pie':
         res['options']['legend']={'position':'left','maxWidth':120,'labels':{'boxWidth':10,'padding':4,'font':{'size':8,'lineHeight':1}}}
     
