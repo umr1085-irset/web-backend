@@ -139,6 +139,19 @@ class StudyPublicSerializer(serializers.ModelSerializer):
     pmids = serializers.SerializerMethodField('get_pub_pmids')
     created_by = GetFullUserSerializer(many=False, read_only=True)
     viewer = ViewerSerializer(many=True, read_only=True)
+    #age_range = serializers.SerializerMethodField('get_age_range')
+
+    #def get_age_range(self, study):
+    #    ageRanges = []
+    #    for dataset in study.dataset_of.all():
+    #        ageStart = dataset.bioMeta.age_start
+    #        ageEnd = dataset.bioMeta.age_end
+    #        ageUnit = dataset.bioMeta.age_unit
+    #        ageRange = ageStart
+    #        if ageRange not in ageRanges:
+    #            ageRanges.append(ageRange)
+    #    return ageRanges
+
 
 
     def get_technology(self, study):

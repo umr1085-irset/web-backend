@@ -16,9 +16,10 @@ class biomaterialMetaSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 class sopMetaSerializer(serializers.ModelSerializer):
-    omics= TissueSerializer(many=True, read_only=True)
+    omics= OmicsSerializer(many=True, read_only=True)
     technoGrain = GranularitySerializer(many=True, read_only=True)
-    technology = OmicsSerializer(many=True, read_only=True)
+    technology = SequencingSerializer(many=True, read_only=True)
+    molecules = ChemicalSerializer(many=True, read_only=True)
     expProcess = ExperimentalProcessSerializer(many=True, read_only=True)
     class Meta:
         model = sopMeta
@@ -36,32 +37,136 @@ class DatasetUnrelatedSerializer(serializers.ModelSerializer):
 
 class PublicDatasetSerializer(serializers.ModelSerializer):
     loom = LoomSerializer(many=False, read_only=True)
-    technology = serializers.SerializerMethodField('getTechnologies')
-    type = serializers.SerializerMethodField('getType')
-    gender = serializers.SerializerMethodField('getGender')
-    devStage = serializers.SerializerMethodField('getDevStage')
+    #sop = sopMetaSerializer(many=False, read_only=True)
+    #bioMeta = biomaterialMetaSerializer(many=False, read_only=True)
+    omics = serializers.SerializerMethodField('getOmics')
+    resolution = serializers.SerializerMethodField('getGranularity')
+    technology = serializers.SerializerMethodField('getTechnology')
+    #technology = SequencingSerializer(many=True, read_only=True)
+    #molecules = ChemicalSerializer(many=True, read_only=True)
+
+    molecules  = serializers.SerializerMethodField('getMolecules')
+    #expProcess = ExperimentalProcessSerializer(many=True, read_only=True)
+    expProcess = serializers.SerializerMethodField('getExpProcess')
+    techno_description = serializers.SerializerMethodField('getTechnoDescription')
+    ageRange = serializers.SerializerMethodField('getAgeRange')
+    developmentStage = serializers.SerializerMethodField('getDevStage')
+    sex = serializers.SerializerMethodField('getSex')
+    species = serializers.SerializerMethodField('getSpecies')
+    organ = serializers.SerializerMethodField('getOrgans')
     tissue = serializers.SerializerMethodField('getTissues')
+    diseaseStage = serializers.SerializerMethodField('getDiseaseStage')
+    loomColInfo = serializers.SerializerMethodField('getLoomColInfo')
 
-    def getTechnologies(self, dataset):
-        return dataset.sop.technology.ontologyLabel
+
+    #gender = serializers.SerializerMethodField('getGender')
+    #devStage = serializers.SerializerMethodField('getDevStage')
+    #tissue = serializers.SerializerMethodField('getTissues')
+
     
-    def getType(self, dataset):
-        return dataset.sop.omics.ontologyLabel
+    def getLoomColInfo(self, dataset):
+        unit = dataset.loom.col_name
+        if unit is None : 
+            unit = "cells"
+        nb = str(dataset.loom.cellNumber)
+        colInfo = nb + " " + unit
+        return colInfo
 
-    def getGender(self, dataset):
+    def getAgeRange(self, dataset):
+        age_start = str(dataset.bioMeta.age_start)
+        age_end = str(dataset.bioMeta.age_end)
+        age_unit = dataset.bioMeta.age_unit
+        ageRange = age_start + "-" + age_end + " " + age_unit
+        return ageRange
+
+    def getSex(self, dataset):
         return dataset.bioMeta.sex
 
-    def getTissues(self, dataset):
-        tissues = list()
-        for tissue in dataset.bioMeta.tissue.all() :
-            tissues.append(tissue.ontologyLabel) if tissue.ontologyLabel not in tissues else tissues
-        return tissues
-    
+    def getDiseaseStage(self, dataset):
+        return dataset.bioMeta.diseaseStage
+
+    def getSpecies(self, dataset):
+        labels=[]
+        for x in dataset.bioMeta.species.all():
+            label = x.displayLabel;
+            if label not in labels : 
+                labels.append(label)
+        return labels
+
+
     def getDevStage(self, dataset):
-        devStage = list()
-        for stage in dataset.bioMeta.developmentStage.all() :
-            devStage.append(stage.ontologyLabel) if stage.ontologyLabel not in devStage else devStage
-        return devStage
+        labels=[]
+        for x in dataset.bioMeta.developmentStage.all():
+            label = x.displayLabel;
+            if label not in labels : 
+                labels.append(label)
+        return labels
+
+    def getOrgans(self, dataset):
+        labels=[]
+        for x in dataset.bioMeta.organ.all():
+            label = x.displayLabel;
+            if label not in labels : 
+                labels.append(label)
+        return labels
+
+    def getTissues(self, dataset):
+        labels=[]
+        for x in dataset.bioMeta.tissue.all():
+            label = x.displayLabel;
+            if label not in labels : 
+                labels.append(label)
+        return labels
+
+
+    def getOmics(self, dataset):
+        labels=[]
+        for x in dataset.sop.omics.all():
+            label = x.displayLabel;
+            if label not in labels : 
+                labels.append(label)
+        return labels
+
+    
+    
+    def getGranularity(self, dataset):
+        labels=[]
+        for x in dataset.sop.resolution.all():
+            label = x.displayLabel;
+            if label not in labels : 
+                labels.append(label)
+        return labels 
+    
+    
+    def getTechnology(self, dataset):
+        labels=[]
+        for x in dataset.sop.technology.all():
+            label = x.displayLabel;
+            if label not in labels : 
+                labels.append(label)
+        return labels 
+    
+    
+    
+    def getMolecules(self, dataset):
+        labels=[]
+        for x in dataset.sop.molecule_applied.all():
+            label = x.displayLabel;
+            if label not in labels : 
+                labels.append(label)
+        return labels 
+
+
+    def getExpProcess(self, dataset):
+        labels=[]
+        for x in dataset.sop.experimentalDesign.all():
+            label = x.displayLabel;
+            if label not in labels : 
+                labels.append(label)
+        return labels 
+
+    def getTechnoDescription(self, dataset):
+        return dataset.sop.techno_description
 
     class Meta:
         model = Dataset
@@ -71,6 +176,7 @@ class PublicDatasetSerializer(serializers.ModelSerializer):
         extra_kwargs = {
             'url': {'lookup_field': 'datasetId'}
         }
+
 
 
 class BasicDatasetSerializer(serializers.ModelSerializer):
@@ -88,6 +194,7 @@ class BasicDatasetSerializer(serializers.ModelSerializer):
         }
 
 
+                                                                                                                                                                                                                                                                                                                                                                                       
 class DatasetSerializer(serializers.ModelSerializer):
     loom = LoomSerializer(many=False, read_only=True)
     sop = sopMetaSerializer(many=False, read_only=True)
@@ -139,7 +246,4 @@ class DatasetSerializer(serializers.ModelSerializer):
         model = Dataset
         fields = "__all__"
 
-        lookup_field = 'datasetId'
-        extra_kwargs = {
-            'url': {'lookup_field': 'datasetId'}
-        }
+
