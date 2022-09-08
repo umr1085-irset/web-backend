@@ -1,0 +1,5 @@
+Study.title;Study.description;Study.status;Study.article;Study.viewer;Study.dataCurators;Study.externalID;Study.relatedDataset
+"My test study";"description interesseante";Private;pubmed:31763714;Uncover;Gwendo;geo:GSE123359,SRP1250;
+"Study2";;Private;pubmed:31760001;Uncover;Lo;;ImportDS11
+"Study3withdataset";;Private;pubmed:31663714;Uncover;Lo;;
+"Studytest4";;Private;pubmed:31212123;Uncover;Lo;;Zhang_2021_PNAS,Arguello_2020_Cell_Meta

@@ -1,0 +1,257 @@
+﻿displayLabel;ontologyID;ontologyLabel;model
+Homo sapiens (Human);http://purl.obolibrary.org/obo/NCBITaxon_9606;Homo sapiens;Species
+Mus musculus (Mouse);http://purl.obolibrary.org/obo/NCBITaxon_10090;Mus musculus;Species
+Sus scrofa (Pig);http://purl.obolibrary.org/obo/NCBITaxon_9823;Sus scrofa;Species
+Danio rerio (Zebrafish);http://purl.obolibrary.org/obo/NCBITaxon_7955;Danio rerio;Species
+Rattus norvegicus (Rat);http://purl.obolibrary.org/obo/NCBITaxon_10116;Rattus norvegicus;Species
+Cavia porcellus (Guinea pig);http://purl.obolibrary.org/obo/NCBITaxon_10141;Cavia porcellus;Species
+Canis lupus familiaris (Dog);http://purl.obolibrary.org/obo/NCBITaxon_9615;Canis lupus familiaris;Species
+Macaca mulatta (Rhesus macaque);http://purl.obolibrary.org/obo/NCBITaxon_9544;Macaca mulatta;Species
+Bos taurus (Bovine);http://purl.obolibrary.org/obo/NCBITaxon_9913;Bos taurus;Species
+Gallus gallus (Chicken);http://purl.obolibrary.org/obo/NCBITaxon_9031;Gallus gallus;Species
+adrenal gland;http://purl.obolibrary.org/obo/UBERON_0002369;adrenal gland;BiomaterialCollectedFrom
+brain;http://purl.obolibrary.org/obo/UBERON_0000178;brain;BiomaterialCollectedFrom
+colon;http://purl.obolibrary.org/obo/UBERON_0001155;colon;BiomaterialCollectedFrom
+diaphragm;http://purl.obolibrary.org/obo/UBERON_0001103;diaphragm;BiomaterialCollectedFrom
+ear;http://purl.obolibrary.org/obo/UBERON_0001690;ear;BiomaterialCollectedFrom
+esophagus;http://purl.obolibrary.org/obo/UBERON_0001043;esophagus;BiomaterialCollectedFrom
+eye;http://purl.obolibrary.org/obo/UBERON_0000970;eye;BiomaterialCollectedFrom
+gall bladder;http://purl.obolibrary.org/obo/UBERON_0002110;gall bladder;BiomaterialCollectedFrom
+ganglion;http://purl.obolibrary.org/obo/UBERON_0000045;ganglion;BiomaterialCollectedFrom
+gonad;http://purl.obolibrary.org/obo/UBERON_0000991;gonad;BiomaterialCollectedFrom
+heart;http://purl.obolibrary.org/obo/UBERON_0000948;heart;BiomaterialCollectedFrom
+immune organ;http://purl.obolibrary.org/obo/UBERON_0005057;immune organ;BiomaterialCollectedFrom
+kidney;http://purl.obolibrary.org/obo/UBERON_0002113;kidney;BiomaterialCollectedFrom
+large intestine;http://purl.obolibrary.org/obo/UBERON_0000059;large intestine;BiomaterialCollectedFrom
+liver;http://purl.obolibrary.org/obo/UBERON_0002107;liver;BiomaterialCollectedFrom
+lung;http://purl.obolibrary.org/obo/UBERON_0002048;lung;BiomaterialCollectedFrom
+mesonephros;http://purl.obolibrary.org/obo/UBERON_0000080;mesonephros;BiomaterialCollectedFrom
+pancreas;http://purl.obolibrary.org/obo/UBERON_0001264;pancreas;BiomaterialCollectedFrom
+respiratory tract;http://purl.obolibrary.org/obo/UBERON_0000065;respiratory tract;BiomaterialCollectedFrom
+skeletal element;http://purl.obolibrary.org/obo/UBERON_0004765;skeletal element;BiomaterialCollectedFrom
+skin;http://purl.obolibrary.org/obo/UBERON_0002097;skin;BiomaterialCollectedFrom
+small intestine;http://purl.obolibrary.org/obo/UBERON_0002108;small intestine;BiomaterialCollectedFrom
+spinal cord;http://purl.obolibrary.org/obo/UBERON_0002240;spinal cord;BiomaterialCollectedFrom
+stomach;http://purl.obolibrary.org/obo/UBERON_0000945;stomach;BiomaterialCollectedFrom
+thyroid;http://purl.obolibrary.org/obo/UBERON_0002046;thyroid;BiomaterialCollectedFrom
+tongue;http://purl.obolibrary.org/obo/UBERON_0001723;tongue;BiomaterialCollectedFrom
+umbilical cord;http://purl.obolibrary.org/obo/UBERON_0002331;umbilical cord;BiomaterialCollectedFrom
+urethra;http://purl.obolibrary.org/obo/UBERON_0000057;urethra;BiomaterialCollectedFrom
+urinary bladder;http://purl.obolibrary.org/obo/UBERON_0001255;urinary bladder;BiomaterialCollectedFrom
+uterus;http://purl.obolibrary.org/obo/UBERON_0000995;uterus;BiomaterialCollectedFrom
+prenatal stage;http://purl.obolibrary.org/obo/HsapDv_0000045;prenatal stage;DevelopmentStage
+embryonic stage;http://purl.obolibrary.org/obo/HsapDv_0000002;embryonic human stage;DevelopmentStage
+blastula stage;http://purl.obolibrary.org/obo/HsapDv_0000006;blastula stage;DevelopmentStage
+cleavage stage;http://purl.obolibrary.org/obo/HsapDv_0000004;cleavage stage;DevelopmentStage
+morula stage;http://purl.obolibrary.org/obo/HsapDv_0000205;morula stage;DevelopmentStage
+gastrula stage;http://purl.obolibrary.org/obo/HsapDv_0000010;gastrula stage;DevelopmentStage
+neurula stage;http://purl.obolibrary.org/obo/HsapDv_0000012;neurula stage;DevelopmentStage
+organogenesis stage;http://purl.obolibrary.org/obo/HsapDv_0000015;organogenesis stage;DevelopmentStage
+fetal stage;http://purl.obolibrary.org/obo/HsapDv_0000037;fetal stage;DevelopmentStage
+newborn stage;http://purl.obolibrary.org/obo/HsapDv_0000082;newborn human stage;DevelopmentStage
+infant stage;http://purl.obolibrary.org/obo/HsapDv_0000083;"infant stage";DevelopmentStage
+child stage;http://purl.obolibrary.org/obo/HsapDv_0000081;"child stage";DevelopmentStage
+adolescent stage;http://purl.obolibrary.org/obo/HsapDv_0000086;adolescent stage;DevelopmentStage
+adult stage;http://purl.obolibrary.org/obo/HsapDv_0000087;human adult stage;DevelopmentStage
+early adulthood stage;http://purl.obolibrary.org/obo/HsapDv_0000088;human early adulthood stage;DevelopmentStage
+late adulthood stage;http://purl.obolibrary.org/obo/HsapDv_0000091;human late adulthood stage;DevelopmentStage
+Epigenomics;http://edamontology.org/topic_3173;Epigenomics;Omics
+Fluxomics;http://edamontology.org/topic_3955;Fluxomics;Omics
+Genomics;http://edamontology.org/topic_0622;Genomics;Omics
+Immunomics;http://edamontology.org/topic_3967;Immunomics;Omics
+Metabolomics;http://edamontology.org/topic_3172;Metabolomics;Omics
+Metagenomics;http://edamontology.org/topic_3174;Metagenomics;Omics
+Metatranscriptomics;http://edamontology.org/topic_3941;Metatranscriptomics;Omics
+Paleogenomics;http://edamontology.org/topic_3943;Paleogenomics;Omics
+Pharmacogenomics;http://edamontology.org/topic_0208;Pharmacogenomics;Omics
+Phenomics;http://edamontology.org/topic_3298;Phenomics;Omics
+Phylogenomics;http://edamontology.org/topic_0194;Phylogenomics;Omics
+"Population genomics";http://edamontology.org/topic_3796;"Population genomics";Omics
+Proteogenomics;http://edamontology.org/topic_3922;Proteogenomics;Omics
+Proteomics;http://edamontology.org/topic_0121;Proteomics;Omics
+Regulomics;;;Omics
+Transcriptomics;http://edamontology.org/topic_3308;Transcriptomics;Omics
+Multiomics;;;Omics
+"Spatial transcriptomics";;;Omics
+RNA-seq;http://www.ebi.ac.uk/efo/EFO_0008896;RNA-seq;Technology
+scRNA-Seq;http://www.ebi.ac.uk/efo/EFO_0008913;scRNA-Seq;Technology
+snRNA-Seq;http://www.ebi.ac.uk/efo/EFO_0008940;snRNA-Seq;Technology
+ATAC-Seq;http://www.ebi.ac.uk/efo/EFO_0007045;ATAC-Seq;Technology
+scATAC-Seq;http://www.ebi.ac.uk/efo/EFO_0010891;scATAC-Seq;Technology
+BRB-Seq;http://www.ebi.ac.uk/efo/EFO_0011028;BRB-Seq;Technology
+Drop-Seq;http://www.ebi.ac.uk/efo/EFO_0008722;Drop-Seq;Technology
+CEL-Seq;http://www.ebi.ac.uk/efo/EFO_0008679;CEL-Seq;Technology
+CirSeq;http://www.ebi.ac.uk/efo/EFO_0008691;CirSeq;Technology
+CLaP;http://www.ebi.ac.uk/efo/EFO_0008692;CLaP;Technology
+CytoSeq;http://www.ebi.ac.uk/efo/EFO_0008703;CytoSeq;Technology
+Digital RNA Sequencing;http://www.ebi.ac.uk/efo/EFO_0008710;Digital RNA Sequencing;Technology
+DP-Seq;http://www.ebi.ac.uk/efo/EFO_0008718;DP-Seq;Technology
+Hi-SCL;http://www.ebi.ac.uk/efo/EFO_0008763;Hi-SCL;Technology
+InDrop;http://www.ebi.ac.uk/efo/EFO_0008780;InDrop;Technology
+MARS-Seq;http://www.ebi.ac.uk/efo/EFO_0008796;MARS-Seq;Technology
+Nuc-Seq;http://www.ebi.ac.uk/efo/EFO_0009991;Nuc-Seq;Technology
+PAIR;http://www.ebi.ac.uk/efo/EFO_0008841;PAIR;Technology
+Quartz-Seq;http://www.ebi.ac.uk/efo/EFO_0008877;Quartz-Seq;Technology
+scM&T-Seq;http://www.ebi.ac.uk/efo/EFO_0010006;scM&T-Seq;Technology
+SCRB-Seq;http://www.ebi.ac.uk/efo/EFO_0010004;SCRB-Seq;Technology
+scTrio-seq;http://www.ebi.ac.uk/efo/EFO_0010007;scTrio-seq;Technology
+Smart-Seq;http://www.ebi.ac.uk/efo/EFO_0008930;Smart-Seq;Technology
+Smart-Seq2;http://www.ebi.ac.uk/efo/EFO_0008931;Smart-Seq2;Technology
+STRT-Seq;http://www.ebi.ac.uk/efo/EFO_0008953;STRT-Seq;Technology
+SUPeR-Seq;http://www.ebi.ac.uk/efo/EFO_0008956;SUPeR-Seq;Technology
+TCR-LA-MC PCR;http://www.ebi.ac.uk/efo/EFO_0008967;TCR-LA-MC PCR;Technology
+TIVA;http://www.ebi.ac.uk/efo/EFO_0008971;TIVA;Technology
+5C;http://www.ebi.ac.uk/efo/EFO_0007692;5C;Technology
+Div-Seq;http://www.ebi.ac.uk/efo/EFO_0009309;Div-Seq;Technology
+FRISCR;http://www.ebi.ac.uk/efo/EFO_0008747;FRISCR;Technology
+ICE;http://www.ebi.ac.uk/efo/EFO_0008773;ICE;Technology
+MeRIP-Seq;http://www.ebi.ac.uk/efo/EFO_0008803;MeRIP-Seq;Technology
+miCLIP-m6A;http://www.ebi.ac.uk/efo/EFO_0008807;miCLIP-m6A;Technology
+Pseudo-Seq;http://www.ebi.ac.uk/efo/EFO_0008872;Pseudo-Seq;Technology
+PSI-Seq;http://www.ebi.ac.uk/efo/EFO_0008873;PSI-Seq;Technology
+CAP-seq;http://www.ebi.ac.uk/efo/EFO_0008671;CAP-seq;Technology
+CIP-TAP;http://www.ebi.ac.uk/efo/EFO_0008688;CIP-TAP;Technology
+SPARE;http://www.ebi.ac.uk/efo/EFO_0008943;SPARE;Technology
+CIRS-Seq;http://www.ebi.ac.uk/efo/EFO_0008690;CIRS-Seq;Technology
+icSHAPE;http://www.ebi.ac.uk/efo/EFO_0008775;icSHAPE;Technology
+SHAPE-MaP;http://www.ebi.ac.uk/efo/EFO_0008921;SHAPE-MaP;Technology
+SHAPE-Seq;http://www.ebi.ac.uk/efo/EFO_0008922;SHAPE-Seq;Technology
+2P-Seq;http://www.ebi.ac.uk/efo/EFO_0008639;2P-Seq;Technology
+3P-Seq;http://www.ebi.ac.uk/efo/EFO_0008644;3P-Seq;Technology
+3Seq;http://www.ebi.ac.uk/efo/EFO_0008645;3Seq;Technology
+BruChase-Seq;http://www.ebi.ac.uk/efo/EFO_0008662;BruChase-Seq;Technology
+BruDRB-Seq;http://www.ebi.ac.uk/efo/EFO_0008663;BruDRB-Seq;Technology
+Bru-Seq;http://www.ebi.ac.uk/efo/EFO_0008661;Bru-Seq;Technology
+CAGE;http://www.ebi.ac.uk/efo/EFO_0004181;CAGE;Technology
+CHART;http://www.ebi.ac.uk/efo/EFO_0008681;CHART;Technology
+ChIRP;http://www.ebi.ac.uk/efo/EFO_0008687;ChIRP;Technology
+ClickSeq;http://www.ebi.ac.uk/efo/EFO_0008694;ClickSeq;Technology
+GRO-seq;http://www.ebi.ac.uk/efo/EFO_0005227;GRO-seq;Technology
+NET-Seq;http://www.ebi.ac.uk/efo/EFO_0008826;NET-Seq;Technology
+PAL-Seq;http://www.ebi.ac.uk/efo/EFO_0008843;PAL-Seq;Technology
+PARE-Seq;http://www.ebi.ac.uk/efo/EFO_0008846;PARE-Seq;Technology
+PEAT;http://www.ebi.ac.uk/efo/EFO_0008859;PEAT;Technology
+PRO-Cap;http://www.ebi.ac.uk/efo/EFO_0008868;PRO-Cap;Technology
+PRO-Seq;http://www.ebi.ac.uk/efo/EFO_0008869;PRO-Seq;Technology
+RAP;http://www.ebi.ac.uk/efo/EFO_0008880;RAP;Technology
+RARseq;http://www.ebi.ac.uk/efo/EFO_0008882;RARseq;Technology
+RASL-Seq;http://www.ebi.ac.uk/efo/EFO_0010003;RASL-Seq;Technology
+SMORE-Seq;http://www.ebi.ac.uk/efo/EFO_0008936;SMORE-Seq;Technology
+TAIL-Seq;http://www.ebi.ac.uk/efo/EFO_0008960;TAIL-Seq;Technology
+TATL-Seq;http://www.ebi.ac.uk/efo/EFO_0008963;TATL-Seq;Technology
+TIF-Seq;http://www.ebi.ac.uk/efo/EFO_0008970;TIF-Seq;Technology
+TL-Seq;http://www.ebi.ac.uk/efo/EFO_0008972;TL-Seq;Technology
+4sUDRB-Seq;http://www.ebi.ac.uk/efo/EFO_0008646;4sUDRB-Seq;Technology
+CaptureSeq;http://www.ebi.ac.uk/efo/EFO_0008675;CaptureSeq;Technology
+cP-RNA-Seq;http://www.ebi.ac.uk/efo/EFO_0008697;cP-RNA-Seq;Technology
+FRT-Seq;http://www.ebi.ac.uk/efo/EFO_0008748;FRT-Seq;Technology
+mNET-Seq;http://www.ebi.ac.uk/efo/EFO_0008819;mNET-Seq;Technology
+AGO-CLIP;http://www.ebi.ac.uk/efo/EFO_0008651;AGO-CLIP;Technology
+CLASH;http://www.ebi.ac.uk/efo/EFO_0008693;CLASH;Technology
+DLAF;http://www.ebi.ac.uk/efo/EFO_0008712;DLAF;Technology
+eCLIP;http://www.ebi.ac.uk/efo/EFO_0009998;eCLIP;Technology
+iCLIP;http://www.ebi.ac.uk/efo/EFO_0008774;iCLIP;Technology
+miTRAP;http://www.ebi.ac.uk/efo/EFO_0008818;miTRAP;Technology
+PAR-CLIP;http://www.ebi.ac.uk/efo/EFO_0008845;PAR-CLIP;Technology
+PIP-Seq;http://www.ebi.ac.uk/efo/EFO_0008862;PIP-Seq;Technology
+Pol II CLIP;http://www.ebi.ac.uk/efo/EFO_0008865;Pol II CLIP;Technology
+RBNS;http://www.ebi.ac.uk/efo/EFO_0008884;RBNS;Technology
+RIP-Seq;http://www.ebi.ac.uk/efo/EFO_0005310;RIP-Seq;Technology
+TRAP-Seq;http://www.ebi.ac.uk/efo/EFO_0008975;TRAP-Seq;Technology
+TRIBE;http://www.ebi.ac.uk/efo/EFO_0008976;TRIBE;Technology
+BrdU-CLIP;http://www.ebi.ac.uk/efo/EFO_0008658;BrdU-CLIP;Technology
+HiTS-RAP;http://www.ebi.ac.uk/efo/EFO_0008766;HiTS-RAP;Technology
+irCLIP;http://www.ebi.ac.uk/efo/EFO_0010008;irCLIP;Technology
+PD-Seq;http://www.ebi.ac.uk/efo/EFO_0008856;PD-Seq;Technology
+PDZ-Seq;http://www.ebi.ac.uk/efo/EFO_0008857;PDZ-Seq;Technology
+2b-RAD;http://www.ebi.ac.uk/efo/EFO_0008638;2b-RAD;Technology
+CPT-seq;http://www.ebi.ac.uk/efo/EFO_0008698;CPT-seq;Technology
+ddRADseq;http://www.ebi.ac.uk/efo/EFO_0008707;ddRADseq;Technology
+Digenome-seq;http://www.ebi.ac.uk/efo/EFO_0008709;Digenome-seq;Technology
+EC-seq;http://www.ebi.ac.uk/efo/EFO_0008728;EC-seq;Technology
+hyRAD;http://www.ebi.ac.uk/efo/EFO_0008772;hyRAD;Technology
+Rapture;http://www.ebi.ac.uk/efo/EFO_0008881;Rapture;Technology
+RC-Seq;http://www.ebi.ac.uk/efo/EFO_0008885;RC-Seq;Technology
+Repli-Seq;http://www.ebi.ac.uk/efo/EFO_0008889;Repli-Seq;Technology
+SLAF-seq;http://www.ebi.ac.uk/efo/EFO_0008927;SLAF-seq;Technology
+TC-Seq;http://www.ebi.ac.uk/efo/EFO_0008964;TC-Seq;Technology
+Bubble-Seq;http://www.ebi.ac.uk/efo/EFO_0009992;Bubble-Seq;Technology
+NSCR;http://www.ebi.ac.uk/efo/EFO_0008832;NSCR;Technology
+NS-Seq;http://www.ebi.ac.uk/efo/EFO_0008831;NS-Seq;Technology
+Rep-Seq;http://www.ebi.ac.uk/efo/EFO_0008887;Rep-Seq;Technology
+Ig-seq;http://www.ebi.ac.uk/efo/EFO_0008777;Ig-seq;Technology
+BLESS;http://www.ebi.ac.uk/efo/EFO_0008657;BLESS;Technology
+DSB-Seq;http://www.ebi.ac.uk/efo/EFO_0008724;DSB-Seq;Technology
+GUIDE-seq;http://www.ebi.ac.uk/efo/EFO_0008760;GUIDE-seq;Technology
+HTGTS;http://www.ebi.ac.uk/efo/EFO_0008770;HTGTS;Technology
+LAM-HTGTS;http://www.ebi.ac.uk/efo/EFO_0008784;LAM-HTGTS;Technology
+Break-seq;http://www.ebi.ac.uk/efo/EFO_0008659;Break-seq;Technology
+SSB-Seq;http://www.ebi.ac.uk/efo/EFO_0008949;SSB-Seq;Technology
+DNase-Seq;http://www.ebi.ac.uk/efo/EFO_0003752;DNase-Seq;Technology
+Pu-seq;http://www.ebi.ac.uk/efo/EFO_0008875;Pu-seq;Technology
+Hi-C;http://www.ebi.ac.uk/efo/EFO_0007693;Hi-C;Technology
+5C;http://www.ebi.ac.uk/efo/EFO_0007692;5C;Technology
+FAST-ATAC;http://www.ebi.ac.uk/efo/EFO_0008736;FAST-ATAC;Technology
+Chem-seq;http://www.ebi.ac.uk/efo/EFO_0008683;Chem-seq;Technology
+ChIA-PET;http://www.ebi.ac.uk/efo/EFO_0008684;ChIA-PET;Technology
+ChIPmentation;http://www.ebi.ac.uk/efo/EFO_0008686;ChIPmentation;Technology
+ChIP-Seq;http://www.ebi.ac.uk/efo/EFO_0002692;ChIP-Seq;Technology
+DamID;http://www.ebi.ac.uk/efo/EFO_0008704;DamID;Technology
+DNase I SIM;http://www.ebi.ac.uk/efo/EFO_0008715;DNase I SIM;Technology
+FAIRE-seq;http://www.ebi.ac.uk/efo/EFO_0004428;FAIRE-seq;Technology
+Sono-Seq;http://www.ebi.ac.uk/efo/EFO_0008942;Sono-Seq;Technology
+FiT-Seq;http://www.ebi.ac.uk/efo/EFO_0008743;FiT-Seq;Technology
+HiTS-FLIP;http://www.ebi.ac.uk/efo/EFO_0008765;HiTS-FLIP;Technology
+MINCE-seq;http://www.ebi.ac.uk/efo/EFO_0008812;MINCE-seq;Technology
+MNase-Seq;http://www.ebi.ac.uk/efo/EFO_0003751;MNase-Seq;Technology
+MPE-seq;http://www.ebi.ac.uk/efo/EFO_0008821;MPE-seq;Technology
+NG Capture-C;http://www.ebi.ac.uk/efo/EFO_0008827;NG Capture-C;Technology
+NOMe-Seq;http://www.ebi.ac.uk/efo/EFO_0008830;NOMe-Seq;Technology
+ORGANIC;http://www.ebi.ac.uk/efo/EFO_0008838;ORGANIC;Technology
+SELEX-seq;http://www.ebi.ac.uk/efo/EFO_0008918;SELEX-seq;Technology
+THS-seq;http://www.ebi.ac.uk/efo/EFO_0008969;THS-seq;Technology
+UMI-4C;http://www.ebi.ac.uk/efo/EFO_0009995;UMI-4C;Technology
+X-ChIP-seq;http://www.ebi.ac.uk/efo/EFO_0008986;X-ChIP-seq;Technology
+Aba-seq;http://www.ebi.ac.uk/efo/EFO_0008649;Aba-seq;Technology
+BisChIP-Seq;http://www.ebi.ac.uk/efo/EFO_0008656;BisChIP-Seq;Technology
+BSAS;http://www.ebi.ac.uk/efo/EFO_0008666;BSAS;Technology
+BSPP;http://www.ebi.ac.uk/efo/EFO_0008667;BSPP;Technology
+Bisulfite-Seq;http://www.ebi.ac.uk/efo/EFO_0003753;Bisulfite-Seq;Technology
+CAB-Seq;http://www.ebi.ac.uk/efo/EFO_0008668;CAB-Seq;Technology
+EpiRADseq;http://www.ebi.ac.uk/efo/EFO_0009997;EpiRADseq;Technology
+fCAB-seq;http://www.ebi.ac.uk/efo/EFO_0008741;fCAB-seq;Technology
+fC-CET;http://www.ebi.ac.uk/efo/EFO_0008739;fC-CET;Technology
+fC-Seal;http://www.ebi.ac.uk/efo/EFO_0008740;fC-Seal;Technology
+hMeDIP-seq;http://www.ebi.ac.uk/efo/EFO_0008767;hMeDIP-seq;Technology
+JBP1-seq;http://www.ebi.ac.uk/efo/EFO_0010000;JBP1-seq;Technology
+MAB-seq;http://www.ebi.ac.uk/efo/EFO_0010001;MAB-seq;Technology
+MBDCap-seq;http://www.ebi.ac.uk/efo/EFO_0008798;MBDCap-seq;Technology
+MethylCap-Seq;http://www.ebi.ac.uk/efo/EFO_0008805;MethylCap-Seq;Technology
+MeDIP-Seq;http://www.ebi.ac.uk/efo/EFO_0003749;MeDIP-Seq;Technology
+MIRA;http://www.ebi.ac.uk/efo/EFO_0008816;MIRA;Technology
+MRE-Seq;http://www.ebi.ac.uk/efo/EFO_0003748;MRE-Seq;Technology
+oxBS-Seq;http://www.ebi.ac.uk/efo/EFO_0008840;oxBS-Seq;Technology
+PBAT;http://www.ebi.ac.uk/efo/EFO_0008855;PBAT;Technology
+redBS-Seq;http://www.ebi.ac.uk/efo/EFO_0008886;redBS-Seq;Technology
+caMAB-seq;http://www.ebi.ac.uk/efo/EFO_0008670;caMAB-seq;Technology
+RRMAB-seq;http://www.ebi.ac.uk/efo/EFO_0010002;RRMAB-seq;Technology
+TAB-Seq;http://www.ebi.ac.uk/efo/EFO_0008958;TAB-Seq;Technology
+TAmC-Seq;http://www.ebi.ac.uk/efo/EFO_0008961;TAmC-Seq;Technology
+T-WGBS;http://www.ebi.ac.uk/efo/EFO_0008957;T-WGBS;Technology
+Safe-SeqS;http://www.ebi.ac.uk/efo/EFO_0008901;Safe-SeqS;Technology
+scAba-seq;http://www.ebi.ac.uk/efo/EFO_0009994;scAba-seq;Technology
+scBS-Seq;http://www.ebi.ac.uk/efo/EFO_0008905;scBS-Seq;Technology
+MIPSTR;http://www.ebi.ac.uk/efo/EFO_0008814;MIPSTR;Technology
+Nuc-Seq;http://www.ebi.ac.uk/efo/EFO_0009991;Nuc-Seq;Technology
+OS-Seq;http://www.ebi.ac.uk/efo/EFO_0008839;OS-Seq;Technology
+Exposure;http://www.ebi.ac.uk/efo/EFO_0000487;exposure;ExperimentalDesign
+Genotyping;http://www.ebi.ac.uk/efo/EFO_0000750;genotyping;ExperimentalDesign
+Transcription profiling;http://www.ebi.ac.uk/efo/EFO_0001032;transcription profiling;ExperimentalDesign
+Transfection;http://www.ebi.ac.uk/efo/EFO_0000726;transfection;ExperimentalDesign
+Treatment;http://www.ebi.ac.uk/efo/EFO_0000727;treatment;ExperimentalDesign
+Investigation;http://purl.obolibrary.org/obo/OBI_0000066;investigation;ExperimentalDesign
+Knock in expression;http://www.ebi.ac.uk/efo/EFO_0000561;knock in expression;ExperimentalDesign
+Genetic modification;http://www.ebi.ac.uk/efo/EFO_0000510;genetic modification;ExperimentalDesign
+Bulk;http://purl.obolibrary.org/obo/NCIT_C69010;Bulk;Resolution
+Single cell;;Single cell;Resolution
+Single cell;http://www.ebi.ac.uk/efo/EFO_0010185;Single cell;Resolution

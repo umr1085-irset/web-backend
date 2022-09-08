@@ -1,0 +1,3 @@
+Dataset.title;Dataset.status;Dataset.bioMeta.species.displayLabel;Dataset.bioMeta.biomaterialType;Dataset.bioMeta.sex;Dataset.bioMeta.age_start;Dataset.bioMeta.age_end;Dataset.bioMeta.diseaseStage;Dataset.bioMeta.developmentStage.displayLabel;Dataset.sop.omics.displayLabel;Dataset.sop.resolution.displayLabel;Loom.file;Loom.row_name;Loom.col_name
+ImportDS12;Private;Homo sapiens (Human);Tissue;Male;6;7;Tb3;embryonic stage;Transcriptomics;Single cell;testLoom12.loom;genes;cells
+ImportDS13;Private;Homo sapiens (Human);Tissue;Male;6;7;Tb4;embryonic stage;Transcriptomics;Sincel cell;testLoom13.loom;genes;cells
