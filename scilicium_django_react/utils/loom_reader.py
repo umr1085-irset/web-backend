@@ -8,6 +8,11 @@ import numpy as np
 import json
 import time
 from copy import copy
+from io import BytesIO
+from PIL import Image
+import requests
+import matplotlib
+import matplotlib.cm as cm
 
 def get_available_reductions(loom_path):
     '''
@@ -249,7 +254,7 @@ def json_component_chartjs(loom_path,style='pie',attrs=[],cidx_filter=None):
     chart['labels'] = lbls.tolist()
     if style=='bar':
         res['options']['legend']={'display':False}
-        #res['options']['scales']={'xAxes':[{'ticks':{'min':0}}]}
+        res['options']['scales']={'xAxes':[{'ticks':{'min':0}}]}
     if style=='pie':
         res['options']['legend']={'position':'left','maxWidth':120,'labels':{'boxWidth':10,'padding':4,'font':{'size':8,'lineHeight':1}}}
     
@@ -335,6 +340,21 @@ def check_color(loom_path,color,cidx_filter=None):
             return get_symbol_values(loom_path,color,cidx_filter=cidx_filter)
         except:
             raise Exception(f'color must be None, a valid gene symbol or a valid data attribute')
+
+
+def json_scatOrSpat(loom_path,color=None,reduction=None,returnjson=True,cidx_filter=None):
+    
+    if reduction==None :
+        reduction = get_available_reductions(loom_path)[0]
+    if "spatial" in reduction:
+        print("viz method: spatial")
+        result=json_spatial(loom_path,color,reduction,returnjson,cidx_filter)
+        return result
+    else : 
+        print("viz method: scatter")
+        result=json_scatter(loom_path,color,reduction,returnjson,cidx_filter)
+        return result
+ 
             
 def json_scatter(loom_path,color=None,reduction=None,returnjson=True,cidx_filter=None):
     '''
@@ -360,6 +380,7 @@ def json_scatter(loom_path,color=None,reduction=None,returnjson=True,cidx_filter
     start = time.time()
     if reduction==None:
         reduction = get_available_reductions(loom_path)[0] # first reduction available
+
     X,Y = get_reduction_x_y(loom_path,reduction)
     
     fig = go.Figure()
@@ -1022,85 +1043,100 @@ def json_density(loom_path,reduction=None,ca=None,symbols=[],returnjson=True,cid
 #from io import BytesIO
 #import matplotlib
 #import matplotlib.cm as cm
-#
-#def spatial_points_solid(x,y,r=8):
-#    kwargs = {'type': 'circle', 'xref': 'x', 'yref': 'y', 'fillcolor': 'orange', 'line': {'width':0}}
-#    r=r
-#    points = [go.layout.Shape(x0=x-r, y0=y-r, x1=x+r, y1=y+r, **kwargs) for x, y in zip(x,y)]
-#    return points
-#    
-#def spatial_points_continuous(x, y, exp, mapper):
-#    kwargs = {'type': 'circle', 'xref': 'x', 'yref': 'y', 'line': {'width':0}}
-#    c=[mapper.to_rgba(exp_) for exp_ in exp]
-#    r=8
-#    points = [go.layout.Shape(x0=x_-r, y0=y_-r, x1=x_+r, y1=y_+r, fillcolor=matplotlib.colors.to_hex(c[i]), **kwargs) for i, (x_, y_) in enumerate(zip(x,y))]
-#    return points
-#
-#def json_spatial(loom_path, color=None, returnjson=True, cidx_filter=None):
-#    '''
-#    Compute JSON from Plotly figure, for Spatial Transcriptomics data
-#    
-#    Params
-#    ------
-#    loom_path : str
-#        Path to a .loom file
-#    color : str
-#        Symbol name. Default is None (solid orange color)
-#    returnjson: bool
-#        return figure or its JSON form
-#    cidx_filter : array or None
-#        Column indices to filter cells to use
+
+def spatial_points_solid(x,y,color,r=8):
+    print("spatial points solid")
+
+    kwargs = {'type': 'circle', 'xref': 'x', 'yref': 'y', 'fillcolor': 'orange','line': {'width':0}}
+    r=r
+    points = [go.layout.Shape(x0=x-r, y0=y-r, x1=x+r, y1=y+r, **kwargs) for x, y in zip(x,y)]
+    return points
+    
+def spatial_points_continuous(x, y, exp, mapper):
+    kwargs = {'type': 'circle', 'xref': 'x', 'yref': 'y', 'line': {'width':0}}
+    c=[mapper.to_rgba(exp_) for exp_ in exp]
+    r=8
+    points = [go.layout.Shape(x0=x_-r, y0=y_-r, x1=x_+r, y1=y_+r, fillcolor=matplotlib.colors.to_hex(c[i]), **kwargs) for i, (x_, y_) in enumerate(zip(x,y))]
+    return points
+
+def json_spatial(loom_path, color=None, reduction=None,returnjson=True, cidx_filter=None):
+    '''
+    Compute JSON from Plotly figure, for Spatial Transcriptomics data
+    
+    Params
+    ------
+    loom_path : str
+        Path to a .loom file
+    color : str
+        Symbol name. Default is None (solid orange color)
+    returnjson: bool
+        return figure or its JSON form
+    cidx_filter : array or None
+        Column indices to filter cells to use
+        
+    Return
+    ------
+    Array of symbols
+    '''
+    X,Y = get_reduction_x_y(loom_path,'spatial') # get column attribute names for X and Y
+    df = get_dataframe(loom_path,[X,Y],cidx_filter=cidx_filter) # pandas dataframe
+    x = df[X].values
+    y = -df[Y].values
+
+    df = loompy.connect(loom_path,"r") # open loom file
+    url = df.attrs.spatial_img_url # get image file path
+    keys = df.ca.keys()
+    df.close() # close loom file
+    print("color")
+    print(color)
+    tmpcolor=check_color(loom_path,color,cidx_filter=cidx_filter)
+    print("tmpcolor")
+    print(tmpcolor)
+
+    if color in keys :
+        print("spatial solid")
+        points = spatial_points_solid(x,y,tmpcolor)
+    else : 
+        #exp = check_color(loom_path, color, cidx_filter=cidx_filter)
+        print("spatial continuous")
+        minima = min(tmpcolor)
+        maxima = max(tmpcolor)
+        norm = matplotlib.colors.Normalize(vmin=minima, vmax=maxima, clip=True)
+        mapper = cm.ScalarMappable(norm=norm, cmap=cm.magma)
+        points = spatial_points_continuous(x, y, tmpcolor, mapper)
+
 #        
-#    Return
-#    ------
-#    Array of symbols
-#    '''
-#    X,Y = get_reduction_x_y(loom_path,'spatial') # get column attribute names for X and Y
-#    df = get_dataframe(loom_path,[X,Y],cidx_filter=cidx_filter) # pandas dataframe
-#    x = df[X].values
-#    y = -df[Y].values
-#
-#    if color!=None:
-#        exp = check_color(loom_path, color, cidx_filter=cidx_filter)
-#        minima = min(exp)
-#        maxima = max(exp)
-#        norm = matplotlib.colors.Normalize(vmin=minima, vmax=maxima, clip=True)
-#        mapper = cm.ScalarMappable(norm=norm, cmap=cm.magma)
-#        points = spatial_points_continuous(x, y, exp, mapper)
-#        #print(points)
-#    else:
-#        points = spatial_points_solid(x,y)
-#        
-#    fig = go.Figure() # create figure
-#    fig.update_layout(shapes=points) # add points to figure
-#    fig.update_layout(template="plotly_white", width=600, height=600, xaxis_showgrid=False, yaxis_showgrid=False) # set layout attributes
+    fig = go.Figure() # create figure
+    fig.update_layout(shapes=points) # add points to figure
+    fig.update_layout(template="plotly_white", width=600, height=600, xaxis_showgrid=False, yaxis_showgrid=False) # set layout attributes
 #    
-#    df = loompy.connect(loom_path) # open loom file
-#    url = df.attrs.spatial_img_url # get image file path
-#    df.close() # close loom file
-#    response = requests.get(url) # get img
-#    img = Image.open(BytesIO(response.content)) # open image
-#    w,h = img.size # get image width and height
-#    fig.add_layout_image( # add image to figure
-#        source=img,
-#        xref="x",
-#        yref="y",
-#        x=0,
-#        y=0,
-#        xanchor="left",
-#        yanchor="top",
-#        layer="below",
-#        sizing="stretch",
-#        sizex=w,
-#        sizey=h
-#    )
+    #df = loompy.connect(loom_path,"r") # open loom file
+    #url = df.attrs.spatial_img_url # get image file path
+    #df.close() # close loom file
+    response = requests.get(url) # get img
+    img = Image.open(BytesIO(response.content)) # open image
+    w,h = img.size # get image width and height
+    fig.add_layout_image( # add image to figure
+        source=img,
+        xref="x",
+        yref="y",
+        x=0,
+        y=0,
+        xanchor="left",
+        yanchor="top",
+        layer="below",
+        sizing="stretch",
+        sizex=w,
+        sizey=h
+    )
 #    
-#    fig.update_xaxes(range=[0, w]) # set x axis range
-#    fig.update_yaxes(range=[-h, 0]) # set y axis range
-#    fig.update_xaxes(showticklabels=False) # remove x axis ticks
-#    fig.update_yaxes(showticklabels=False) # remove y axis ticks
+    fig.update_xaxes(range=[0, w]) # set x axis range
+    fig.update_yaxes(range=[-h, 0]) # set y axis range
+    fig.update_xaxes(showticklabels=False) # remove x axis ticks
+    fig.update_yaxes(showticklabels=False) # remove y axis ticks
 #    
-#    if returnjson:
-#        return json.loads(pio.to_json(fig, validate=True, pretty=False, remove_uids=True))
-#    else:
-#        return fig
+    if returnjson:
+        return json.loads(pio.to_json(fig, validate=True, pretty=False, remove_uids=True))
+    else:
+        print("return fig")
+        return fig
