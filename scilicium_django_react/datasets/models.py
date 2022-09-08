@@ -26,6 +26,8 @@ class biomaterialMeta(models.Model):
         ('TISSUE','Tissue'),
         ('CELL','Cell'),
         ('BLOOD','Blood'),
+        ('TUMOR TISSUE', 'Tumor tissue'),
+        ('NORMAL TISSUE', 'Normal tissue'),
     )
 
     GENDER = (
@@ -85,14 +87,15 @@ class Loom(models.Model):
     def save(self, *args, **kwargs):
         force = kwargs.pop('force', False)
         super(Loom, self).save(*args, **kwargs)
-        loomattr = extract_attr_keys(self.file.path)
-        shape = get_shape(self.file.path)
-        self.reductions = get_available_reductions(self.file.path)
-        self.rowEntity = loomattr['row_attr_keys']
-        self.colEntity = loomattr['col_attr_keys']
-        self.classes = get_classes(self.file.path)
-        self.cellNumber = shape[1]
-        self.geneNumber = shape[0]
+        if self.file and self.file.name:
+            loomattr = extract_attr_keys(self.file.path)
+            shape = get_shape(self.file.path)
+            self.reductions = get_available_reductions(self.file.path)
+            self.rowEntity = loomattr['row_attr_keys']
+            self.colEntity = loomattr['col_attr_keys']
+            self.classes = get_classes(self.file.path)
+            self.cellNumber = shape[1]
+            self.geneNumber = shape[0]
         self.loomId = "hul" + str(self.id)
         super(Loom, self).save()
 

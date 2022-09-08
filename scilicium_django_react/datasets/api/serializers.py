@@ -26,6 +26,7 @@ class sopMetaSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 class LoomSerializer(serializers.ModelSerializer):
+    file = serializers.FileField(required=False, allow_null=True)
     class Meta:
         model = Loom
         fields = "__all__"
