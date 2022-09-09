@@ -16,7 +16,7 @@ from scilicium_django_react.ontologies.models import *
 def get_ontoTerm(model,label):
     #les attributs sont différents des noms d'onto...
     dict_datasetAttr_model = {"tissue":"Tissue", "organ":"Organ", "species":"Species", "developmentStage": "DevStage", "omics":"Omics", "resolution":"Granularity", "technology":"Sequencing","experimentalDesign":"ExperimentalProcess", "molecule_applied":"Chemical"}
-    print(dict_datasetAttr_model[model])
+    #print(dict_datasetAttr_model[model])
     myModelStr = dict_datasetAttr_model[model]
 
     try : 
@@ -66,10 +66,10 @@ def check_ontoLabels(dict_meta) :
                 dict_onto[model] = onto_list
             else :
                 if value != "" : 
-                    print("single value")
+                    #print("single value")
                     ontoTerm = get_ontoTerm(model,value)
                     dict_onto[model] = [ontoTerm]
-                    print(ontoTerm)
+                    #print(ontoTerm)
     
             keys_to_suppress.append(key)
 
@@ -147,7 +147,7 @@ def import_bioMeta(dict_bioMeta,user):
     
 
 
-def import_loom(dict_loom,user):
+def import_loom(dict_loom,user,loom_dir):
     """
         Import loom
         dict_loom : dictionary
@@ -179,29 +179,25 @@ def import_loom(dict_loom,user):
         print("Loom object created for " + filename)
         
         #une fois l'instance loom créé, on enregistre le fichier
-        loom_dir = "data_to_import/loom"
+        #loom_dir = "data_to_import/loom"
         if filename != "" : 
             filepath = os.path.join(settings.ROOT_DIR,loom_dir,filename)
-            #path = Path(filepath)          
-            #with path.open(mode = 'rb') as f:
-                #loom.file = File(f,name=path.name)
-                #loom.save()
+            #filepath = os.path.join(loom_dir,filename)
 
             
             f = File(open(filepath,'rb'))
             #TO CHECK : save:True sans sp.save()
             loom.file.save(filename,f,save=False)     
-            #loom.save()
-            destination = os.path.join(settings.MEDIA_ROOT,get_upload_path(loom,filename))
+            loom.save()
             
+            
+            #destination = os.path.join(settings.MEDIA_ROOT,get_upload_path(loom,filename))
             #print(destination)
             #try :
                 #shutil.copy(filepath,destination)
             #except OSError : 
                 #print("could not copy file")
             #print("Loom created with file " + filename)
-
-            loom.save()
 
         return loom.id
 
@@ -237,7 +233,7 @@ def import_dataset(dict_dataset,admin_user,loomId,bioMetaId,sopId) :
     ds.save()
 
 
-def import_data_from_list(infofile):
+def import_data_from_list(infofile, loom_dir):
 
 
     admin_user = User.objects.filter(is_superuser=True)
@@ -259,7 +255,7 @@ def import_data_from_list(infofile):
 
         for row in csv_reader: 
             row_data = {key: value for key, value in zip(headers,row)}
-            print("row in csv")
+            #print("row in csv")
             print(row_data)
            
             if row_data["Loom.file"] == "" :
@@ -290,16 +286,16 @@ def import_data_from_list(infofile):
                             key2 = key.split("Dataset.")[1]
                             dict_dataset[key2] = value
                 dict_loom["name"] = loomName
-                print(dict_loom)
+                #print(dict_loom)
                 dict_bioMeta["name"] = bioMetaName
-                print(dict_bioMeta)
+                #print(dict_bioMeta)
                 dict_sop["name"] = sopName
-                print(dict_sop)
-                print(dict_dataset)
+                #print(dict_sop)
+                #print(dict_dataset)
             
 
 
-                loomId = import_loom(dict_loom, admin_user)
+                loomId = import_loom(dict_loom, admin_user, loom_dir)
                 bioMetaId = import_bioMeta(dict_bioMeta, admin_user)
                 sopId = import_sop(dict_sop, admin_user)
                 import_dataset(dict_dataset, admin_user, loomId, bioMetaId, sopId)
@@ -307,25 +303,20 @@ def import_data_from_list(infofile):
                 print("Dataset already exists: " + row_data["Dataset.title"])
 
 
-def launch_import(infofile):
-    import_data_from_list(infofile)
+def launch_import(infofile,loom_dir):
+    import_data_from_list(infofile, loom_dir)
 
 
 class Command(BaseCommand):
     # Show this when the user types help
-    help = "Loads data from test.csv"
+    help = "Loads csv to import dataset metadata (biometa,sopmeta) and associated loom file"
 
 
     def add_arguments(self, parser):
         #Positional arguments
         parser.add_argument('infofile', type=str, help="Filepath to the file containing the dataset info")
+        parser.add_argument('loom_dir', type=str, help="Path to the directory containing the loom file")
 
 
     def handle(self, *args, **options):
-        launch_import(options['infofile'])
-        #Code to load the data into database
-        #for row in DictReader(open('./children.csv')):
-            #child=children(name=row['Name'], sex=row['Sex'], age=row['Age'])  
-            #child.save()
-
-
+        launch_import(options['infofile'], options['loom_dir'])
