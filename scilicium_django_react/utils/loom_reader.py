@@ -417,8 +417,16 @@ def json_scatter(loom_path,color=None,reduction=None,returnjson=True,cidx_filter
             r=0,
             b=0,
             t=0
-        )
+        ),
+        legend = dict(
+            yanchor ="bottom",
+            y = 0,
+            xanchor = "right",
+            x = 1,
+            bgcolor = "rgba(255,255,255,0.8)",
+            )
     )
+
     fig.update_yaxes(showticklabels=False)
     fig.update_xaxes(showticklabels=False)
     end = time.time()
@@ -426,7 +434,13 @@ def json_scatter(loom_path,color=None,reduction=None,returnjson=True,cidx_filter
         print('#######################')
         print(end - start)
         print('#######################')
-        return json.loads(pio.to_json(fig, validate=True, pretty=False, remove_uids=True))
+        try : 
+            jsonD = json.loads(pio.to_json(fig, validate = True, pretty=False, remove_uids=True))
+            #print(jsonD)
+            return jsonD
+        except json.decoder.JSONDecodeError:
+            print("String could not be converted to JSON")
+            return json.loads('{}')
     else:
         print('#######################')
         print(end - start)
@@ -649,6 +663,21 @@ def get_ra(loom_path,key='Symbol',unique=False,ridx_filter=None):
     else:
         return labels
 
+def get_ca_metalist(loom_path,metadata):
+
+    df = loompy.connect(loom_path,'r')
+    classes= [item.strip() for item in df.attrs["Classes"].split(",")]
+
+    for key in classes : 
+        for key2,value in df.ca.items() :
+            if key == key2 : 
+                metadata['filters'][key] = {'name':key,'values':np.unique(value),'attributes':'ca'}
+                metadata['filters_keys']['ca'].append(key)
+    df.close()
+    return metadata
+
+
+
 def get_ca(loom_path,key='Sample',unique=False,cidx_filter=None):
     '''
     Extract column attribute data from loom file
@@ -751,7 +780,7 @@ def first_n_symbols(loom_path,n=10,ridx_filter=None):
     labels = get_ra(loom_path,key='Symbol',unique=False,ridx_filter=ridx_filter)
     return labels[:n]
 
-def auto_get_symbols(loom_path,n=10,ridx_filter=None,cidx_filter=None,method='first'):
+def auto_get_symbols(loom_path,n=5,ridx_filter=None,cidx_filter=None,method='first'):
     '''
     Get genes automatically, first n genes or n most variable genes
     
@@ -1045,7 +1074,7 @@ def json_density(loom_path,reduction=None,ca=None,symbols=[],returnjson=True,cid
 #import matplotlib.cm as cm
 
 def spatial_points_solid(x,y,color,r=8):
-    print("spatial points solid")
+    #print("spatial points solid")
 
     kwargs = {'type': 'circle', 'xref': 'x', 'yref': 'y', 'fillcolor': 'orange','line': {'width':0}}
     r=r
@@ -1087,18 +1116,18 @@ def json_spatial(loom_path, color=None, reduction=None,returnjson=True, cidx_fil
     url = df.attrs.spatial_img_url # get image file path
     keys = df.ca.keys()
     df.close() # close loom file
-    print("color")
-    print(color)
+    #print("color")
+    #print(color)
     tmpcolor=check_color(loom_path,color,cidx_filter=cidx_filter)
-    print("tmpcolor")
-    print(tmpcolor)
+    #print("tmpcolor")
+    #print(tmpcolor)
 
     if color in keys :
-        print("spatial solid")
+        #print("spatial solid")
         points = spatial_points_solid(x,y,tmpcolor)
     else : 
         #exp = check_color(loom_path, color, cidx_filter=cidx_filter)
-        print("spatial continuous")
+        #print("spatial continuous")
         minima = min(tmpcolor)
         maxima = max(tmpcolor)
         norm = matplotlib.colors.Normalize(vmin=minima, vmax=maxima, clip=True)

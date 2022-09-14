@@ -31,6 +31,17 @@ class LoomSerializer(serializers.ModelSerializer):
         model = Loom
         fields = "__all__"
 
+
+
+class LoomBasicSerializer(serializers.ModelSerializer):
+    file = serializers.FileField(required=False, allow_null=True)
+    class Meta:
+        model = Loom
+        fields = ["file","cellNumber","geneNumber","loomId","id","col_name","row_name"]
+
+
+
+
 class DatasetUnrelatedSerializer(serializers.ModelSerializer):
     class Meta:
         model = Loom
@@ -197,13 +208,15 @@ class BasicDatasetSerializer(serializers.ModelSerializer):
 
                                                                                                                                                                                                                                                                                                                                                                                        
 class DatasetSerializer(serializers.ModelSerializer):
-    loom = LoomSerializer(many=False, read_only=True)
-    sop = sopMetaSerializer(many=False, read_only=True)
-    bioMeta = biomaterialMetaSerializer(many=False, read_only=True)
+    loom = LoomBasicSerializer(many=False, read_only=True)
+    #sop = sopMetaSerializer(many=False, read_only=True)
+    #bioMeta = biomaterialMetaSerializer(many=False, read_only=True)
     metadata = serializers.SerializerMethodField('get_metadata')
     rel_datasets = serializers.SerializerMethodField('get_relativedatasets')
     reductions = serializers.SerializerMethodField('get_reduction')
     default_display = serializers.SerializerMethodField('get_default_display')
+
+    
     
     def get_reduction(self, dataset):
         reductions = dataset.loom.reductions
@@ -217,17 +230,24 @@ class DatasetSerializer(serializers.ModelSerializer):
             
     def get_metadata(self, dataset):
         metadata = {'col_name':'','row_name':'','filters':{},'filters_keys':{'ca':[],'ra':[]}}
-        for col in dataset.loom.classes :
-           metadata['filters'][col] = {'name':col,'values':get_ca(dataset.loom.file.path,key=col,unique=True),'attributes':'ca'}
-           metadata['filters_keys']['ca'].append(col)
+        #if len(dataset.loom.classes) > 6 : 
+           # columns = dataset.loom.classes[0:6]
+        #else :
+            #columns = dataset.loom.classes
+    
+        metadata = get_ca_metalist(dataset.loom.file.path,metadata)
+    
+        #for col in columns :
+           #metadata['filters'][col] = {'name':col,'values':get_ca(dataset.loom.file.path,key=col,unique=True),'attributes':'ca'}
+           #metadata['filters_keys']['ca'].append(col)
 
         #Always add Chromosome on row attributes
-        if check_ra(dataset.loom.file.path,'Chromosome'):
-            metadata['filters']['Chromosome'] = {'name':'Chromosome','values':get_ra(dataset.loom.file.path,key='Chromosome',unique=True),'attributes':'ra'}
-            metadata['filters_keys']['ra'].append('Chromosome')
-        if check_ra(dataset.loom.file.path,'Symbol'):
-            metadata['filters']['Symbol'] = {'name':'Symbol','values':get_ra(dataset.loom.file.path,key='Symbol',unique=True),'attributes':'ra'}
-            metadata['filters_keys']['ra'].append('Symbol')
+        #if check_ra(dataset.loom.file.path,'Chromosome'):
+            #metadata['filters']['Chromosome'] = {'name':'Chromosome','values':get_ra(dataset.loom.file.path,key='Chromosome',unique=True),'attributes':'ra'}
+            #metadata['filters_keys']['ra'].append('Chromosome')
+        #if check_ra(dataset.loom.file.path,'Symbol'):
+            #metadata['filters']['Symbol'] = {'name':'Symbol','values':get_ra(dataset.loom.file.path,key='Symbol',unique=True),'attributes':'ra'}
+            #metadata['filters_keys']['ra'].append('Symbol')
         metadata['row_name'] = dataset.loom.row_name
         metadata['col_name'] = dataset.loom.col_name
         metadata['cell_number'] = dataset.loom.cellNumber
@@ -237,7 +257,7 @@ class DatasetSerializer(serializers.ModelSerializer):
     def get_relativedatasets(self, dataset):
         d_id_list = []
         all_datasets = list(dataset.study.dataset_of.all())
-        for i in all_datasets :
+        for i in all_datasets : 
             if i.datasetId != dataset.datasetId :
                 loom = i.loom
                 d_id_list.append({'id': i.datasetId, 'title':i.title, 'gene_number': loom.geneNumber, 'cell_number': loom.cellNumber, 'col_name': loom.col_name, 'row_name': loom.row_name})
@@ -245,6 +265,6 @@ class DatasetSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Dataset
-        fields = "__all__"
+        fields = ["id","datasetId","title","description","loom","metadata","rel_datasets","reductions","default_display", "status"]
 
 

@@ -185,7 +185,7 @@ class GetLoomGenes(APIView):
 
         if 'method' in post_data and post_data['method'] !='custom':
             gene_selection = post_data['method']
-            response_data["genes"] = auto_get_symbols(data.file.path,n=11,ridx_filter=ridx_filter,cidx_filter=cidx_filter,method=gene_selection)
+            response_data["genes"] = auto_get_symbols(data.file.path,n=6,ridx_filter=ridx_filter,cidx_filter=cidx_filter,method=gene_selection)
             response = Response(response_data, status=status.HTTP_200_OK)
             return response
         else:
@@ -262,12 +262,12 @@ class GetLoomPlots(APIView):
         response_data["name"] = data.name
         response_data["classes"] = data.classes
         print(ridx_filter)
-        print(filters['ra'])
+        #print(filters['ra'])
         if genes_menu != 'undefined':
             response_data["genes_menu"] = get_ra(data.file.path,unique=True,ridx_filter=ridx_filter)
         if style =="scatter":
-            print("scatter")
-            print(attrs)
+            #print("scatter")
+            #print(attrs)
             response_data['chart'] = json_scatOrSpat(data.file.path,color=attrs,reduction=reduction,cidx_filter=cidx_filter)
             #print(response_data['chart'])
             response_data['style'] = "scatter"
