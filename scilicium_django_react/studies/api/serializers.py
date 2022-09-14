@@ -172,8 +172,8 @@ class StudyPublicSerializer(serializers.ModelSerializer):
         technology = []
         for dataset in study.dataset_of.all():
             for x in dataset.sop.technology.all():
-                if x.ontologyLabel not in technology:
-                    technology.append(x.ontologyLabel)
+                if x.displayLabel not in technology:
+                    technology.append(x.displayLabel)
         return technology
     
     def get_gender(self, study):
@@ -188,32 +188,32 @@ class StudyPublicSerializer(serializers.ModelSerializer):
         tissues = []
         for dataset in study.dataset_of.all():
             for x in dataset.bioMeta.tissue.all():
-                if x.ontologyLabel not in tissues:
-                    tissues.append(x.ontologyLabel)
+                if x.displayLabel not in tissues:
+                    tissues.append(x.displayLabel)
         return tissues
     
     def get_organs(self, study):
         organs = []
         for dataset in study.dataset_of.all():
             for x in dataset.bioMeta.organ.all():
-                if x.ontologyLabel not in organs:
-                    organs.append(x.ontologyLabel)
+                if x.displayLabel not in organs:
+                    organs.append(x.displayLabel)
         return organs
     
     def get_species(self, study):
         species = []
         for dataset in study.dataset_of.all():
             for spe in dataset.bioMeta.species.all():
-                if spe.ontologyLabel not in species:
-                    species.append(spe.ontologyLabel)
+                if spe.displayLabel not in species:
+                    species.append(spe.displayLabel)
         return species
     
     def get_dev_stage(self, study):
         devstage = []
         for dataset in study.dataset_of.all():
             for dev in dataset.bioMeta.developmentStage.all():
-                if dev.ontologyLabel not in devstage:
-                    devstage.append(dev.ontologyLabel)
+                if dev.displayLabel not in devstage:
+                    devstage.append(dev.displayLabel)
         return devstage
 
     def get_authors(self, study):
