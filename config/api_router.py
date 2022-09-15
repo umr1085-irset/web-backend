@@ -31,4 +31,5 @@ urlpatterns += [
     url(r'^v1/dataset/statistics/', GetLoomStatistics.as_view(),name="dataset_statistics" ),
     url(r'^v1/dataset/genes/', GetLoomGenes.as_view(),name="dataset_genes" ),
     url(r'^v1/public/studies/', GetPublicStudies.as_view(),name="public_studies" ),
+    url(r'^v1/public/datasets/', GetPublicDatasets.as_view(),name="public_datasets" ),
 ]

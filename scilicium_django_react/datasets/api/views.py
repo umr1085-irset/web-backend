@@ -16,12 +16,30 @@ from django.conf import settings
 
 from matplotlib import pyplot as plt
 from scilicium_django_react.datasets.models import Dataset, Loom
+from scilicium_django_react.studies.models import Study, Viewer
 from scilicium_django_react.datasets.api.serializers import DatasetSerializer, LoomSerializer, PublicDatasetSerializer, BasicDatasetSerializer
 from scilicium_django_react.users.models import User
 from scilicium_django_react.utils.loom_reader import *
 from scilicium_django_react.utils.chartjsCreator import *
 from scilicium_django_react.utils.plotlyCreator import *
 
+class GetPublicDatasets(APIView):
+    # Allow anyone to access
+    # For test only
+    queryset = Dataset.objects.all()
+    #querysetStudy = Study.objects.all()
+    permission_classes = (permissions.AllowAny,)
+    authentication_classes = ()
+
+    def post(self, request, *args, **kwargs):
+        post_data = request.data
+        #viewerobj = get_object_or_404(Viewer,name=post_data['viewer'])
+        #filter on viewer for the STUDY
+        viewerobj = get_object_or_404(Viewer,name=post_data['viewer']) 
+        #publicStudies = self.querysetStudy.filter(status="PUBLIC",viewer=viewerobj)
+        publicDatasets= self.queryset.filter(status="PUBLIC", study__viewer=viewerobj)
+        serializer = PublicDatasetSerializer(publicDatasets,many=True)
+        return Response(serializer.data) 
 
 class DatasetViewSet(viewsets.ModelViewSet):
 
@@ -167,7 +185,7 @@ class GetLoomGenes(APIView):
 
         if 'method' in post_data and post_data['method'] !='custom':
             gene_selection = post_data['method']
-            response_data["genes"] = auto_get_symbols(data.file.path,n=11,ridx_filter=ridx_filter,cidx_filter=cidx_filter,method=gene_selection)
+            response_data["genes"] = auto_get_symbols(data.file.path,n=6,ridx_filter=ridx_filter,cidx_filter=cidx_filter,method=gene_selection)
             response = Response(response_data, status=status.HTTP_200_OK)
             return response
         else:
@@ -244,11 +262,14 @@ class GetLoomPlots(APIView):
         response_data["name"] = data.name
         response_data["classes"] = data.classes
         print(ridx_filter)
-        print(filters['ra'])
+        #print(filters['ra'])
         if genes_menu != 'undefined':
             response_data["genes_menu"] = get_ra(data.file.path,unique=True,ridx_filter=ridx_filter)
         if style =="scatter":
-            response_data['chart'] = json_scatter(data.file.path,color=attrs,reduction=reduction,cidx_filter=cidx_filter)
+            #print("scatter")
+            #print(attrs)
+            response_data['chart'] = json_scatOrSpat(data.file.path,color=attrs,reduction=reduction,cidx_filter=cidx_filter)
+            #print(response_data['chart'])
             response_data['style'] = "scatter"
             response = Response(response_data, status=status.HTTP_200_OK)
             return response
