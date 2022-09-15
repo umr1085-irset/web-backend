@@ -3,6 +3,7 @@ from django.core.management.base import BaseCommand, CommandError
 from django.contrib.auth import get_user_model
 from django.apps import apps
 
+from django.conf import settings
 from scilicium_django_react.users.models import User
 from scilicium_django_react.ontologies.models import *
 
@@ -89,20 +90,19 @@ def import_data_from_list(infofile):
     else :
         admin_user = admin_user[0]
 
-    print(os.getcwd())
-    with open(infofile, "r", encoding="utf-8-sig") as csvfile:
-        #les entêtes du fichier csv correspondent aux attributs des models onto
-        #par contre, les noms des modèles actuels ne correspondent pas à ceux qui devaient être implémentés
-        #donc dictionnaire pour établir les correspondances
+    #print(os.getcwd())
+    path = os.path.join(settings.ROOT_DIR,infofile)
+
+    with open(path, "r", encoding="utf-8-sig") as csvfile:
     
         csv_reader = csv.reader(csvfile, delimiter=";")
         headers = next(csv_reader)
 
         for row in csv_reader: 
             row_data = {key: value for key, value in zip(headers,row)}
-            print("row in csv")
+            #print("row in csv")
             print(row_data)
-
+            #dico pour faire le lien entre le nom du modèle d'onto en base et le nom qui devait inialement etre donne et qui est utilisé dans les fichiers csv...
             dict_modelName = {"Species":"Species", "BiomaterialCollectedFrom":"Organ", "BiomaterialEntity":"Tissue", "DevelopmentStage": "DevStage", "Omics":"Omics", "Resolution":"Granularity", "Technology":"Sequencing","ExperimentalDesign":"ExperimentalProcess", "Modification":"Chemical"}
             dict_onto={}
             for key, value in row_data.items():
