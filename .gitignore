@@ -70,3 +70,5 @@ yarn-error.log
 
 docs/_build/html/.doctrees/
 media/
+data_to_import/
+
