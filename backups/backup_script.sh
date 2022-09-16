@@ -14,3 +14,6 @@ DATE=`eval date +%Y%m%d`
 echo "Writing Postgres dump"
 /usr/local/bin/docker-compose -f "$DIR""/../production.yml" exec -T postgres sh -c "pg_dump --clean -U $POSTGRES_USER $POSTGRES_DB > /backups/DB_backup"
 mv "$DIR""/DB_backup" "$REMOTE_BACKUP_DIR"
+
+echo "Building archive"
+tar -pzcf  "$REMOTE_BACKUP_DIR""archive-$DATE"".tar.gz" "$REMOTE_BACKUP_DIR""/media/"
