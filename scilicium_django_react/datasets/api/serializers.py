@@ -67,6 +67,7 @@ class PublicDatasetSerializer(serializers.ModelSerializer):
     species = serializers.SerializerMethodField('getSpecies')
     organ = serializers.SerializerMethodField('getOrgans')
     tissue = serializers.SerializerMethodField('getTissues')
+    biomaterialType = serializers.SerializerMethodFiled('getBiomaterialType')
     diseaseStage = serializers.SerializerMethodField('getDiseaseStage')
     loomColInfo = serializers.SerializerMethodField('getLoomColInfo')
 
@@ -87,12 +88,23 @@ class PublicDatasetSerializer(serializers.ModelSerializer):
     def getAgeRange(self, dataset):
         age_start = str(dataset.bioMeta.age_start)
         age_end = str(dataset.bioMeta.age_end)
+        if age_start == "None" or age_start is None : 
+            age_start = ""
+        if age_end == "None" or age_end is None : 
+            age_end = ""
         age_unit = dataset.bioMeta.age_unit
+        if age_unit == "None" or age_unit is None :
+            age_unit = ""
         ageRange = age_start + "-" + age_end + " " + age_unit
         return ageRange
 
     def getSex(self, dataset):
         return dataset.bioMeta.sex
+
+
+    def getBiomaterialType(self, dataset):
+        return dataset.bioMeta.biomaterialType
+
 
     def getDiseaseStage(self, dataset):
         return dataset.bioMeta.diseaseStage
