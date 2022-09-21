@@ -140,7 +140,9 @@ class StudyPublicSerializer(serializers.ModelSerializer):
     created_by = GetFullUserSerializer(many=False, read_only=True)
     viewer = ViewerSerializer(many=True, read_only=True)
     nb_dataset = serializers.SerializerMethodField('get_nb_datasets')
-    
+    shorthand = serializers.SerializerMethodField('get_shorthand')
+    biomaterialType = serializers.SerializerMethodField('get_biotype')
+    experimentalDesign = serializers.SerializerMethodField('get_design')
     #age_range = serializers.SerializerMethodField('get_age_range')
 
     #def get_age_range(self, study):
@@ -167,6 +169,13 @@ class StudyPublicSerializer(serializers.ModelSerializer):
         return info
         
 
+    def get_design(self,study):
+        designs = []
+        for dataset in study.dataset_of.all():
+            for x in dataset.sop.experimentalDesign.all():
+                if x.displayLabel not in designs:
+                    designs.append(x.displayLabel)
+        return designs
 
     def get_technology(self, study):
         technology = []
@@ -184,6 +193,14 @@ class StudyPublicSerializer(serializers.ModelSerializer):
                 genders.append(gender)
         return genders
     
+    def get_biotype(self, study):
+        biotypes = []
+        for dataset in study.dataset_of.all():
+            biotype = dataset.bioMeta.biomaterialType
+            if biotype not in biotypes:
+                biotypes.append(biotype)
+        return biotypes
+
     def get_tissues(self, study):
         tissues = []
         for dataset in study.dataset_of.all():
@@ -224,6 +241,12 @@ class StudyPublicSerializer(serializers.ModelSerializer):
                     authors.append(author.fullName)
         return authors
     
+    def get_shorthand(self, study):
+        shorthandList = []
+        for article in study.article.all():
+            shorthandList.append(article.shorthand)
+        return shorthandList
+    
     def get_pub_date(self, study):
         dates = [] 
         for article in study.article.all():
@@ -250,10 +273,13 @@ class StudyPublicSerializer(serializers.ModelSerializer):
             "updated_at",
             "authors",
             "pub_date",
-            "technology",
             "species",
-            "dev_stage",
+            "shorthand",
             "gender",
+            "dev_stage",
+            "technology",
+            "biomaterialType",
+            "experimentalDesign",
             "tissues",
             "organs",
             "pmids",
