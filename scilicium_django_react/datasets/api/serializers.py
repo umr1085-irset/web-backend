@@ -10,6 +10,8 @@ class biomaterialMetaSerializer(serializers.ModelSerializer):
     species = SpeciesSerializer(many=True, read_only=True)
     organ = OrganSerializer(many=True, read_only=True)
     developmentStage = DevStageSerializer(many=True, read_only=True)
+    biomaterialType = BiomaterialTypeSerializer(many=True, read_only=True)
+    pathology = PathologySerializer(many=True, read_only=True)
     
     class Meta:
         model = biomaterialMeta
@@ -67,8 +69,9 @@ class PublicDatasetSerializer(serializers.ModelSerializer):
     species = serializers.SerializerMethodField('getSpecies')
     organ = serializers.SerializerMethodField('getOrgans')
     tissue = serializers.SerializerMethodField('getTissues')
-    biomaterialType = serializers.SerializerMethodFiled('getBiomaterialType')
+    biomaterialType = serializers.SerializerMethodField('getBiomaterialType')
     diseaseStage = serializers.SerializerMethodField('getDiseaseStage')
+    pathology = serializers.SerializerMethodField('getPathology')
     loomColInfo = serializers.SerializerMethodField('getLoomColInfo')
 
 
@@ -103,8 +106,13 @@ class PublicDatasetSerializer(serializers.ModelSerializer):
 
 
     def getBiomaterialType(self, dataset):
-        return dataset.bioMeta.biomaterialType
-
+        #return dataset.bioMeta.biomaterialType
+        labels=[]
+        for x in dataset.bioMeta.biomaterialType.all():
+            label = x.displayLabel;
+            if label not in labels : 
+                labels.append(label)
+        return labels
 
     def getDiseaseStage(self, dataset):
         return dataset.bioMeta.diseaseStage
@@ -117,6 +125,14 @@ class PublicDatasetSerializer(serializers.ModelSerializer):
                 labels.append(label)
         return labels
 
+
+    def getPathology(self, dataset):
+        labels=[]
+        for x in dataset.bioMeta.pathology.all():
+            label = x.displayLabel;
+            if label not in labels : 
+                labels.append(label)
+        return labels
 
     def getDevStage(self, dataset):
         labels=[]

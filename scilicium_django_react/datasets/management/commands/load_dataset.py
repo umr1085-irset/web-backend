@@ -15,7 +15,7 @@ from scilicium_django_react.ontologies.models import *
 
 def get_ontoTerm(model,label):
     #les attributs sont différents des noms d'onto...
-    dict_datasetAttr_model = {"tissue":"Tissue", "organ":"Organ", "species":"Species", "developmentStage": "DevStage", "omics":"Omics", "resolution":"Granularity", "technology":"Sequencing","experimentalDesign":"ExperimentalProcess", "molecule_applied":"Chemical"}
+    dict_datasetAttr_model = {"tissue":"Tissue", "organ":"Organ", "species":"Species", "developmentStage": "DevStage", "omics":"Omics", "resolution":"Granularity", "technology":"Sequencing","experimentalDesign":"ExperimentalProcess", "molecule_applied":"Chemical", "biomaterialType":"BiomaterialType", "pathology":"Pathology"}
     #print(dict_datasetAttr_model[model])
     myModelStr = dict_datasetAttr_model[model]
 
@@ -27,10 +27,10 @@ def get_ontoTerm(model,label):
     else : 
         if className.objects.filter(displayLabel = label).exists() :
             print("onto term exists for " + label )
-            onto_object = className.objects.get(displayLabel = label)
+            onto_object = className.objects.filter(displayLabel = label).first()
         elif className.objects.filter(displayLabel = label.lower()).exists() : 
             print("onto terme lowercase exists for" + label)
-            onto_object = className.objects.get(displayLabel = label.lower())
+            onto_object = className.objects.filter(displayLabel = label.lower()).first()
         else : 
             onto_object = create_ontoTerm(className,label)
 
@@ -113,14 +113,14 @@ def import_bioMeta(dict_bioMeta,user):
         value = dict_bioMeta["sex"]
         dict_bioMeta["sex"]=[value]
 
-    if "biomaterialType" in dict_bioMeta.keys() : 
-        value =  dict_bioMeta["biomaterialType"]
+    #if "biomaterialType" in dict_bioMeta.keys() : 
+        #value =  dict_bioMeta["biomaterialType"]
         #dans le model actuel, il ne peut y avoir qu'une seule valeur...
-        if "," in value : 
-            singleValue = value.split(",")[0]
-            dict_bioMeta["biomaterialType"] = singleValue.upper()
-        else :
-            dict_bioMeta["biomaterialType"] = value.upper()
+        #if "," in value : 
+            #singleValue = value.split(",")[0]
+            #dict_bioMeta["biomaterialType"] = singleValue.upper()
+        #else :
+            #dict_bioMeta["biomaterialType"] = value.upper()
 
     int_key_empty = []    
     for key, value in dict_bioMeta.items() :
@@ -142,6 +142,10 @@ def import_bioMeta(dict_bioMeta,user):
             bio.tissue.add(*value)
         elif model == "organ" : 
             bio.organ.add(*value)
+        elif model == "pathology" : 
+            bio.pathology.add(*value)
+        elif model == "biomaterialType": 
+            bio.biomaterialType.add(*value)
     
     return bio.id
     
@@ -155,11 +159,7 @@ def import_loom(dict_loom,user,loom_dir):
     """
     
     if not Loom.objects.filter(name = dict_loom['name']).exists():
-        #adding temporary but compulsory value
-        #dict_loom["rowEntity"]=["Symbol"]
-        #dict_loom["colEntity"]=["Age"]
-        #dict_loom["reductions"]=["Umap"]
-        #dict_loom["classes"]=["Age"]
+        
         row = "genes"
         col = "cells"
         if "row_name" in dict_loom.keys() : 
@@ -171,7 +171,7 @@ def import_loom(dict_loom,user,loom_dir):
         #on stocke les infos sur le fichier mais on sauve d'abord l'object sans cette info
         filename=dict_loom["file"]
         del dict_loom["file"]
-        
+        #adding temporary but compulsory value
         loom = Loom(name = dict_loom["name"], rowEntity = ["Symbol"], colEntity = ["Age"], reductions = ["Umap"], classes = ["Age"], row_name = row, col_name = col, created_by = user)
         #loom = Loom.objects.create(**dict_loom)
         loom.save()

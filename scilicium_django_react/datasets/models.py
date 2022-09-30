@@ -7,7 +7,7 @@ from django_better_admin_arrayfield.models.fields import ArrayField
 # Create your models here.
 from django.contrib.auth.models import  User
 from scilicium_django_react.studies.models import Study, Contributor
-from scilicium_django_react.ontologies.models import CellLine, Species, Tissue, DevStage, Organ, Chemical, Omics, Granularity, Sequencing, ExperimentalProcess
+from scilicium_django_react.ontologies.models import CellLine, Species, Tissue, DevStage, Organ, Chemical, Omics, Granularity, Sequencing, ExperimentalProcess, Pathology, BiomaterialType
 from django.utils.text import slugify
 from scilicium_django_react.utils.loom_reader import *
 
@@ -21,14 +21,14 @@ def get_upload_path(instance, filename):
     return path
         
 class biomaterialMeta(models.Model):
-    BIO_TYPE = (
-        ('ORGAN','Organ'),
-        ('TISSUE','Tissue'),
-        ('CELL','Cell'),
-        ('BLOOD','Blood'),
-        ('TUMOR TISSUE', 'Tumor tissue'),
-        ('NORMAL TISSUE', 'Normal tissue'),
-    )
+    #BIO_TYPE = (
+      #  ('ORGAN','Organ'),
+      #  ('TISSUE','Tissue'),
+      #  ('CELL','Cell'),
+      #  ('BLOOD','Blood'),
+      #  ('TUMOR TISSUE', 'Tumor tissue'),
+      #  ('NORMAL TISSUE', 'Normal tissue'),
+    #)
 
     GENDER = (
         ('male','Male'),
@@ -44,11 +44,13 @@ class biomaterialMeta(models.Model):
     developmentStage = models.ManyToManyField(DevStage, related_name='as_dev_stage', blank=True)
     #cell_Line = models.ManyToManyField(CellLine, related_name='as_cellLine', blank=True)
     sex = ArrayField(models.CharField(max_length=32, blank=True, choices=GENDER),default=list,blank=True)
-    biomaterialType = models.CharField(max_length=100, choices=BIO_TYPE, default="ORGAN")
+    #biomaterialType = models.CharField(max_length=100, choices=BIO_TYPE, default="ORGAN")
+    biomaterialType = models.ManyToManyField(BiomaterialType, related_name='as_biomaterialType', blank=True)
     age_start = models.IntegerField(blank=True, null=True)
     age_end = models.IntegerField(blank=True, null=True)
     age_unit = models.CharField(max_length=100, default="",blank=True, null=True)
     diseaseStage = models.CharField(max_length=100, default="",blank=True, null=True)
+    pathology = models.ManyToManyField(Pathology, related_name='as_pathology', blank=True)
 
     def __str__(self):
         return self.name
@@ -96,7 +98,7 @@ class Loom(models.Model):
             self.classes = get_classes(self.file.path)
             self.cellNumber = shape[1]
             self.geneNumber = shape[0]
-        self.loomId = "hul" + str(self.id)
+        self.loomId = "l" + str(self.id)
         super(Loom, self).save()
 
 
@@ -131,5 +133,5 @@ class Dataset(models.Model):
     def save(self, *args, **kwargs):
         force = kwargs.pop('force', False)
         super(Dataset, self).save(*args, **kwargs)
-        self.datasetId = "hud" + str(self.id)
+        self.datasetId = "d" + str(self.id)
         super(Dataset, self).save()
