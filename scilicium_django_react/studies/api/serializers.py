@@ -143,6 +143,7 @@ class StudyPublicSerializer(serializers.ModelSerializer):
     shorthand = serializers.SerializerMethodField('get_shorthand')
     biomaterialType = serializers.SerializerMethodField('get_biotype')
     experimentalDesign = serializers.SerializerMethodField('get_design')
+    pathology = serializers.SerializerMethodField('get_pathology')
     #age_range = serializers.SerializerMethodField('get_age_range')
 
     #def get_age_range(self, study):
@@ -196,9 +197,13 @@ class StudyPublicSerializer(serializers.ModelSerializer):
     def get_biotype(self, study):
         biotypes = []
         for dataset in study.dataset_of.all():
-            biotype = dataset.bioMeta.biomaterialType
-            if biotype not in biotypes:
-                biotypes.append(biotype)
+
+            for x in dataset.bioMeta.biomaterialType.all():
+                if x.displayLabel not in biotypes:
+                    biotypes.append(x.displayLabel)
+            #biotype = dataset.bioMeta.biomaterialType
+            #if biotype not in biotypes:
+                #biotypes.append(biotype)
         return biotypes
 
     def get_tissues(self, study):
@@ -208,6 +213,14 @@ class StudyPublicSerializer(serializers.ModelSerializer):
                 if x.displayLabel not in tissues:
                     tissues.append(x.displayLabel)
         return tissues
+    
+    def get_pathology(self, study):
+        pathologies = []
+        for dataset in study.dataset_of.all():
+            for x in dataset.bioMeta.pathology.all():
+                if x.displayLabel not in pathologies:
+                    pathologies.append(x.displayLabel)
+        return pathologies
     
     def get_organs(self, study):
         organs = []
@@ -279,6 +292,7 @@ class StudyPublicSerializer(serializers.ModelSerializer):
             "dev_stage",
             "technology",
             "biomaterialType",
+            "pathology",
             "experimentalDesign",
             "tissues",
             "organs",

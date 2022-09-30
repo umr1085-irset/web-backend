@@ -86,7 +86,7 @@ class Project(models.Model):
     def save(self, *args, **kwargs):
         force = kwargs.pop('force', False)
         super(Project, self).save(*args, **kwargs)
-        self.projectId = "hup" + str(self.id)
+        self.projectId = "p" + str(self.id)
         super(Project, self).save()
 
 
@@ -126,5 +126,5 @@ class Study(models.Model):
     def save(self, *args, **kwargs):
         force = kwargs.pop('force', False)
         super(Study, self).save(*args, **kwargs)
-        self.studyId = "hus" + str(self.id)
+        self.studyId = "s" + str(self.id)
         super(Study, self).save()

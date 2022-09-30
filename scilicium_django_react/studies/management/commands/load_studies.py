@@ -143,9 +143,11 @@ def add_datasets(study, datasetInfo) :
     datasets=[]
     if datasetInfo != "" :
         if "," in datasetInfo :
-            datasets = datasetInfo.split(",")
-        else : 
-            datasets.append(datasetInfo)
+            #datasets = datasetInfo.split(",")
+            datasets = [ds.strip() for ds in datasetInfo.split(",")]
+        else :
+            ds = datasetInfo.strip()
+            datasets.append(ds)
 
     for dsName in datasets : 
         #le nom du dataset est parfois entouré de guillements, qu'il faut enlever
@@ -196,6 +198,11 @@ def  import_data_from_list(infofile):
                 print(pmid + "in pubmedList")
                 artObjList.append(createPubmedArticle(pmid))
             
+
+            #for bioId in biorxivList : 
+                #artObjList.append(createBiorxivArticle(bioId))
+                
+
             description = ""
             #par defaut, on regarde s'il y a une desc associé à l'article
             if len(artObjList) > 0 : 
