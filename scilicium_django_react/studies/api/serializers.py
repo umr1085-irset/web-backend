@@ -144,6 +144,7 @@ class StudyPublicSerializer(serializers.ModelSerializer):
     biomaterialType = serializers.SerializerMethodField('get_biotype')
     experimentalDesign = serializers.SerializerMethodField('get_design')
     pathology = serializers.SerializerMethodField('get_pathology')
+    articlefull = serializers.SerializerMethodField('get_articleFull')
     #age_range = serializers.SerializerMethodField('get_age_range')
 
     #def get_age_range(self, study):
@@ -259,7 +260,24 @@ class StudyPublicSerializer(serializers.ModelSerializer):
         for article in study.article.all():
             shorthandList.append(article.shorthand)
         return shorthandList
-    
+
+
+    def get_articleFull(self, study):
+        firstFull = []
+
+        for article in study.article.all():
+            infoarticle=""
+            shorthand = article.shorthand
+            journal = article.journal
+            pmid = article.pmid
+            if shorthand is not None and journal is not None and pmid is not None :
+                infoarticle=journal + ". " + shorthand + " " + " pmid:" + pmid + " " 
+            elif pmid is not None  :
+                infoarticle = "pmid:" + pmid
+            firstFull.append(infoarticle)
+        return firstFull[0]
+
+
     def get_pub_date(self, study):
         dates = [] 
         for article in study.article.all():
@@ -269,12 +287,12 @@ class StudyPublicSerializer(serializers.ModelSerializer):
         return dates
     
     def get_pub_pmids(self, study):
-        pmids = [] 
+        firstPmid = [] 
         for article in study.article.all():
             pmid = article.pmid
-            if pmid not in pmids:
-                pmids.append(pmid)
-        return pmids
+            if pmid not in firstPmid:
+                firstPmid.append(pmid)
+        return firstPmid[0]
 
     class Meta:
         model = Study
@@ -288,6 +306,7 @@ class StudyPublicSerializer(serializers.ModelSerializer):
             "pub_date",
             "species",
             "shorthand",
+            "articlefull",
             "gender",
             "dev_stage",
             "technology",
