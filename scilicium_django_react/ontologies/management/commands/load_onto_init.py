@@ -103,7 +103,7 @@ def import_data_from_list(infofile):
             #print("row in csv")
             print(row_data)
             #dico pour faire le lien entre le nom du modèle d'onto en base et le nom qui devait inialement etre donne et qui est utilisé dans les fichiers csv...
-            dict_modelName = {"Species":"Species", "BiomaterialCollectedFrom":"Organ", "BiomaterialEntity":"Tissue", "DevelopmentStage": "DevStage", "Omics":"Omics", "Resolution":"Granularity", "Technology":"Sequencing","ExperimentalDesign":"ExperimentalProcess", "Modification":"Chemical"}
+            dict_modelName = {"Species":"Species", "BiomaterialCollectedFrom":"Organ", "BiomaterialEntity":"Tissue", "DevelopmentStage": "DevStage", "Omics":"Omics", "Resolution":"Granularity", "Technology":"Sequencing","ExperimentalDesign":"ExperimentalProcess", "Modification":"Chemical", "BiomaterialType":"BiomaterialType", "Pathology":"Pathology"}
             dict_onto={}
             for key, value in row_data.items():
                 if key=="model" :

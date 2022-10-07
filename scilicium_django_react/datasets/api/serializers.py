@@ -10,6 +10,8 @@ class biomaterialMetaSerializer(serializers.ModelSerializer):
     species = SpeciesSerializer(many=True, read_only=True)
     organ = OrganSerializer(many=True, read_only=True)
     developmentStage = DevStageSerializer(many=True, read_only=True)
+    biomaterialType = BiomaterialTypeSerializer(many=True, read_only=True)
+    pathology = PathologySerializer(many=True, read_only=True)
     
     class Meta:
         model = biomaterialMeta
@@ -67,7 +69,9 @@ class PublicDatasetSerializer(serializers.ModelSerializer):
     species = serializers.SerializerMethodField('getSpecies')
     organ = serializers.SerializerMethodField('getOrgans')
     tissue = serializers.SerializerMethodField('getTissues')
+    biomaterialType = serializers.SerializerMethodField('getBiomaterialType')
     diseaseStage = serializers.SerializerMethodField('getDiseaseStage')
+    pathology = serializers.SerializerMethodField('getPathology')
     loomColInfo = serializers.SerializerMethodField('getLoomColInfo')
 
 
@@ -87,12 +91,28 @@ class PublicDatasetSerializer(serializers.ModelSerializer):
     def getAgeRange(self, dataset):
         age_start = str(dataset.bioMeta.age_start)
         age_end = str(dataset.bioMeta.age_end)
+        if age_start == "None" or age_start is None : 
+            age_start = ""
+        if age_end == "None" or age_end is None : 
+            age_end = ""
         age_unit = dataset.bioMeta.age_unit
+        if age_unit == "None" or age_unit is None :
+            age_unit = ""
         ageRange = age_start + "-" + age_end + " " + age_unit
         return ageRange
 
     def getSex(self, dataset):
         return dataset.bioMeta.sex
+
+
+    def getBiomaterialType(self, dataset):
+        #return dataset.bioMeta.biomaterialType
+        labels=[]
+        for x in dataset.bioMeta.biomaterialType.all():
+            label = x.displayLabel;
+            if label not in labels : 
+                labels.append(label)
+        return labels
 
     def getDiseaseStage(self, dataset):
         return dataset.bioMeta.diseaseStage
@@ -105,6 +125,14 @@ class PublicDatasetSerializer(serializers.ModelSerializer):
                 labels.append(label)
         return labels
 
+
+    def getPathology(self, dataset):
+        labels=[]
+        for x in dataset.bioMeta.pathology.all():
+            label = x.displayLabel;
+            if label not in labels : 
+                labels.append(label)
+        return labels
 
     def getDevStage(self, dataset):
         labels=[]

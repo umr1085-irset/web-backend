@@ -50,6 +50,16 @@ class DevStage(models.Model):
     def __str__(self):
         return self.displayLabel
 
+class BiomaterialType(models.Model):
+    ontologyLabel = models.CharField(max_length=200,blank=True, null=True)
+    ontologyID = models.CharField(max_length=200,blank=True, null=True)
+    displayLabel = models.CharField(max_length=200,blank=True, null=True)
+    description =  models.TextField("Description", blank=True, default="")
+    as_parent =  models.ManyToManyField("self", related_name='as_children', blank=True) #all parents
+
+    def __str__(self):
+        return self.displayLabel
+
 class Pathology(models.Model):
     ontologyLabel = models.CharField(max_length=200,blank=True, null=True)
     ontologyID = models.CharField(max_length=200,blank=True, null=True)

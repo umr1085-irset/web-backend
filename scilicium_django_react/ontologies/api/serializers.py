@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from scilicium_django_react.ontologies.models import Topics,Keyword, ExperimentalProcess, Granularity, Sequencing, Omics, Species, Organ, Tissue, CellLine, DevStage, Pathology, Chemical
+from scilicium_django_react.ontologies.models import Topics,Keyword, ExperimentalProcess, Granularity, Sequencing, Omics, Species, Organ, Tissue, CellLine, DevStage, Pathology, Chemical, BiomaterialType
 
 
 class TissueSerializer(serializers.ModelSerializer):
@@ -15,6 +15,11 @@ class CellLineSerializer(serializers.ModelSerializer):
 class SpeciesSerializer(serializers.ModelSerializer):
     class Meta:
         model = Species
+        fields = "__all__"
+
+class BiomaterialTypeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = BiomaterialType
         fields = "__all__"
 
 class DevStageSerializer(serializers.ModelSerializer):

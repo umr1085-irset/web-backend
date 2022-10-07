@@ -24,8 +24,9 @@ def checkPMCforAbstract(pmcid) :
 
     urlPMC = "https://www.ebi.ac.uk/biostudies/files/S-E"+pmcid+"/S-E"+pmcid+".json"
     response_PMC=requests.get(urlPMC)
-    data_PMC = response_PMC.txt
-    jsonp = json.loads(data_PMC)
+    #data_PMC = response_PMC.txt
+    #jsonp = json.loads(data_PMC)
+    jsonp=response_PMC.json()
     attributes = jsonp["section"]["attributes"]
     for item in attributes : 
         if item["name"] == "Abstract" : 
@@ -63,6 +64,10 @@ def createPubmedArticle(pmid) :
         #print(parse_json)
         info = parse_json["result"][pmid]
         authors = info["authors"]
+        firstAuthor = authors[0]["name"]
+        firstAuthorName = firstAuthor[0:len(firstAuthor)-2]
+        year = info["pubdate"]
+        shortHand = firstAuthorName + " et al. (" + str(year) + ")"
         title  = info["title"]
         volume = info["volume"]
         if volume == "" : 
@@ -92,7 +97,7 @@ def createPubmedArticle(pmid) :
             print("PMC ID " + pmc)
             abstract = checkPMCforAbstract(pmc)
 
-        article = Article(title=title,pmid=pmid,doid=doid,pmc=pmc,abstract=abstract,journal=journal,volume=volInt,releaseDate=date_ok)
+        article = Article(title=title,pmid=pmid,doid=doid,pmc=pmc,abstract=abstract,journal=journal,volume=volInt,releaseDate=date_ok,shorthand=shortHand)
         article.save()
         
             
@@ -138,11 +143,16 @@ def add_datasets(study, datasetInfo) :
     datasets=[]
     if datasetInfo != "" :
         if "," in datasetInfo :
-            datasets = datasetInfo.split(",")
-        else : 
-            datasets.append(datasetInfo)
+            #datasets = datasetInfo.split(",")
+            datasets = [ds.strip() for ds in datasetInfo.split(",")]
+        else :
+            ds = datasetInfo.strip()
+            datasets.append(ds)
 
     for dsName in datasets : 
+        #le nom du dataset est parfois entouré de guillements, qu'il faut enlever
+        if '"' in dsName : 
+            dsName=txt.replace('"','')
         if Dataset.objects.filter(title = dsName).exists() :
             dsObj = Dataset.objects.filter(title = dsName).first()
             study.dataset_of.add(dsObj)
@@ -188,6 +198,11 @@ def  import_data_from_list(infofile):
                 print(pmid + "in pubmedList")
                 artObjList.append(createPubmedArticle(pmid))
             
+
+            #for bioId in biorxivList : 
+                #artObjList.append(createBiorxivArticle(bioId))
+                
+
             description = ""
             #par defaut, on regarde s'il y a une desc associé à l'article
             if len(artObjList) > 0 : 
