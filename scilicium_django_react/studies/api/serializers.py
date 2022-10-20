@@ -1,3 +1,4 @@
+import datetime
 from rest_framework import serializers
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from scilicium_django_react.studies.models import *
@@ -253,28 +254,41 @@ class StudyPublicSerializer(serializers.ModelSerializer):
             for author in article.author.all() :
                 if author.fullName not in authors:
                     authors.append(author.fullName)
+        if len(authors) < 1 : 
+            authors.append("")
         return authors
     
     def get_shorthand(self, study):
         shorthandList = []
         for article in study.article.all():
             shorthandList.append(article.shorthand)
+        if len(shorthandList) < 1 : 
+            shorthandList.append("")
         return shorthandList
 
 
     def get_articleFull(self, study):
-        firstFull = []
+        firstFull=[]
 
         for article in study.article.all():
             infoarticle=""
-            shorthand = article.shorthand
+            shortfull = article.shorthand
+            if "(" in shortfull :
+                shorthand=shortfull.split("(")[0]
+            else : 
+                shorthand=shortfull
             journal = article.journal
             pmid = article.pmid
-            if shorthand is not None and journal is not None and pmid is not None :
-                infoarticle=journal + ". " + shorthand + " " + " pmid:" + pmid + " " 
+            year = str(article.releaseDate.year)
+            if shorthand is not None and journal is not None and pmid is not None and year is not None :
+                infoarticle= shorthand +" " + journal + ". " + year + " " + " pmid:" + pmid 
+            elif shortfull is not None :
+                infoarticle = shortfull
             elif pmid is not None  :
                 infoarticle = "pmid:" + pmid
             firstFull.append(infoarticle)
+        if len(firstFull) < 1 : 
+            firstFull.append("")
         return firstFull[0]
 
 
@@ -284,6 +298,8 @@ class StudyPublicSerializer(serializers.ModelSerializer):
             date = article.releaseDate.year
             if date not in dates:
                 dates.append(date)
+        if len(dates) < 1 : 
+            dates.append("")
         return dates
     
     def get_pub_pmids(self, study):
@@ -292,6 +308,8 @@ class StudyPublicSerializer(serializers.ModelSerializer):
             pmid = article.pmid
             if pmid not in firstPmid:
                 firstPmid.append(pmid)
+        if len(firstPmid) < 1 :
+            firstPmid.append("")
         return firstPmid[0]
 
     class Meta:
