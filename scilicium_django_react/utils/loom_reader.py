@@ -13,6 +13,7 @@ from PIL import Image
 import requests
 import matplotlib
 import matplotlib.cm as cm
+import math
 
 def get_available_reductions(loom_path):
     '''
@@ -205,10 +206,25 @@ def get_dataframe(loom_path,attrs,cidx_filter=None):
     df.close()
     return pd.DataFrame(d)
 
-def n_colors(n):
+def n_colors_old(n):
     l = ['#8BC34A','#FFC107','#3F51B5','#9C27B0','#E91E63','#008C93','#CDDC39','#FFE708','#22ADF2','#FF7224','#BC199D','#DB0B29','#5C8C1E','#EA9713','#3A4884','#712B7F','#B2265B','#0C685D','#AFB53A','#E2C729','#2996C1','#E53C20','#7F2877','#A50A1D','#C0F96E','#F9F15F','#7095F2','#CA2FEA','#FC63A1','#22C6AE','#D1EF7F','#F4EAB3','#86DCF7','#F7AD8D','#F757E1','#EF5472','#99AF69','#FCC57C','#7586BC','#9D59AD','#E25D93','#33A090','#D8D861','#F9DF70','#58C7E0','#FC6C65','#A553A1','#CC2E45','#D6A427','#63554B']
-
+    
     return l[:n]
+
+def n_colors(NbColors):
+    pi = 3.14159265359
+    pid2 = pi/2
+    angle = 0
+    step = pi/(NbColors)
+    ListOfColors = []
+    for i in range(0,NbColors):
+        R = round((math.cos(angle)+1)/2 * 200)
+        G = round((math.cos(angle-pid2)+1)/2 * 200)
+        B = round((math.cos(angle-pi)+1)/2 * 200)
+        A = 0.4
+        angle = angle + step
+        ListOfColors.append('rgba('+str(R)+','+str(G)+','+str(B)+','+str(A)+')')
+    return ListOfColors
 
 def json_component_chartjs(loom_path,style='pie',attrs=[],cidx_filter=None):
     '''
