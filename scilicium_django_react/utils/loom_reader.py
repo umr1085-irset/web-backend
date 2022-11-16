@@ -757,8 +757,11 @@ def most_variable_symbols(loom_path,n=10,ridx_filter=None,cidx_filter=None):
     '''
     
     df = loompy.connect(loom_path,'r')
-    if cidx_filter==None and ridx_filter==None and df.attrs.most_variable_genes:
-        return df.attrs.most_variable_genes.split(',')
+    try: # if a filter != None, comparing an array to None throws an error
+        if cidx_filter==None and ridx_filter==None and df.attrs.most_variable_genes:
+            return df.attrs.most_variable_genes.split(',')
+    except:
+        pass # do nothing
             
     labels = get_ra(loom_path,key='Symbol',unique=False,ridx_filter=ridx_filter) # get symbols (filter applied)
     if isinstance(ridx_filter, np.ndarray) and isinstance(cidx_filter, np.ndarray):
