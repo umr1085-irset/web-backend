@@ -799,7 +799,27 @@ def first_n_symbols(loom_path,n=10,ridx_filter=None):
     labels = get_ra(loom_path,key='Symbol',unique=False,ridx_filter=ridx_filter)
     return labels[:n]
 
-def auto_get_symbols(loom_path,n=5,ridx_filter=None,cidx_filter=None,method='first'):
+def get_relevant_genes(loom_path, ridx_filter=None):
+    '''
+    Retrieve relevant genes
+    
+    Params
+    ------
+    loom_path : str
+        Path to a .loom file
+    ridx_filter : array or None
+        Row indices to filter genes to use
+        
+    Return
+    ------
+    List of genes
+    '''
+    df = loompy.connect(loom_path)
+    labels = df.attrs.relevant_genes.split(',')
+    df.close()
+    return labels
+
+def auto_get_symbols(loom_path,n=5,ridx_filter=None,cidx_filter=None,method='relevant'):
     '''
     Get genes automatically, first n genes or n most variable genes
     
@@ -820,8 +840,8 @@ def auto_get_symbols(loom_path,n=5,ridx_filter=None,cidx_filter=None,method='fir
     ------
     Array of symbols
     '''
-    if method=='first':
-        return first_n_symbols(loom_path,n=n,ridx_filter=ridx_filter)
+    if method=='relevant':
+        return get_relevant_genes(loom_path,n=n,ridx_filter=ridx_filter)
     elif method=='variance':
         return most_variable_symbols(loom_path,n=n,ridx_filter=ridx_filter,cidx_filter=cidx_filter)
     else:
