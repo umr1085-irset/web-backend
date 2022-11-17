@@ -224,6 +224,7 @@ def n_colors(NbColors):
         A = 0.4
         angle = angle + step
         ListOfColors.append('rgba('+str(R)+','+str(G)+','+str(B)+','+str(A)+')')
+    print(ListOfColors)
     return ListOfColors
 
 def json_component_chartjs(loom_path,style='pie',attrs=[],cidx_filter=None):
