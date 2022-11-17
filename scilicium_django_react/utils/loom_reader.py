@@ -403,15 +403,28 @@ def json_scatter(loom_path,color=None,reduction=None,returnjson=True,cidx_filter
     fig = go.Figure()
     if isinstance(cidx_filter, np.ndarray): # if filter exists, draw all points first as background
         df = get_dataframe(loom_path,[X,Y],cidx_filter=None) # all points
-        x = df[X].values
-        y = df[Y].values
+        if df.shape[0]>N_MAX_CELLS:
+            sub_idx = np.random.choice(df.shape[0], N_MAX_CELLS, replace=False) # select 200 cells randomly
+            x = df[X].values[sub_idx]
+            y = df[Y].values[sub_idx]
+        else:
+            x = df[X].values
+            y = df[Y].values
         tmpcolor = check_color(loom_path,None,cidx_filter=None) # None means default background color
         fig.add_trace(continuous_scatter_gl(x,y,tmpcolor,tracename='All cells'))
 
     df = get_dataframe(loom_path,[X,Y],cidx_filter=cidx_filter) # pandas dataframe
-    x = df[X].values
-    y = df[Y].values
     tmpcolor = check_color(loom_path,color,cidx_filter=cidx_filter) # numpy array
+    
+    if df.shape[0]>N_MAX_CELLS:
+        sub_idx = np.random.choice(df.shape[0], N_MAX_CELLS, replace=False) # select 200 cells randomly
+        x = df[X].values[sub_idx]
+        y = df[Y].values[sub_idx]
+        if isinstance(tmpcolor, np.ndarray): # if color is an array (numerical or strings)
+            tmpcolor = tmpcolor[sub_idx]
+    else:
+        x = df[X].values
+        y = df[Y].values
 
     if color!=None:
         if np.issubdtype(tmpcolor.dtype, np.number): # if color is None or type of color array is numerical
