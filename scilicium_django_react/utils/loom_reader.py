@@ -15,6 +15,8 @@ import matplotlib
 import matplotlib.cm as cm
 import math
 
+N_MAX_CELLS = 20000
+
 def get_available_reductions(loom_path):
     '''
     Return labels of available reduction as list
