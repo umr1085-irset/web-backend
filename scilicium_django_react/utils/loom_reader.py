@@ -831,8 +831,9 @@ def get_relevant_genes(loom_path, ridx_filter=None):
     List of genes
     '''
     df = loompy.connect(loom_path)
-    labels = df.attrs.relevant_genes.split(',')
+    labels = np.array(df.attrs.relevant_genes.split(','))
     df.close()
+    print(labels)
     return labels
 
 def auto_get_symbols(loom_path,n=5,ridx_filter=None,cidx_filter=None,method='relevant'):
