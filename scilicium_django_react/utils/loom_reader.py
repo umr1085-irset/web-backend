@@ -14,6 +14,7 @@ import requests
 import matplotlib
 import matplotlib.cm as cm
 import math
+#from django.conf import settings
 
 N_MAX_CELLS = 20000
 
@@ -1167,6 +1168,10 @@ def json_spatial(loom_path, color=None, reduction=None,returnjson=True, cidx_fil
 
     df = loompy.connect(loom_path,"r") # open loom file
     url = df.attrs.spatial_img_url # get image file path
+    #print(settings.MEDIA_ROOT)
+    #print(df.attrs.spatial_img_url)
+    #url = os.path.join(settings.MEDIA_ROOT,df.attrs.spatial_img_url)
+    #print(url)
     keys = df.ca.keys()
     df.close() # close loom file
     #print("color")
