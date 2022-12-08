@@ -14,7 +14,7 @@ import requests
 import matplotlib
 import matplotlib.cm as cm
 import math
-#from django.conf import settings
+from django.conf import settings
 
 N_MAX_CELLS = 20000
 
@@ -1167,11 +1167,8 @@ def json_spatial(loom_path, color=None, reduction=None,returnjson=True, cidx_fil
     y = -df[Y].values
 
     df = loompy.connect(loom_path,"r") # open loom file
-    url = df.attrs.spatial_img_url # get image file path
-    #print(settings.MEDIA_ROOT)
-    #print(df.attrs.spatial_img_url)
-    #url = os.path.join(settings.MEDIA_ROOT,df.attrs.spatial_img_url)
-    #print(url)
+    #url = df.attrs.spatial_img_url # get image file path
+    url = os.path.join(settings.MEDIA_ROOT,df.attrs.spatial_img_url)
     keys = df.ca.keys()
     df.close() # close loom file
     #print("color")
@@ -1197,11 +1194,12 @@ def json_spatial(loom_path, color=None, reduction=None,returnjson=True, cidx_fil
     fig.update_layout(shapes=points) # add points to figure
     fig.update_layout(template="plotly_white", width=600, height=600, xaxis_showgrid=False, yaxis_showgrid=False) # set layout attributes
 #    
-    #df = loompy.connect(loom_path,"r") # open loom file
-    #url = df.attrs.spatial_img_url # get image file path
-    #df.close() # close loom file
-    response = requests.get(url) # get img
-    img = Image.open(BytesIO(response.content)) # open image
+    try:
+        response = requests.get(url) # get img
+        img = Image.open(BytesIO(response.content)) # open image
+    except:
+        img = Image.open(url) # open image
+        
     w,h = img.size # get image width and height
     fig.add_layout_image( # add image to figure
         source=img,
