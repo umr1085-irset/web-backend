@@ -1129,6 +1129,9 @@ def json_density(loom_path,reduction=None,ca=None,symbols=[],returnjson=True,cid
     )
     fig.update_yaxes(showticklabels=False)
     fig.update_xaxes(showticklabels=False)
+
+    if reduction=='spatial':
+        fig.update_yaxes(autorange="reversed")
     
     if returnjson:
         return json.loads(pio.to_json(fig, validate=True, pretty=False, remove_uids=True)),lgd
