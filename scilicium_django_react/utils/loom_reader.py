@@ -230,6 +230,22 @@ def n_colors(NbColors):
     print(ListOfColors)
     return ListOfColors
 
+def n_colors_float(NbColors):
+    pi = 3.14159265359
+    pid2 = pi/2
+    angle = 0
+    step = pi/(NbColors)
+    ListOfColors = []
+    for i in range(0,NbColors):
+        R = round((math.cos(angle)+1)/2 * 200)/255
+        G = round((math.cos(angle-pid2)+1)/2 * 200)/255
+        B = round((math.cos(angle-pi)+1)/2 * 200)/255
+        A = 1
+        angle = angle + step
+        ListOfColors.append((R,G,B,A))
+    print(ListOfColors)
+    return ListOfColors
+
 def json_component_chartjs(loom_path,style='pie',attrs=[],cidx_filter=None):
     '''
     Compute JSON for ChartJs figure
@@ -1127,18 +1143,23 @@ def json_density(loom_path,reduction=None,ca=None,symbols=[],returnjson=True,cid
 #import matplotlib
 #import matplotlib.cm as cm
 
-def spatial_points_solid(x,y,color,r=8):
-    #print("spatial points solid")
-
-    kwargs = {'type': 'circle', 'xref': 'x', 'yref': 'y', 'fillcolor': 'orange','line': {'width':0}}
-    r=r
-    points = [go.layout.Shape(x0=x-r, y0=y-r, x1=x+r, y1=y+r, **kwargs) for x, y in zip(x,y)]
+def spatial_points_solid(x,y,colorvector,r=8):
+    if isinstance(colorvector, str):
+        kwargs = {'type': 'circle', 'xref': 'x', 'yref': 'y', 'fillcolor': colorvector,'line': {'width':1}}
+        points = [go.layout.Shape(x0=x-r, y0=y-r, x1=x+r, y1=y+r, **kwargs) for x, y in zip(x,y)]
+    else:
+        unique_values = np.unique(colorvector)
+        colors = n_colors_float(len(unique_values))
+        colordict = dict(zip(unique_values,colors))
+        c=[colordict[x] for x in colorvector]
+        kwargs = {'type': 'circle', 'xref': 'x', 'yref': 'y', 'line': {'width':0}}
+        points = [go.layout.Shape(x0=x_-r, y0=y_-r, x1=x_+r, y1=y_+r, fillcolor=matplotlib.colors.to_hex(c[i]), opacity=.8, **kwargs) for i, (x_, y_) in enumerate(zip(x,y))]
     return points
     
-def spatial_points_continuous(x, y, exp, mapper):
+def spatial_points_continuous(x, y, exp, mapper,r=8):
     kwargs = {'type': 'circle', 'xref': 'x', 'yref': 'y', 'line': {'width':0}}
     c=[mapper.to_rgba(exp_) for exp_ in exp]
-    r=8
+    print(c[:5])
     points = [go.layout.Shape(x0=x_-r, y0=y_-r, x1=x_+r, y1=y_+r, fillcolor=matplotlib.colors.to_hex(c[i]), **kwargs) for i, (x_, y_) in enumerate(zip(x,y))]
     return points
 
@@ -1171,35 +1192,31 @@ def json_spatial(loom_path, color=None, reduction=None,returnjson=True, cidx_fil
     url = os.path.join(settings.MEDIA_ROOT,df.attrs.spatial_img_url)
     keys = df.ca.keys()
     df.close() # close loom file
-    #print("color")
-    #print(color)
-    tmpcolor=check_color(loom_path,color,cidx_filter=cidx_filter)
-    #print("tmpcolor")
-    #print(tmpcolor)
 
-    if color in keys :
-        #print("spatial solid")
-        points = spatial_points_solid(x,y,tmpcolor)
-    else : 
-        #exp = check_color(loom_path, color, cidx_filter=cidx_filter)
-        #print("spatial continuous")
-        minima = min(tmpcolor)
-        maxima = max(tmpcolor)
-        norm = matplotlib.colors.Normalize(vmin=minima, vmax=maxima, clip=True)
-        mapper = cm.ScalarMappable(norm=norm, cmap=cm.magma)
-        points = spatial_points_continuous(x, y, tmpcolor, mapper)
-
+    if color==None:
+        colorvector = 'orange'
+        points = spatial_points_solid(x,y,colorvector)
+    else:
+        colorvector = check_color(loom_path,color,cidx_filter=cidx_filter)
+        if np.issubdtype(colorvector.dtype, np.number):
+            minima = min(colorvector)
+            maxima = max(colorvector)
+            norm = matplotlib.colors.Normalize(vmin=minima, vmax=maxima, clip=True)
+            mapper = cm.ScalarMappable(norm=norm, cmap=cm.magma)
+            points = spatial_points_continuous(x, y, colorvector, mapper)
+        else:
+            points = spatial_points_solid(x,y,colorvector)
 #        
     fig = go.Figure() # create figure
     fig.update_layout(shapes=points) # add points to figure
-    fig.update_layout(template="plotly_white", width=600, height=600, xaxis_showgrid=False, yaxis_showgrid=False) # set layout attributes
+    fig.update_layout(template="plotly_white", width=600, height=600, xaxis_showgrid=False, yaxis_showgrid=False,margin=dict(l=5, r=5, t=5, b=5)) # set layout attributes
 #    
     try:
         response = requests.get(url) # get img
         img = Image.open(BytesIO(response.content)) # open image
     except:
         img = Image.open(url) # open image
-        
+
     w,h = img.size # get image width and height
     fig.add_layout_image( # add image to figure
         source=img,
@@ -1214,12 +1231,12 @@ def json_spatial(loom_path, color=None, reduction=None,returnjson=True, cidx_fil
         sizex=w,
         sizey=h
     )
-#    
+
     fig.update_xaxes(range=[0, w]) # set x axis range
     fig.update_yaxes(range=[-h, 0]) # set y axis range
     fig.update_xaxes(showticklabels=False) # remove x axis ticks
     fig.update_yaxes(showticklabels=False) # remove y axis ticks
-#    
+
     if returnjson:
         return json.loads(pio.to_json(fig, validate=True, pretty=False, remove_uids=True))
     else:
