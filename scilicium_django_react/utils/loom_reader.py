@@ -214,40 +214,51 @@ def n_colors_old(n):
     
     return l[:n]
 
-def n_colors(NbColors):
+def n_colors(NbColors,forcefloat=False):
     pi = 3.14159265359
     pid2 = pi/2
     angle = 0
     step = pi/(NbColors)
     ListOfColors = []
+    alpha = .4
+    alpha_inv = .6
     for i in range(0,NbColors):
         R = round((math.cos(angle)+1)/2 * 200)
+        R = round(alpha*R + alpha_inv*255)
         G = round((math.cos(angle-pid2)+1)/2 * 200)
+        G = round(alpha*G + alpha_inv*255)
         B = round((math.cos(angle-pi)+1)/2 * 200)
-        A = 0.4
+        B = round(alpha*B + alpha_inv*255)
+        A = 1
         angle = angle + step
-        ListOfColors.append('rgba('+str(R)+','+str(G)+','+str(B)+','+str(A)+')')
+        if forcefloat:
+            R /= 255
+            G /= 255
+            B /= 255
+            ListOfColors.append((R,G,B,A))
+        else:
+            ListOfColors.append('rgba('+str(R)+','+str(G)+','+str(B)+','+str(A)+')')
     print(ListOfColors)
     return ListOfColors
 
-def n_colors_float(NbColors):
-    pi = 3.14159265359
-    pid2 = pi/2
-    angle = 0
-    step = pi/(NbColors)
-    ListOfColors = []
-    for i in range(0,NbColors):
-        R = round((math.cos(angle)+1)/2 * 200)
-        R = round(0.4*R + (1-0.4)*255)/255
-        G = round((math.cos(angle-pid2)+1)/2 * 200)
-        G = round(0.4*G + (1-0.4)*255)/255
-        B = round((math.cos(angle-pi)+1)/2 * 200)
-        B = round(0.4*B + (1-0.4)*255)/255
-        A = 1
-        angle = angle + step
-        ListOfColors.append((R,G,B,A))
-    print(ListOfColors)
-    return ListOfColors
+#def n_colors_float(NbColors):
+#    pi = 3.14159265359
+#    pid2 = pi/2
+#    angle = 0
+#    step = pi/(NbColors)
+#    ListOfColors = []
+#    for i in range(0,NbColors):
+#        R = round((math.cos(angle)+1)/2 * 200)
+#        R = round(0.4*R + (1-0.4)*255)/255
+#        G = round((math.cos(angle-pid2)+1)/2 * 200)
+#        G = round(0.4*G + (1-0.4)*255)/255
+#        B = round((math.cos(angle-pi)+1)/2 * 200)
+#        B = round(0.4*B + (1-0.4)*255)/255
+#        A = 1
+#        angle = angle + step
+#        ListOfColors.append((R,G,B,A))
+#    print(ListOfColors)
+#    return ListOfColors
 
 def json_component_chartjs(loom_path,style='pie',attrs=[],cidx_filter=None):
     '''
@@ -1155,7 +1166,7 @@ def spatial_points_solid(x,y,colorvector,r=8):
         points = [go.layout.Shape(x0=x-r, y0=y-r, x1=x+r, y1=y+r, **kwargs) for x, y in zip(x,y)]
     else:
         unique_values = np.unique(colorvector)
-        colors = n_colors_float(len(unique_values))
+        colors = n_colors(len(unique_values),forcefloat=True)
         colordict = dict(zip(unique_values,colors))
         c=[colordict[x] for x in colorvector]
         kwargs = {'type': 'circle', 'xref': 'x', 'yref': 'y', 'line': {'width':0}}
