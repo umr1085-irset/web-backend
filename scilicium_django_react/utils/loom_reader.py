@@ -237,9 +237,12 @@ def n_colors_float(NbColors):
     step = pi/(NbColors)
     ListOfColors = []
     for i in range(0,NbColors):
-        R = round((math.cos(angle)+1)/2 * 200)/255
-        G = round((math.cos(angle-pid2)+1)/2 * 200)/255
-        B = round((math.cos(angle-pi)+1)/2 * 200)/255
+        R = round((math.cos(angle)+1)/2 * 200)
+        R = round(0.4*R + (1-0.4)*255)/255
+        G = round((math.cos(angle-pid2)+1)/2 * 200)
+        G = round(0.4*G + (1-0.4)*255)/255
+        B = round((math.cos(angle-pi)+1)/2 * 200)
+        B = round(0.4*B + (1-0.4)*255)/255
         A = 1
         angle = angle + step
         ListOfColors.append((R,G,B,A))
@@ -1156,7 +1159,7 @@ def spatial_points_solid(x,y,colorvector,r=8):
         colordict = dict(zip(unique_values,colors))
         c=[colordict[x] for x in colorvector]
         kwargs = {'type': 'circle', 'xref': 'x', 'yref': 'y', 'line': {'width':0}}
-        points = [go.layout.Shape(x0=x_-r, y0=y_-r, x1=x_+r, y1=y_+r, fillcolor=matplotlib.colors.to_hex(c[i]), opacity=.8, **kwargs) for i, (x_, y_) in enumerate(zip(x,y))]
+        points = [go.layout.Shape(x0=x_-r, y0=y_-r, x1=x_+r, y1=y_+r, fillcolor=matplotlib.colors.to_hex(c[i]), opacity=1, **kwargs) for i, (x_, y_) in enumerate(zip(x,y))]
     return points
     
 def spatial_points_continuous(x, y, exp, mapper,r=8):
