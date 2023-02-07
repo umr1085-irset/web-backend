@@ -902,7 +902,10 @@ def auto_get_symbols(loom_path,n=10,ridx_filter=None,cidx_filter=None,method='re
     Array of symbols
     '''
     if method=='relevant':
-        return get_relevant_genes(loom_path)
+        try:
+            return get_relevant_genes(loom_path)
+        except:
+            return most_variable_symbols(loom_path,n=n,ridx_filter=ridx_filter,cidx_filter=cidx_filter)    
     elif method=='variance':
         return most_variable_symbols(loom_path,n=n,ridx_filter=ridx_filter,cidx_filter=cidx_filter)
     else:
