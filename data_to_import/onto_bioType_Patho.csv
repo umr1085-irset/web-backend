@@ -1,0 +1,31 @@
+﻿displayLabel;ontologyID;ontologyLabel;model
+Normal tissue;http://purl.obolibrary.org/obo/NCIT_C19697;Tissue Sample;BiomaterialType
+Tumor tissue;http://purl.obolibrary.org/obo/NCIT_C18009;Tumor tissue;BiomaterialType
+Metastatic tumor tissue;http://purl.obolibrary.org/obo/NCIT_C156440;Metastatic Tumor Sample;BiomaterialType
+Fibrous tissue;http://purl.obolibrary.org/obo/NCIT_C129504;Fibrous tissue;BiomaterialType
+Cell line;http://purl.obolibrary.org/obo/NCIT_C16403;Cell Line;BiomaterialType
+Explant;;Explant;BiomaterialType
+Organoid;http://purl.obolibrary.org/obo/NCIT_C172259;Organoid;BiomaterialType
+Tumoroid;;Tumoroid;BiomaterialType
+Spheroid;;Spheroid;BiomaterialType
+Sorted cells;http://purl.obolibrary.org/obo/NCIT_C126974;Sorted Cells;BiomaterialType
+PDX;http://purl.obolibrary.org/obo/NCIT_C122936;Patient Derived Xenotype;BiomaterialType
+Blood;http://purl.obolibrary.org/obo/UBERON_0000178;Blood;BiomaterialType
+Saliva;http://purl.obolibrary.org/obo/UBERON_0001836;Saliva;BiomaterialType
+Native cell;http://purl.obolibrary.org/obo/CL_0000003;native cell;BiomaterialType
+Clear Cell Renal Cell Carcinoma;http://purl.obolibrary.org/obo/NCIT_C4033;Clear Cell Renal Cell Carcinoma;Pathology
+Chromophobe Renal Cell Carcinoma;http://purl.obolibrary.org/obo/NCIT_C4146;Chromophobe Renal Cell Carcinoma;Pathology
+Papillary Renal Cell Carcinoma;http://purl.obolibrary.org/obo/NCIT_C6975;Papillary Renal Cell Carcinoma;Pathology
+Adenocarcinoma;http://purl.obolibrary.org/obo/NCIT_C2852;Adenocarcinoma;Pathology
+Bladder Urothelial Carcinoma;http://purl.obolibrary.org/obo/NCIT_C39851;Bladder Urothelial Carcinoma;Pathology
+Transitional Cell Carcinoma;http://purl.obolibrary.org/obo/NCIT_C2930;Transitional Cell Carcinoma;Pathology
+Metastatic Transitional Cell Carcinoma;http://purl.obolibrary.org/obo/NCIT_C129828;Metastatic Transitional Cell Carcinoma;Pathology
+Urothelial Carcinoma;http://purl.obolibrary.org/obo/NCIT_C4030;Urothelial Carcinoma;Pathology
+Ovarian Small Cell Carcinoma;http://purl.obolibrary.org/obo/NCIT_C27390;Ovarian Small Cell Carcinoma;Pathology
+Lung Small Cell Carcinoma;http://purl.obolibrary.org/obo/NCIT_C4917;Lung Small Cell Carcinoma;Pathology
+Small Cell Neuroendocrine Carcinoma;http://purl.obolibrary.org/obo/NCIT_C3915;Small Cell Neuroendocrine Carcinoma;Pathology
+Small Cell Intermediate Cell Carcinoma;http://purl.obolibrary.org/obo/NCIT_C4099;Small Cell Intermediate Cell Carcinoma;Pathology
+Prostatic Intraepithelial Neoplasia;http://purl.obolibrary.org/obo/NCIT_C4064;Prostatic Intraepithelial Neoplasia;Pathology
+Wilms Tumor;http://purl.obolibrary.org/obo/NCIT_C3267;Wilms Tumor;Pathology
+Muscle Invasive Bladder Urothelial Carcinoma;http://purl.obolibrary.org/obo/NCIT_C180604;Muscle Invasive Bladder Urothelial Carcinoma;Pathology
+Basal Cell Carcinoma;http://purl.obolibrary.org/obo/NCIT_C156767;Basal Cell Carcinoma;Pathology

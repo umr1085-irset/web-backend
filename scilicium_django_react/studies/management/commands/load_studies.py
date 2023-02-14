@@ -1,4 +1,5 @@
 import os, csv, sys, json, requests
+from requests.exceptions import HTTPError
 from datetime import datetime
 from django.utils.timezone import make_aware
 from django.core.management.base import BaseCommand, CommandError
@@ -21,34 +22,22 @@ def checkPMCforAbstract(pmcid) :
     #data = response_API.txt
     #parse_json = json.loads(data)
     #pmcid = parse_json["records"]["pmcid"]
-
-    urlPMC = "https://www.ebi.ac.uk/biostudies/files/S-E"+pmcid+"/S-E"+pmcid+".json"
-    response_PMC=requests.get(urlPMC)
+    
+    urlPMC = "https://www.ebi.ac.uk/europepmc/webservices/rest/article/PMC/"+pmcid
+    try : 
+        response_PMC=requests.get(urlPMC, params={"resultType":"core","format":"json"})
     #data_PMC = response_PMC.txt
     #jsonp = json.loads(data_PMC)
-    jsonp=response_PMC.json()
-    attributes = jsonp["section"]["attributes"]
-    for item in attributes : 
-        if item["name"] == "Abstract" : 
-            abstract = item["value"]
+    except HTTPError as http_err:
+        print("HTTP error occurred")
+    else : 
+        responseTxt=response_PMC.text
+        print(responseTxt)
+        parse_json = json.loads(responseTxt)
+        abstract = parse_json["result"]["abstractText"]
     return abstract
 
 
-def createPubmedArticleOLD(pmid) : 
-
-    url = "https://www.ebi.ac.uk/eropepmc/webservices/rest/article/MED/"+pmid+"?resultType=core&format=json"
-    response_API = requests.get(url)
-    data = response_API.text
-    parse_json = json.loads(data)
-    info = parse_json["result"]
-    authors = info["authorList"]
-    journalinfo = info["journalInfo"]
-    volume = journalinfo["volume"]
-    date = datetime.datetime(journalinfo["yearOfPublication"],journalinfo["printPublicationDate"].split("-")[1],journalinfo["printPublicationDate"].split("-")[2],00,00,00)
-    journal = journalinfo["journal"]["medlineAbbreviation"]
-    doid = info["doi"]
-      
-    print(authors)
     
 
 def createPubmedArticle(pmid) : 
@@ -58,63 +47,73 @@ def createPubmedArticle(pmid) :
     else :
 
         url = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary.fcgi?db=pubmed&id="+pmid+"&retmode=json"
-        response_API = requests.get(url)
-        data = response_API.text
-        parse_json = json.loads(data)
-        #print(parse_json)
-        info = parse_json["result"][pmid]
-        authors = info["authors"]
-        firstAuthor = authors[0]["name"]
-        firstAuthorName = firstAuthor[0:len(firstAuthor)-2]
-        year = info["pubdate"]
-        shortHand = firstAuthorName + " et al. (" + str(year) + ")"
-        title  = info["title"]
-        volume = info["volume"]
-        if volume == "" : 
-            volInt = 0
-        else : 
-            volInt = int(volume)
-        journal = info["fulljournalname"] 
-        dateStr = info["sortpubdate"]
-        dateArr = dateStr.split(" ")[0].split("/")
-        #print(dateArr)
-        date = datetime(int(dateArr[0]),int(dateArr[1]),int(dateArr[2]),0,0,0)
-        date_ok = make_aware(date)
-        doid = info["elocationid"]
-        ids = info["articleids"]
-        #print(ids)
-        doid = ""
-        pmc = ""
-        for item in ids : 
-            print(item)
-            if item["idtype"] == "doi" :
-                doid = item["value"]
-            elif item["idtype"] == "pmc" : 
-                pmc = item["value"]
-    
-        abstract = ""
-        if pmc != "" :
-            print("PMC ID " + pmc)
-            abstract = checkPMCforAbstract(pmc)
+        try : 
+            response_API = requests.get(url)
 
-        article = Article(title=title,pmid=pmid,doid=doid,pmc=pmc,abstract=abstract,journal=journal,volume=volInt,releaseDate=date_ok,shorthand=shortHand)
-        article.save()
+        except HTTPError as http_err:
+            print("HTTP error occurred")
+            article = None
+        else :
+
+            data = response_API.text
+            parse_json = json.loads(data)
+            #print(parse_json)
+            info = parse_json["result"][pmid]
+            authors = info["authors"]
+            firstAuthor = authors[0]["name"]
+            firstAuthorName = firstAuthor[0:len(firstAuthor)-2]
+            year = info["pubdate"]
+            shortHand = firstAuthorName + " et al. (" + str(year) + ")"
+            title  = info["title"]
+            volume = info["volume"]
+            if volume == "" : 
+                volInt = 0
+            else : 
+                volInt = int(volume)
+            journal = info["fulljournalname"] 
+            dateStr = info["sortpubdate"]
+            dateArr = dateStr.split(" ")[0].split("/")
+            #print(dateArr)
+            date = datetime(int(dateArr[0]),int(dateArr[1]),int(dateArr[2]),0,0,0)
+            date_ok = make_aware(date)
+            doid = info["elocationid"]
+            ids = info["articleids"]
+            #print(ids)
+            doid = ""
+            pmc = ""
+            for item in ids : 
+                #print(item)
+                if item["idtype"] == "doi" :
+                    doid = item["value"]
+                elif item["idtype"] == "pmc" : 
+                    pmc = item["value"]
+    
+            abstract = ""
+            if pmc != "" :
+                print("PMC ID " + pmc)
+                abstract = checkPMCforAbstract(pmc)
+
+            article = Article(title=title,pmid=pmid,doid=doid,pmc=pmc,abstract=abstract,journal=journal,volume=volInt,releaseDate=date_ok,shorthand=shortHand)
+            article.save()
         
             
 
-        authorlist=[]
-        for author in authors :
-            if Author.objects.filter(fullName = author["name"]).exists() : 
-                print("Author " + author["name"] + "already exists")
-                a = Author.objects.filter(fullName = author["name"]).first()
-                authorlist.append(a)
-            else : 
-                a=Author(fullName=author["name"])
-                a.save()
-                authorlist.append(a)
+            authorlist=[]
+            for author in authors :
+                if Author.objects.filter(fullName = author["name"]).exists() : 
+                    print("Author " + author["name"] + "already exists")
+                    a = Author.objects.filter(fullName = author["name"]).first()
+                    authorlist.append(a)
+                else : 
+                    a=Author(fullName=author["name"])
+                    a.save()
+                    authorlist.append(a)
 
-        for authorObj in authorlist : 
-            article.author.add(authorObj)
+            for authorObj in authorlist : 
+                article.author.add(authorObj)
+
+
+
 
     return article
 
@@ -206,7 +205,8 @@ def  import_data_from_list(infofile):
             description = ""
             #par defaut, on regarde s'il y a une desc associé à l'article
             if len(artObjList) > 0 : 
-                description = getattr(artObjList[0], "abstract")
+                if artObjList[0] is not None : 
+                    description = getattr(artObjList[0], "abstract")
             #si la description est donnée dans le fichier, c'est cette description que l'on prend
             if row_data["Study.description"] != "" : 
                 description = row_data["Study.description"]
@@ -217,7 +217,8 @@ def  import_data_from_list(infofile):
                 study.save()
 
                 for article in artObjList : 
-                    study.article.add(article)
+                    if article is not None : 
+                        study.article.add(article)
             
                 viewer = row_data["Study.viewer"]
                 viewerObj = Viewer.objects.get(name = viewer)

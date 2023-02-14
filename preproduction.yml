@@ -4,6 +4,7 @@ volumes:
   production_postgres_data: {}
   production_postgres_data_backups: {}
   production_traefik: {}
+  djangoapp: {}
 
 services:
   django: &django
@@ -11,6 +12,8 @@ services:
       context: .
       dockerfile: ./compose/production/django/Dockerfile
     image: scilicium/geno_app_django:dev
+    volumes: 
+      - djangoapp:/app
     depends_on:
       - postgres
       - redis

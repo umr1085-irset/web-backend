@@ -13,6 +13,10 @@ from PIL import Image
 import requests
 import matplotlib
 import matplotlib.cm as cm
+import math
+from django.conf import settings
+
+N_MAX_CELLS = 20000
 
 def get_available_reductions(loom_path):
     '''
@@ -205,10 +209,72 @@ def get_dataframe(loom_path,attrs,cidx_filter=None):
     df.close()
     return pd.DataFrame(d)
 
-def n_colors(n):
+def n_colors_old(n):
     l = ['#8BC34A','#FFC107','#3F51B5','#9C27B0','#E91E63','#008C93','#CDDC39','#FFE708','#22ADF2','#FF7224','#BC199D','#DB0B29','#5C8C1E','#EA9713','#3A4884','#712B7F','#B2265B','#0C685D','#AFB53A','#E2C729','#2996C1','#E53C20','#7F2877','#A50A1D','#C0F96E','#F9F15F','#7095F2','#CA2FEA','#FC63A1','#22C6AE','#D1EF7F','#F4EAB3','#86DCF7','#F7AD8D','#F757E1','#EF5472','#99AF69','#FCC57C','#7586BC','#9D59AD','#E25D93','#33A090','#D8D861','#F9DF70','#58C7E0','#FC6C65','#A553A1','#CC2E45','#D6A427','#63554B']
-
+    
     return l[:n]
+
+def n_colors(NbColors):
+    pi = 3.14159265359
+    pid2 = pi/2
+    angle = 0
+    step = pi/(NbColors)
+    ListOfColors = []
+    for i in range(0,NbColors):
+        R = round((math.cos(angle)+1)/2 * 200)
+        G = round((math.cos(angle-pid2)+1)/2 * 200)
+        B = round((math.cos(angle-pi)+1)/2 * 200)
+        A = .4
+        angle = angle + step
+        ListOfColors.append('rgba('+str(R)+','+str(G)+','+str(B)+','+str(A)+')')
+    print(ListOfColors)
+    return ListOfColors
+
+def n_colors_float(NbColors):
+    pi = 3.14159265359
+    pid2 = pi/2
+    angle = 0
+    step = pi/(NbColors)
+    ListOfColors = []
+    for i in range(0,NbColors):
+        R = round((math.cos(angle)+1)/2 * 200)
+        R = round(0.4*R + (1-0.4)*255)/255
+        G = round((math.cos(angle-pid2)+1)/2 * 200)
+        G = round(0.4*G + (1-0.4)*255)/255
+        B = round((math.cos(angle-pi)+1)/2 * 200)
+        B = round(0.4*B + (1-0.4)*255)/255
+        A = 1
+        angle = angle + step
+        ListOfColors.append((R,G,B,A))
+    print(ListOfColors)
+    return ListOfColors
+
+#def n_colors(NbColors,forcefloat=False):
+#    pi = 3.14159265359
+#    pid2 = pi/2
+#    angle = 0
+#    step = pi/(NbColors)
+#    ListOfColors = []
+#    alpha = .4
+#    alpha_inv = .6
+#    for i in range(0,NbColors):
+#        R = round((math.cos(angle)+1)/2 * 200)
+#        R = round(alpha*R + alpha_inv*255)
+#        G = round((math.cos(angle-pid2)+1)/2 * 200)
+#        G = round(alpha*G + alpha_inv*255)
+#        B = round((math.cos(angle-pi)+1)/2 * 200)
+#        B = round(alpha*B + alpha_inv*255)
+#        A = 1
+#        angle = angle + step
+#        if forcefloat:
+#            R /= 255
+#            G /= 255
+#            B /= 255
+#            ListOfColors.append((R,G,B,A))
+#        else:
+#            ListOfColors.append('rgba('+str(R)+','+str(G)+','+str(B)+','+str(A)+')')
+#    print(ListOfColors)
+#    return ListOfColors
 
 def json_component_chartjs(loom_path,style='pie',attrs=[],cidx_filter=None):
     '''
@@ -386,15 +452,28 @@ def json_scatter(loom_path,color=None,reduction=None,returnjson=True,cidx_filter
     fig = go.Figure()
     if isinstance(cidx_filter, np.ndarray): # if filter exists, draw all points first as background
         df = get_dataframe(loom_path,[X,Y],cidx_filter=None) # all points
-        x = df[X].values
-        y = df[Y].values
+        if df.shape[0]>N_MAX_CELLS:
+            sub_idx = np.random.choice(df.shape[0], N_MAX_CELLS, replace=False) # select 200 cells randomly
+            x = df[X].values[sub_idx]
+            y = df[Y].values[sub_idx]
+        else:
+            x = df[X].values
+            y = df[Y].values
         tmpcolor = check_color(loom_path,None,cidx_filter=None) # None means default background color
         fig.add_trace(continuous_scatter_gl(x,y,tmpcolor,tracename='All cells'))
 
     df = get_dataframe(loom_path,[X,Y],cidx_filter=cidx_filter) # pandas dataframe
-    x = df[X].values
-    y = df[Y].values
     tmpcolor = check_color(loom_path,color,cidx_filter=cidx_filter) # numpy array
+    
+    if df.shape[0]>N_MAX_CELLS:
+        sub_idx = np.random.choice(df.shape[0], N_MAX_CELLS, replace=False) # select 200 cells randomly
+        x = df[X].values[sub_idx]
+        y = df[Y].values[sub_idx]
+        if isinstance(tmpcolor, np.ndarray): # if color is an array (numerical or strings)
+            tmpcolor = tmpcolor[sub_idx]
+    else:
+        x = df[X].values
+        y = df[Y].values
 
     if color!=None:
         if np.issubdtype(tmpcolor.dtype, np.number): # if color is None or type of color array is numerical
@@ -741,8 +820,11 @@ def most_variable_symbols(loom_path,n=10,ridx_filter=None,cidx_filter=None):
     '''
     
     df = loompy.connect(loom_path,'r')
-    if cidx_filter==None and ridx_filter==None and df.attrs.most_variable_genes:
-        return df.attrs.most_variable_genes.split(',')
+    try: # if a filter != None, comparing an array to None throws an error
+        if cidx_filter==None and ridx_filter==None and df.attrs.most_variable_genes:
+            return df.attrs.most_variable_genes.split(',')
+    except:
+        pass # do nothing
             
     labels = get_ra(loom_path,key='Symbol',unique=False,ridx_filter=ridx_filter) # get symbols (filter applied)
     if isinstance(ridx_filter, np.ndarray) and isinstance(cidx_filter, np.ndarray):
@@ -780,7 +862,25 @@ def first_n_symbols(loom_path,n=10,ridx_filter=None):
     labels = get_ra(loom_path,key='Symbol',unique=False,ridx_filter=ridx_filter)
     return labels[:n]
 
-def auto_get_symbols(loom_path,n=5,ridx_filter=None,cidx_filter=None,method='first'):
+def get_relevant_genes(loom_path):
+    '''
+    Retrieve relevant genes
+    
+    Params
+    ------
+    loom_path : str
+        Path to a .loom file
+        
+    Return
+    ------
+    List of genes
+    '''
+    df = loompy.connect(loom_path, 'r')
+    labels = df.attrs.relevant_genes.split(',')
+    df.close()
+    return labels
+
+def auto_get_symbols(loom_path,n=10,ridx_filter=None,cidx_filter=None,method='relevant'):
     '''
     Get genes automatically, first n genes or n most variable genes
     
@@ -801,8 +901,11 @@ def auto_get_symbols(loom_path,n=5,ridx_filter=None,cidx_filter=None,method='fir
     ------
     Array of symbols
     '''
-    if method=='first':
-        return first_n_symbols(loom_path,n=n,ridx_filter=ridx_filter)
+    if method=='relevant':
+        try:
+            return get_relevant_genes(loom_path)
+        except:
+            return most_variable_symbols(loom_path,n=n,ridx_filter=ridx_filter,cidx_filter=cidx_filter)    
     elif method=='variance':
         return most_variable_symbols(loom_path,n=n,ridx_filter=ridx_filter,cidx_filter=cidx_filter)
     else:
@@ -1059,6 +1162,9 @@ def json_density(loom_path,reduction=None,ca=None,symbols=[],returnjson=True,cid
     )
     fig.update_yaxes(showticklabels=False)
     fig.update_xaxes(showticklabels=False)
+
+    if reduction=='spatial':
+        fig.update_yaxes(autorange="reversed")
     
     if returnjson:
         return json.loads(pio.to_json(fig, validate=True, pretty=False, remove_uids=True)),lgd
@@ -1073,18 +1179,23 @@ def json_density(loom_path,reduction=None,ca=None,symbols=[],returnjson=True,cid
 #import matplotlib
 #import matplotlib.cm as cm
 
-def spatial_points_solid(x,y,color,r=8):
-    #print("spatial points solid")
-
-    kwargs = {'type': 'circle', 'xref': 'x', 'yref': 'y', 'fillcolor': 'orange','line': {'width':0}}
-    r=r
-    points = [go.layout.Shape(x0=x-r, y0=y-r, x1=x+r, y1=y+r, **kwargs) for x, y in zip(x,y)]
+def spatial_points_solid(x,y,colorvector,r=8):
+    if isinstance(colorvector, str):
+        kwargs = {'type': 'circle', 'xref': 'x', 'yref': 'y', 'fillcolor': colorvector,'line': {'width':1}}
+        points = [go.layout.Shape(x0=x-r, y0=y-r, x1=x+r, y1=y+r, **kwargs) for x, y in zip(x,y)]
+    else:
+        unique_values = np.unique(colorvector)
+        colors = n_colors_float(len(unique_values))
+        colordict = dict(zip(unique_values,colors))
+        c=[colordict[x] for x in colorvector]
+        kwargs = {'type': 'circle', 'xref': 'x', 'yref': 'y', 'line': {'width':0}}
+        points = [go.layout.Shape(x0=x_-r, y0=y_-r, x1=x_+r, y1=y_+r, fillcolor=matplotlib.colors.to_hex(c[i]), opacity=1, **kwargs) for i, (x_, y_) in enumerate(zip(x,y))]
     return points
     
-def spatial_points_continuous(x, y, exp, mapper):
+def spatial_points_continuous(x, y, exp, mapper,r=8):
     kwargs = {'type': 'circle', 'xref': 'x', 'yref': 'y', 'line': {'width':0}}
     c=[mapper.to_rgba(exp_) for exp_ in exp]
-    r=8
+    print(c[:5])
     points = [go.layout.Shape(x0=x_-r, y0=y_-r, x1=x_+r, y1=y_+r, fillcolor=matplotlib.colors.to_hex(c[i]), **kwargs) for i, (x_, y_) in enumerate(zip(x,y))]
     return points
 
@@ -1113,37 +1224,35 @@ def json_spatial(loom_path, color=None, reduction=None,returnjson=True, cidx_fil
     y = -df[Y].values
 
     df = loompy.connect(loom_path,"r") # open loom file
-    url = df.attrs.spatial_img_url # get image file path
+    #url = df.attrs.spatial_img_url # get image file path
+    url = os.path.join(settings.MEDIA_ROOT,df.attrs.spatial_img_url)
     keys = df.ca.keys()
     df.close() # close loom file
-    #print("color")
-    #print(color)
-    tmpcolor=check_color(loom_path,color,cidx_filter=cidx_filter)
-    #print("tmpcolor")
-    #print(tmpcolor)
 
-    if color in keys :
-        #print("spatial solid")
-        points = spatial_points_solid(x,y,tmpcolor)
-    else : 
-        #exp = check_color(loom_path, color, cidx_filter=cidx_filter)
-        #print("spatial continuous")
-        minima = min(tmpcolor)
-        maxima = max(tmpcolor)
-        norm = matplotlib.colors.Normalize(vmin=minima, vmax=maxima, clip=True)
-        mapper = cm.ScalarMappable(norm=norm, cmap=cm.magma)
-        points = spatial_points_continuous(x, y, tmpcolor, mapper)
-
+    if color==None:
+        colorvector = 'orange'
+        points = spatial_points_solid(x,y,colorvector)
+    else:
+        colorvector = check_color(loom_path,color,cidx_filter=cidx_filter)
+        if np.issubdtype(colorvector.dtype, np.number):
+            minima = min(colorvector)
+            maxima = max(colorvector)
+            norm = matplotlib.colors.Normalize(vmin=minima, vmax=maxima, clip=True)
+            mapper = cm.ScalarMappable(norm=norm, cmap=cm.magma)
+            points = spatial_points_continuous(x, y, colorvector, mapper)
+        else:
+            points = spatial_points_solid(x,y,colorvector)
 #        
     fig = go.Figure() # create figure
     fig.update_layout(shapes=points) # add points to figure
-    fig.update_layout(template="plotly_white", width=600, height=600, xaxis_showgrid=False, yaxis_showgrid=False) # set layout attributes
+    fig.update_layout(template="plotly_white", width=600, height=600, xaxis_showgrid=False, yaxis_showgrid=False,margin=dict(l=5, r=5, t=5, b=5)) # set layout attributes
 #    
-    #df = loompy.connect(loom_path,"r") # open loom file
-    #url = df.attrs.spatial_img_url # get image file path
-    #df.close() # close loom file
-    response = requests.get(url) # get img
-    img = Image.open(BytesIO(response.content)) # open image
+    try:
+        response = requests.get(url) # get img
+        img = Image.open(BytesIO(response.content)) # open image
+    except:
+        img = Image.open(url) # open image
+
     w,h = img.size # get image width and height
     fig.add_layout_image( # add image to figure
         source=img,
@@ -1158,12 +1267,12 @@ def json_spatial(loom_path, color=None, reduction=None,returnjson=True, cidx_fil
         sizex=w,
         sizey=h
     )
-#    
+
     fig.update_xaxes(range=[0, w]) # set x axis range
     fig.update_yaxes(range=[-h, 0]) # set y axis range
     fig.update_xaxes(showticklabels=False) # remove x axis ticks
     fig.update_yaxes(showticklabels=False) # remove y axis ticks
-#    
+
     if returnjson:
         return json.loads(pio.to_json(fig, validate=True, pretty=False, remove_uids=True))
     else:
