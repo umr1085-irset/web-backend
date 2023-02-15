@@ -214,7 +214,7 @@ def n_colors_old(n):
     
     return l[:n]
 
-def n_colors(NbColors):
+def n_colors(NbColors,rgbonly=False):
     pi = 3.14159265359
     pid2 = pi/2
     angle = 0
@@ -226,7 +226,10 @@ def n_colors(NbColors):
         B = round((math.cos(angle-pi)+1)/2 * 200)
         A = .4
         angle = angle + step
-        ListOfColors.append('rgba('+str(R)+','+str(G)+','+str(B)+','+str(A)+')')
+        if rgbonly:
+            ListOfColors.append('rgb('+str(R)+','+str(G)+','+str(B)+')')            
+        else:
+            ListOfColors.append('rgba('+str(R)+','+str(G)+','+str(B)+','+str(A)+')')
     print(ListOfColors)
     return ListOfColors
 
@@ -409,7 +412,8 @@ def continuous_scatter_gl_3d(x,y,z,color,tracename=''):
         marker=dict(
             color=color,
             colorscale='matter',
-            size=4
+            size=3,
+            opacity=0.4
         ),
         name=tracename,
         hoverinfo=hoverinfo
@@ -419,7 +423,8 @@ def continuous_scatter_gl_3d(x,y,z,color,tracename=''):
 def discrete_scatter_gl_3d(x,y,z,color):
     unique_classes = np.unique(color)
     traces=[]
-    color_seq = n_colors(len(unique_classes))
+    color_seq = n_colors(len(unique_classes), rgbonly=True)
+
     for i,unique_class_ in enumerate(unique_classes):
         idx = np.where(color==unique_class_)[0]
         subX = x[idx]
@@ -433,7 +438,8 @@ def discrete_scatter_gl_3d(x,y,z,color):
                 name=unique_class_,
                 marker=dict(
                     color=color_seq[i],
-                    size=4
+                    size=3,
+                    opacity=0.4,
                 ),
                 showlegend=True
             )
@@ -634,6 +640,7 @@ def json_scatter3d(loom_path,reduction,color=None,returnjson=True,cidx_filter=No
     if color!=None:
         if np.issubdtype(tmpcolor.dtype, np.number): # if color is None or type of color array is numerical
             idx = np.argsort(tmpcolor)
+            tmpcolor = tmpcolor[idx]
             x = x[idx]
             y = y[idx]
             z = z[idx]
