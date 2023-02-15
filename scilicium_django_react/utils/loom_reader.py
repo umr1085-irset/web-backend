@@ -396,6 +396,50 @@ def discrete_scatter_gl(x,y,color):
         )
     return traces
 
+def continuous_scatter_gl_3d(x,y,z,color,tracename=''):
+    if tracename=='All cells':
+        hoverinfo='skip'
+    else:
+        hoverinfo=None
+    trace=go.Scatter3d(
+        x = x, 
+        y = y,
+        z = z,
+        mode='markers',
+        marker=dict(
+            color=color,
+            colorscale='matter',
+            size=4
+        ),
+        name=tracename,
+        hoverinfo=hoverinfo
+    )
+    return trace
+
+def discrete_scatter_gl_3d(x,y,z,color):
+    unique_classes = np.unique(color)
+    traces=[]
+    color_seq = n_colors(len(unique_classes))
+    for i,unique_class_ in enumerate(unique_classes):
+        idx = np.where(color==unique_class_)[0]
+        subX = x[idx]
+        subY = y[idx]
+        subZ = z[idx]
+        traces.append(go.Scatter3d(
+                x=subX,
+                y=subY,
+                z=subZ,
+                mode='markers',
+                name=unique_class_,
+                marker=dict(
+                    color=color_seq[i],
+                    size=4
+                ),
+                showlegend=True
+            )
+        )
+    return traces
+
 def check_color(loom_path,color,cidx_filter=None):
     if color==None:
         return '#dddddd'
@@ -412,13 +456,19 @@ def json_scatOrSpat(loom_path,color=None,reduction=None,returnjson=True,cidx_fil
     
     if reduction==None :
         reduction = get_available_reductions(loom_path)[0]
-    if "spatial" in reduction:
-        print("viz method: spatial")
-        result=json_spatial(loom_path,color,reduction,returnjson,cidx_filter)
-        return result
-    else : 
-        print("viz method: scatter")
-        result=json_scatter(loom_path,color,reduction,returnjson,cidx_filter)
+    l = get_reduction_x_y(loom_path,reduction)
+    if len(l)==2:
+        if "spatial" in reduction:
+            print("viz method: spatial")
+            result=json_spatial(loom_path,color,reduction,returnjson,cidx_filter)
+            return result
+        else : 
+            print("viz method: scatter")
+            result=json_scatter(loom_path,color,reduction,returnjson,cidx_filter)
+            return result
+    else:
+        print("viz method: scatter 3d")
+        result=json_scatter3d(loom_path,reduction,color,returnjson,cidx_filter)
         return result
  
             
@@ -504,6 +554,117 @@ def json_scatter(loom_path,color=None,reduction=None,returnjson=True,cidx_filter
             x = 1,
             bgcolor = "rgba(255,255,255,0.8)",
             )
+    )
+
+    fig.update_yaxes(showticklabels=False)
+    fig.update_xaxes(showticklabels=False)
+    end = time.time()
+    if returnjson:
+        print('#######################')
+        print(end - start)
+        print('#######################')
+        try : 
+            jsonD = json.loads(pio.to_json(fig, validate = True, pretty=False, remove_uids=True))
+            #print(jsonD)
+            return jsonD
+        except json.decoder.JSONDecodeError:
+            print("String could not be converted to JSON")
+            return json.loads('{}')
+    else:
+        print('#######################')
+        print(end - start)
+        print('#######################')
+        return fig
+
+def json_scatter3d(loom_path,reduction,color=None,returnjson=True,cidx_filter=None):
+    '''
+    Compute JSON from Plotly figure
+    
+    Params
+    ------
+    loom_path: str
+        path to Loom file
+    color: str or None
+        column attribute or gene symbol
+    attrs: list
+        List of up to two attributes to plot
+    returnjson: bool
+        return figure or its JSON form
+    cidx_filter: array
+        column indices filter
+        
+    Return
+    ------
+    Plotly figure or its JSON form
+    '''
+    start = time.time()
+
+    X,Y,Z = get_reduction_x_y(loom_path,reduction)
+    
+    fig = go.Figure()
+    if isinstance(cidx_filter, np.ndarray): # if filter exists, draw all points first as background
+        df = get_dataframe(loom_path,[X,Y,Z],cidx_filter=None) # all points
+        if df.shape[0]>N_MAX_CELLS:
+            sub_idx = np.random.choice(df.shape[0], N_MAX_CELLS, replace=False) # select 200 cells randomly
+            x = df[X].values[sub_idx]
+            y = df[Y].values[sub_idx]
+            z = df[Z].values[sub_idx]
+        else:
+            x = df[X].values
+            y = df[Y].values
+            z = df[Z].values
+        tmpcolor = check_color(loom_path,None,cidx_filter=None) # None means default background color
+        fig.add_trace(continuous_scatter_gl_3d(x,y,z,tmpcolor,tracename='All cells'))
+        
+    df = get_dataframe(loom_path,[X,Y,Z],cidx_filter=cidx_filter) # pandas dataframe
+    tmpcolor = check_color(loom_path,color,cidx_filter=cidx_filter) # numpy array
+    
+    if df.shape[0]>N_MAX_CELLS:
+        sub_idx = np.random.choice(df.shape[0], N_MAX_CELLS, replace=False) # select 200 cells randomly
+        x = df[X].values[sub_idx]
+        y = df[Y].values[sub_idx]
+        z = df[Z].values[sub_idx]
+        if isinstance(tmpcolor, np.ndarray): # if color is an array (numerical or strings)
+            tmpcolor = tmpcolor[sub_idx]
+    else:
+        x = df[X].values
+        y = df[Y].values
+        z = df[Z].values
+        
+    if color!=None:
+        if np.issubdtype(tmpcolor.dtype, np.number): # if color is None or type of color array is numerical
+            idx = np.argsort(tmpcolor)
+            x = x[idx]
+            y = y[idx]
+            z = z[idx]
+            fig.add_trace(continuous_scatter_gl_3d(x,y,z,tmpcolor,tracename=color))
+        else: # discrete
+            fig.add_traces(discrete_scatter_gl_3d(x,y,z,tmpcolor))
+    elif color==None and not isinstance(cidx_filter, np.ndarray): # fallback case
+        fig.add_trace(continuous_scatter_gl_3d(x,y,z,tmpcolor))
+
+    fig.update_layout(
+        # background color white
+        paper_bgcolor='rgba(0,0,0,0)',
+        plot_bgcolor='rgba(0,0,0,0)',
+        margin=dict(
+            l=0,
+            r=0,
+            b=0,
+            t=0
+        ),
+        legend = dict(
+            yanchor ="bottom",
+            y = 0,
+            xanchor = "right",
+            x = 1,
+            bgcolor = "rgba(255,255,255,0.8)",
+        ),
+        scene=dict(
+            xaxis=dict(showticklabels=False),
+            yaxis=dict(showticklabels=False),
+            zaxis=dict(showticklabels=False),
+        )
     )
 
     fig.update_yaxes(showticklabels=False)
