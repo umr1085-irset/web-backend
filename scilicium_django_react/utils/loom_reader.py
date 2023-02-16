@@ -15,6 +15,7 @@ import matplotlib
 import matplotlib.cm as cm
 import math
 from django.conf import settings
+import os
 
 N_MAX_CELLS = 20000
 
@@ -1395,19 +1396,14 @@ def json_spatial(loom_path, color=None, reduction=None,returnjson=True, cidx_fil
     ------
     Array of symbols
     '''
-    print('enter json_spatial')
     X,Y = get_reduction_x_y(loom_path,'spatial') # get column attribute names for X and Y
     df = get_dataframe(loom_path,[X,Y],cidx_filter=cidx_filter) # pandas dataframe
     x = df[X].values
     y = -df[Y].values
-    print('x y okay')
 
     df = loompy.connect(loom_path,"r") # open loom file
     #url = df.attrs.spatial_img_url # get image file path
-    print('r')
-    print(settings.MEDIA_ROOT)
     url = os.path.join(settings.MEDIA_ROOT,df.attrs.spatial_img_url)
-    print(url)
     keys = df.ca.keys()
     df.close() # close loom file
 
