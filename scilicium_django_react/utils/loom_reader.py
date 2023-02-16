@@ -1404,6 +1404,7 @@ def json_spatial(loom_path, color=None, reduction=None,returnjson=True, cidx_fil
     df = loompy.connect(loom_path,"r") # open loom file
     #url = df.attrs.spatial_img_url # get image file path
     url = os.path.join(settings.MEDIA_ROOT,df.attrs.spatial_img_url)
+    print(url)
     keys = df.ca.keys()
     df.close() # close loom file
 
