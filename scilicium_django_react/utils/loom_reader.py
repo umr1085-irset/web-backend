@@ -230,7 +230,7 @@ def n_colors(NbColors,rgbonly=False):
             ListOfColors.append('rgb('+str(R)+','+str(G)+','+str(B)+')')            
         else:
             ListOfColors.append('rgba('+str(R)+','+str(G)+','+str(B)+','+str(A)+')')
-    print(ListOfColors)
+    #print(ListOfColors)
     return ListOfColors
 
 def n_colors_float(NbColors):
@@ -249,7 +249,7 @@ def n_colors_float(NbColors):
         A = 1
         angle = angle + step
         ListOfColors.append((R,G,B,A))
-    print(ListOfColors)
+    #print(ListOfColors)
     return ListOfColors
 
 #def n_colors(NbColors,forcefloat=False):
@@ -1373,7 +1373,6 @@ def spatial_points_solid(x,y,colorvector,r=8):
 def spatial_points_continuous(x, y, exp, mapper,r=8):
     kwargs = {'type': 'circle', 'xref': 'x', 'yref': 'y', 'line': {'width':0}}
     c=[mapper.to_rgba(exp_) for exp_ in exp]
-    print(c[:5])
     points = [go.layout.Shape(x0=x_-r, y0=y_-r, x1=x_+r, y1=y_+r, fillcolor=matplotlib.colors.to_hex(c[i]), **kwargs) for i, (x_, y_) in enumerate(zip(x,y))]
     return points
 
@@ -1396,13 +1395,17 @@ def json_spatial(loom_path, color=None, reduction=None,returnjson=True, cidx_fil
     ------
     Array of symbols
     '''
+    print('enter json_spatial')
     X,Y = get_reduction_x_y(loom_path,'spatial') # get column attribute names for X and Y
     df = get_dataframe(loom_path,[X,Y],cidx_filter=cidx_filter) # pandas dataframe
     x = df[X].values
     y = -df[Y].values
+    print('x y okay')
 
     df = loompy.connect(loom_path,"r") # open loom file
     #url = df.attrs.spatial_img_url # get image file path
+    print('r')
+    print(settings.MEDIA_ROOT)
     url = os.path.join(settings.MEDIA_ROOT,df.attrs.spatial_img_url)
     print(url)
     keys = df.ca.keys()
