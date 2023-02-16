@@ -1407,9 +1407,15 @@ def json_spatial(loom_path, color=None, reduction=None,returnjson=True, cidx_fil
     keys = df.ca.keys()
     df.close() # close loom file
 
+    # adjust dot size depending on image resolution
+    if 'hires' in url:
+        r = 8
+    else:
+        r = 3
+
     if color==None:
         colorvector = 'orange'
-        points = spatial_points_solid(x,y,colorvector)
+        points = spatial_points_solid(x,y,colorvector,r=r)
     else:
         colorvector = check_color(loom_path,color,cidx_filter=cidx_filter)
         if np.issubdtype(colorvector.dtype, np.number):
@@ -1417,9 +1423,9 @@ def json_spatial(loom_path, color=None, reduction=None,returnjson=True, cidx_fil
             maxima = max(colorvector)
             norm = matplotlib.colors.Normalize(vmin=minima, vmax=maxima, clip=True)
             mapper = cm.ScalarMappable(norm=norm, cmap=cm.magma)
-            points = spatial_points_continuous(x, y, colorvector, mapper)
+            points = spatial_points_continuous(x, y, colorvector, mapper,r=r)
         else:
-            points = spatial_points_solid(x,y,colorvector)
+            points = spatial_points_solid(x,y,colorvector,r=r)
 #        
     fig = go.Figure() # create figure
     fig.update_layout(shapes=points) # add points to figure
