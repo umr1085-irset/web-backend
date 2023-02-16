@@ -562,8 +562,15 @@ def json_scatter(loom_path,color=None,reduction=None,returnjson=True,cidx_filter
             )
     )
 
-    fig.update_yaxes(showticklabels=False)
-    fig.update_xaxes(showticklabels=False)
+    if "PCA" not in reduction.upper():
+        fig.update_yaxes(showticklabels=False)
+        fig.update_xaxes(showticklabels=False)
+    else:
+        fig.update_layout(
+            xaxis_title=X,
+            yaxis_title=Y,
+        )
+
     end = time.time()
     if returnjson:
         print('#######################')
@@ -671,11 +678,14 @@ def json_scatter3d(loom_path,reduction,color=None,returnjson=True,cidx_filter=No
             xaxis=dict(showticklabels=False),
             yaxis=dict(showticklabels=False),
             zaxis=dict(showticklabels=False),
+            xaxis_title=X,
+            yaxis_title=Y,
+            zaxis_title=Z
         )
     )
 
-    fig.update_yaxes(showticklabels=False)
-    fig.update_xaxes(showticklabels=False)
+    #fig.update_yaxes(showticklabels=False)
+    #fig.update_xaxes(showticklabels=False)
     end = time.time()
     if returnjson:
         print('#######################')
