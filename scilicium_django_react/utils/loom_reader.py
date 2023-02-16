@@ -1411,7 +1411,7 @@ def json_spatial(loom_path, color=None, reduction=None,returnjson=True, cidx_fil
     if 'hires' in url:
         r = 8
     else:
-        r = 2
+        r = 2.5
 
     if color==None:
         colorvector = 'orange'
