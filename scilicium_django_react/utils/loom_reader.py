@@ -1115,58 +1115,42 @@ def dotplot_json(loom_path,attribute='',symbols=[],cidx_filter=None,ridx_filter=
     ------
     JSON
     '''
-    print(loom_path)
-    print(attribute)
-    print(symbols)
-    print(cidx_filter)
-    print(ridx_filter)
-    print(returnjson)
-    print(log)
-    print(scale)
+    
     if symbols == []: # if empty symbol list
         symbols = most_variable_symbols(loom_path,n=10,ridx_filter=ridx_filter) # retrive
-    print('1')
     allsymbols = get_ra(loom_path,key='Symbol') # symbol list
-    print('2')
     vals = dict()
-    print('3')
     vals[attribute] = get_ca(loom_path,key=attribute,unique=False,cidx_filter=cidx_filter) # get column attribute values
-    print('4')
     df = loompy.connect(loom_path,'r')
-    print('5')
+    
     for s in symbols:
         i = np.where(allsymbols==s)[0][0]
         if isinstance(cidx_filter, np.ndarray):
             vals[s] = df[i,cidx_filter]
         else:
             vals[s] = df[i,:]
-    print('6')
+
     if log==True:
         for s in symbols:
             vals[s] = np.log(vals[s]+1)
-    print('7')
     df.close()
     
     df = pd.DataFrame(vals)
-    print('8')
     colors = df.groupby([attribute]).mean() # average value for each gene grouped by attribute
-    print('9')
     sizes = df.groupby([attribute]).agg(lambda x: x.ne(0).sum()/len(x)) # percentage of non-zeros for each gene grouped by attribute
-    print('10')
+    
     if scale==True:
         colors -= colors.min() # minimum becomes 0
         colors /= colors.max() # maximum becomes 1
-    print('11')
     r,c = colors.shape
     i_coords, j_coords = np.meshgrid(range(c), range(r), indexing='ij')
-    print('12')
+    
     x = i_coords.flatten()
     y = j_coords.flatten()
     cs = [[0.0, "#EBC89B"], [0.5,"#FB6404"],[1, "#67000C"]]
     #cs = [[0.0,"#ebe7e1"],[0.5, "#c27a67"],[1, "#c27a67"]]
-    print('13')
     fig = px.scatter(x=x, y=y,size=sizes.values.T.flatten(),color=colors.values.T.flatten(),color_continuous_scale=cs)
-    print('14')
+    
     fig.update_layout(
         # background color white
         paper_bgcolor='rgba(0,0,0,0)',
@@ -1439,7 +1423,7 @@ def json_spatial(loom_path, color=None, reduction=None,returnjson=True, cidx_fil
             minima = min(colorvector)
             maxima = max(colorvector)
             norm = matplotlib.colors.Normalize(vmin=minima, vmax=maxima, clip=True)
-            mapper = cm.ScalarMappable(norm=norm, cmap=cm.magma)
+            mapper = cm.ScalarMappable(norm=norm, cmap=cm.matter)
             points = spatial_points_continuous(x, y, colorvector, mapper,r=r)
         else:
             points = spatial_points_solid(x,y,colorvector,r=r)
