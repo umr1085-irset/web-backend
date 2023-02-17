@@ -1,6 +1,7 @@
 import loompy
 import pandas as pd
 from matplotlib import pyplot as plt
+import matplotlib.colors as clr
 import plotly.graph_objects as go
 import plotly.express as px
 import plotly.io as pio
@@ -1378,6 +1379,12 @@ def spatial_points_continuous(x, y, exp, mapper,r=8):
     points = [go.layout.Shape(x0=x_-r, y0=y_-r, x1=x_+r, y1=y_+r, fillcolor=matplotlib.colors.to_hex(c[i]), **kwargs) for i, (x_, y_) in enumerate(zip(x,y))]
     return points
 
+def rgb2hex(s):
+    s = s.strip('rgb(').strip(')')
+    s = s.split(',')
+    r,g,b = [int(x) for x in s]
+    return "#{:02x}{:02x}{:02x}".format(r,g,b)
+
 def json_spatial(loom_path, color=None, reduction=None,returnjson=True, cidx_filter=None):
     '''
     Compute JSON from Plotly figure, for Spatial Transcriptomics data
@@ -1424,7 +1431,7 @@ def json_spatial(loom_path, color=None, reduction=None,returnjson=True, cidx_fil
             maxima = max(colorvector)
             norm = matplotlib.colors.Normalize(vmin=minima, vmax=maxima, clip=True)
             #mapper = cm.ScalarMappable(norm=norm, cmap=cm.magma)
-            mapper = cm.ScalarMappable(norm=norm, cmap=px.colors.sequential.matter)
+            mapper = cm.ScalarMappable(norm=norm, cmap=clr.ListedColormap([rgb2hex(x) for x in px.colors.sequential.matter], name='matter'))
             points = spatial_points_continuous(x, y, colorvector, mapper,r=r)
         else:
             points = spatial_points_solid(x,y,colorvector,r=r)
