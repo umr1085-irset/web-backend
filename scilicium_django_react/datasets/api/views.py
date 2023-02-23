@@ -116,7 +116,7 @@ class DatasetViewSet(viewsets.ModelViewSet):
     
     @action(detail=False, permission_classes=[permissions.AllowAny],url_path='public', url_name='public')
     def public(self, request, *args, **kwargs):
-        public = self.queryset.filter(status=“PUBLIC”).order_by('-id')
+        public = self.queryset.filter(status=“PUBLIC”).order_by('-datasetId')
         serializer = PublicDatasetSerializer(public, many=True)
         return Response(serializer.data)
         
