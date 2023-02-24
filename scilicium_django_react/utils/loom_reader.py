@@ -18,7 +18,7 @@ import math
 from django.conf import settings
 import os
 
-N_MAX_CELLS = 200
+N_MAX_CELLS = 20000
 
 def get_available_reductions(loom_path):
     '''
