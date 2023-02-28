@@ -983,7 +983,7 @@ def get_shape(loom_path):
 
 def most_variable_symbols(loom_path,n=10,ridx_filter=None,cidx_filter=None):
     '''
-    Find the most variable genes
+    Return the most variable genes
     
     Params
     ------
@@ -999,28 +999,34 @@ def most_variable_symbols(loom_path,n=10,ridx_filter=None,cidx_filter=None):
     Array of symbols
     '''
     
+    #df = loompy.connect(loom_path,'r')
+    #try: # if a filter != None, comparing an array to None throws an error
+    #    if cidx_filter==None and ridx_filter==None and df.attrs.most_variable_genes:
+    #        return df.attrs.most_variable_genes.split(',')
+    #except:
+    #    pass # do nothing
+    #        
+    #labels = get_ra(loom_path,key='Symbol',unique=False,ridx_filter=ridx_filter) # get symbols (filter applied)
+    #if isinstance(ridx_filter, np.ndarray) and isinstance(cidx_filter, np.ndarray):
+    #    tmp = df[ridx_filter,:] # can't slice both axes at once
+    #    tmp = tmp[:,cidx_filter]
+    #    v = np.var(tmp,axis=1) # computer variance
+    #elif isinstance(ridx_filter, np.ndarray):
+    #    v = np.var(df[ridx_filter, :],axis=1) # compute variances
+    #elif isinstance(cidx_filter, np.ndarray):
+    #    v = np.var(df[:, cidx_filter],axis=1) # compute variances
+    #else:
+    #    v = np.var(df[:, :],axis=1)
+    #df.close()
+    #idx = np.argsort(v)[::-1][:n] # sort and select in descending order
+    #labels = labels[idx] # trim synbol array
+    #return np.delete(labels, np.where(labels == 'nan')) # remove potential nan values and return
+
     df = loompy.connect(loom_path,'r')
-    try: # if a filter != None, comparing an array to None throws an error
-        if cidx_filter==None and ridx_filter==None and df.attrs.most_variable_genes:
-            return df.attrs.most_variable_genes.split(',')
-    except:
-        pass # do nothing
-            
-    labels = get_ra(loom_path,key='Symbol',unique=False,ridx_filter=ridx_filter) # get symbols (filter applied)
-    if isinstance(ridx_filter, np.ndarray) and isinstance(cidx_filter, np.ndarray):
-        tmp = df[ridx_filter,:] # can't slice both axes at once
-        tmp = tmp[:,cidx_filter]
-        v = np.var(tmp,axis=1) # computer variance
-    elif isinstance(ridx_filter, np.ndarray):
-        v = np.var(df[ridx_filter, :],axis=1) # compute variances
-    elif isinstance(cidx_filter, np.ndarray):
-        v = np.var(df[:, cidx_filter],axis=1) # compute variances
-    else:
-        v = np.var(df[:, :],axis=1)
+    arr = df.attrs.most_variable_genes.split(',')
     df.close()
-    idx = np.argsort(v)[::-1][:n] # sort and select in descending order
-    labels = labels[idx] # trim synbol array
-    return np.delete(labels, np.where(labels == 'nan')) # remove potential nan values and return
+    return arr
+
 
 def first_n_symbols(loom_path,n=10,ridx_filter=None):
     '''
