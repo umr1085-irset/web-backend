@@ -143,14 +143,20 @@ class GetLoomStatistics(APIView):
         # Get data
         data = get_object_or_404(Loom,id=data_id)
         response_data = dict()
+        reduced = False
+        if data.light_file:
+            loomfile = data.light_file.path
+            reduced = True
+        else:
+            loomfile = data.file.path
 
 
         if (filters['ca']!={}) or (filters['ra']!={}):
-            cidx_filter, ridx_filter = get_filter_indices(data.file.path,filters)
+            cidx_filter, ridx_filter = get_filter_indices(loomfile,filters)
         else:
             cidx_filter, ridx_filter = (None,None)
         
-        ngenes, ncells = get_shape(data.file.path)
+        ngenes, ncells = get_shape(loomfile)
         try:
             response_data['col_val'] = len(cidx_filter)
         except:
@@ -159,7 +165,8 @@ class GetLoomStatistics(APIView):
             response_data['row_val'] = len(ridx_filter)
         except:
             response_data['row_val'] = ngenes
-        
+
+        response_data['reduced'] = reduced
         response = Response(response_data, status=status.HTTP_200_OK)
         return response
 
@@ -178,18 +185,26 @@ class GetLoomGenes(APIView):
         data = get_object_or_404(Loom,id=data_id)
         response_data = dict()
 
+        reduced = False
+        if data.light_file:
+            loomfile = data.light_file.path
+            reduced = True
+        else:
+            loomfile = data.file.path
+
+        response_data['reduced'] = reduced
         if (filters['ca']!={}) or (filters['ra']=={}):
-            cidx_filter, ridx_filter = get_filter_indices(data.file.path,filters)
+            cidx_filter, ridx_filter = get_filter_indices(loomfile,filters)
         else:
             cidx_filter, ridx_filter = (None,None)
 
         if 'method' in post_data and post_data['method'] !='custom':
             gene_selection = post_data['method']
-            response_data["genes"] = auto_get_symbols(data.file.path,n=6,ridx_filter=ridx_filter,cidx_filter=cidx_filter,method=gene_selection)
+            response_data["genes"] = auto_get_symbols(loomfile,n=6,ridx_filter=ridx_filter,cidx_filter=cidx_filter,method=gene_selection)
             response = Response(response_data, status=status.HTTP_200_OK)
             return response
         else:
-            response_data["genes"] = get_ra(data.file.path,unique=True,ridx_filter=ridx_filter)
+            response_data["genes"] = get_ra(loomfile,unique=True,ridx_filter=ridx_filter)
             response = Response(response_data, status=status.HTTP_200_OK)
             return response
         
@@ -241,9 +256,15 @@ class GetLoomPlots(APIView):
         
         # Get data
         data = get_object_or_404(Loom,id=data_id)
+        reduced = False
+        if data.light_file:
+            loomfile = data.light_file.path
+            reduced = True
+        else:
+            loomfile = data.file.path
 
         if (filters['ca']!={}) or (filters['ra']!={}):
-            cidx_filter, ridx_filter = get_filter_indices(data.file.path,filters)
+            cidx_filter, ridx_filter = get_filter_indices(loomfile,filters)
         else:
             cidx_filter, ridx_filter = (None,None)
         
@@ -261,39 +282,40 @@ class GetLoomPlots(APIView):
         response_data = dict()
         response_data["name"] = data.name
         response_data["classes"] = data.classes
+        response_data['reduced'] = reduced
         print(ridx_filter)
         #print(filters['ra'])
         if genes_menu != 'undefined':
-            response_data["genes_menu"] = get_ra(data.file.path,unique=True,ridx_filter=ridx_filter)
+            response_data["genes_menu"] = get_ra(loomfile,unique=True,ridx_filter=ridx_filter)
         if style =="scatter":
             #print("scatter")
             #print(attrs)
-            response_data['chart'] = json_scatOrSpat(data.file.path,color=attrs,reduction=reduction,cidx_filter=cidx_filter)
+            response_data['chart'] = json_scatOrSpat(loomfile,color=attrs,reduction=reduction,cidx_filter=cidx_filter)
             #print(response_data['chart'])
             response_data['style'] = "scatter"
             response = Response(response_data, status=status.HTTP_200_OK)
             return response
 
         elif style=='hexbin':
-            response_data['chart'] = json_hexbin(data.file.path,reduction=reduction,cmap=plt.cm.Greys,background='white',cidx_filter=cidx_filter)
+            response_data['chart'] = json_hexbin(loomfile,reduction=reduction,cmap=plt.cm.Greys,background='white',cidx_filter=cidx_filter)
             response_data['style'] = 'hexbin'
             response = Response(response_data, status=status.HTTP_200_OK)
             return response
 
         elif style=='dot':
-            response_data['chart'] = dotplot_json(data.file.path,attribute=attrs,symbols=symbols,cidx_filter=cidx_filter,ridx_filter=ridx_filter,log=log,scale=scale)
+            response_data['chart'] = dotplot_json(loomfile,attribute=attrs,symbols=symbols,cidx_filter=cidx_filter,ridx_filter=ridx_filter,log=log,scale=scale)
             response_data['style'] = 'dot'
             response = Response(response_data, status=status.HTTP_200_OK)
             return response
 
         elif style=='violin':
-            response_data['chart'] = violin_json(data.file.path,attribute=attrs,symbols=symbols,cidx_filter=cidx_filter,log=log)
+            response_data['chart'] = violin_json(loomfile,attribute=attrs,symbols=symbols,cidx_filter=cidx_filter,log=log)
             response_data['style'] = 'violin'
             response = Response(response_data, status=status.HTTP_200_OK)
             return response
         
         elif style=='density':
-            response_data['chart'],response_data['legend'] = json_density(data.file.path,reduction=reduction,ca=attrs,symbols=symbols,cidx_filter=cidx_filter)
+            response_data['chart'],response_data['legend'] = json_density(loomfile,reduction=reduction,ca=attrs,symbols=symbols,cidx_filter=cidx_filter)
             response_data['style'] = 'density'
             response = Response(response_data, status=status.HTTP_200_OK)
             return response
@@ -303,7 +325,7 @@ class GetLoomPlots(APIView):
                 attrs = [response_data["classes"][0]]
             else:
                 attrs = [attrs]
-            data = json.loads(json_component_chartjs(data.file.path,style=style,attrs=attrs,cidx_filter=cidx_filter))
+            data = json.loads(json_component_chartjs(loomfile,style=style,attrs=attrs,cidx_filter=cidx_filter))
             response_data['chart'] = data["chart"]
             response_data['style'] = data["style"]
             response_data['options'] = data["options"]
