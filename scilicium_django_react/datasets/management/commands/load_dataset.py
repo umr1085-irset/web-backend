@@ -170,7 +170,9 @@ def import_loom(dict_loom,user):
         
         #on stocke les infos sur le fichier mais on sauve d'abord l'object sans cette info
         filename=dict_loom["file"]
+        lightfilename=dict_loom["light_file"]
         del dict_loom["file"]
+        del dict_loom["light_file"]
         #adding temporary but compulsory value
         loom = Loom(name = dict_loom["name"], rowEntity = ["Symbol"], colEntity = ["Age"], reductions = ["Umap"], classes = ["Age"], row_name = row, col_name = col, created_by = user)
         #loom = Loom.objects.create(**dict_loom)
@@ -182,14 +184,14 @@ def import_loom(dict_loom,user):
         #loom_dir = "data_to_import/loom"
         if filename != "" :
             filepath = filename
-            #filepath = os.path.join(settings.ROOT_DIR,filename.replace(,''))
-            #filepath = os.path.join(settings.ROOT_DIR,loom_dir,filename)
-            #filepath = os.path.join(loom_dir,filename)
-
-            
             f = File(open(filepath,'rb'))
-            #TO CHECK : save:True sans sp.save()
-            loom.file.save(filename,f,save=False)     
+            loom.file.save(filename,f,save=False)
+
+            if lightfilename != "":
+                lightfilepath = lightfilename
+                lf = File(open(lightfilepath,'rb'))
+                loom.light_file.save(lightfilename,lf,save=False)  
+
             loom.save()
             
             
