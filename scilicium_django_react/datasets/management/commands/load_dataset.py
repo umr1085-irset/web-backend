@@ -151,7 +151,7 @@ def import_bioMeta(dict_bioMeta,user):
     
 
 
-def import_loom(dict_loom,user,loom_dir):
+def import_loom(dict_loom,user):
     """
         Import loom
         dict_loom : dictionary
@@ -180,8 +180,10 @@ def import_loom(dict_loom,user,loom_dir):
         
         #une fois l'instance loom créé, on enregistre le fichier
         #loom_dir = "data_to_import/loom"
-        if filename != "" : 
-            filepath = os.path.join(settings.ROOT_DIR,loom_dir,filename)
+        if filename != "" :
+            filepath = filename
+            #filepath = os.path.join(settings.ROOT_DIR,filename.replace(,''))
+            #filepath = os.path.join(settings.ROOT_DIR,loom_dir,filename)
             #filepath = os.path.join(loom_dir,filename)
 
             
@@ -233,7 +235,7 @@ def import_dataset(dict_dataset,admin_user,loomId,bioMetaId,sopId) :
     ds.save()
 
 
-def import_data_from_list(infofile, loom_dir):
+def import_data_from_list(infofile):
 
 
     admin_user = User.objects.filter(is_superuser=True)
@@ -295,7 +297,7 @@ def import_data_from_list(infofile, loom_dir):
             
 
 
-                loomId = import_loom(dict_loom, admin_user, loom_dir)
+                loomId = import_loom(dict_loom, admin_user)
                 bioMetaId = import_bioMeta(dict_bioMeta, admin_user)
                 sopId = import_sop(dict_sop, admin_user)
                 import_dataset(dict_dataset, admin_user, loomId, bioMetaId, sopId)
@@ -303,8 +305,8 @@ def import_data_from_list(infofile, loom_dir):
                 print("Dataset already exists: " + row_data["Dataset.title"])
 
 
-def launch_import(infofile,loom_dir):
-    import_data_from_list(infofile, loom_dir)
+def launch_import(infofile):
+    import_data_from_list(infofile)
 
 
 class Command(BaseCommand):
@@ -315,8 +317,6 @@ class Command(BaseCommand):
     def add_arguments(self, parser):
         #Positional arguments
         parser.add_argument('infofile', type=str, help="Filepath to the file containing the dataset info")
-        parser.add_argument('loom_dir', type=str, help="Path to the directory containing the loom file")
-
 
     def handle(self, *args, **options):
-        launch_import(options['infofile'], options['loom_dir'])
+        launch_import(options['infofile'])
