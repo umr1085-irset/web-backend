@@ -184,13 +184,15 @@ def import_loom(dict_loom,user):
         #loom_dir = "data_to_import/loom"
         if filename != "" :
             filepath = filename
+            basename = os.path.basename(filename)
             f = File(open(filepath,'rb'))
-            loom.file.save(filename,f,save=False)
+            loom.file.save(basename,f,save=False)
 
             if lightfilename != "":
                 lightfilepath = lightfilename
+                lightbasename = os.path.basename(lightfilename)
                 lf = File(open(lightfilepath,'rb'))
-                loom.light_file.save(lightfilename,lf,save=False)  
+                loom.light_file.save(lightbasename,lf,save=False)  
 
             loom.save()
             
