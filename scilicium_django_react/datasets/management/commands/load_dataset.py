@@ -183,7 +183,8 @@ def import_loom(dict_loom,user):
         #une fois l'instance loom créé, on enregistre le fichier
         #loom_dir = "data_to_import/loom"
         if filename != "" :
-            filepath = filename
+            #filepath = filename
+            filepath = os.path.join(settings.ROOT_DIR, filename.replace(settings.MEDIA_ROOT,''))
             basename = os.path.basename(filename)
             f = File(open(filepath,'rb'))
             loom.file.save(basename,f,save=False)
