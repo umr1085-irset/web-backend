@@ -175,13 +175,9 @@ def import_loom(dict_loom,user):
         del dict_loom["file"]
         del dict_loom["light_file"]
         #adding temporary but compulsory value
-        #loom = Loom(name = dict_loom["name"], rowEntity = ["Symbol"], colEntity = ["Age"], reductions = ["Umap"], classes = ["Age"], row_name = row, col_name = col, created_by = user)
-        try:
-            print(dict_loom["name"],'!!!!! loom dict name')
-        except:
-            pass
-            
+        #loom = Loom(name = dict_loom["name"], rowEntity = ["Symbol"], colEntity = ["Age"], reductions = ["Umap"], classes = ["Age"], row_name = row, col_name = col, created_by = user)            
         loom = Loom(name = basename, rowEntity = ["Symbol"], colEntity = ["Age"], reductions = ["Umap"], classes = ["Age"], row_name = row, col_name = col, created_by = user)
+
         #loom = Loom.objects.create(**dict_loom)
         loom.save()
         #loom.created_by.add(user)
@@ -191,6 +187,7 @@ def import_loom(dict_loom,user):
         #loom_dir = "data_to_import/loom"
         if filename != "" :
             if not os.path.isfile(filename):
+                loom.delete() # delete loom object from db
                 raise Exception(f"Loom file doesn't exist: {filename}")
 
             filepath = filename # absolute path, path is name
@@ -200,8 +197,9 @@ def import_loom(dict_loom,user):
 
             if lightfilename != "":
                 if not os.path.isfile(lightfilename):
+                    loom.delete()
                     raise Exception(f"Loom file doesn't exist: {lightfilename}")
-                    
+
                 lightfilepath = lightfilename # absolute path, path is name
                 lightbasename = os.path.basename(lightfilename) # get light file basename to store properly
                 lf = File(open(lightfilepath,'rb'))
