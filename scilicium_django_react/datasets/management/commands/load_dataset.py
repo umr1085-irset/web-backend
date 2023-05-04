@@ -190,29 +190,18 @@ def import_loom(dict_loom,user):
         #une fois l'instance loom créé, on enregistre le fichier
         #loom_dir = "data_to_import/loom"
         if filename != "" :
-            filepath = filename
-            basename = os.path.basename(filename)
-
-            print('***************************************')
-            print(f'Filepath: {filepath}, basename: {basename}')
-            print('***************************************')
-
+            filepath = filename # absolute path, path is name
+            basename = os.path.basename(filename) # get file basename to store properly
             f = File(open(filepath,'rb'))
-            loom.file.save(basename,f,save=False)
+            loom.file.save(basename,f,save=False) # use basename and file connection f
 
             if lightfilename != "":
-                lightfilepath = lightfilename
-                lightbasename = os.path.basename(lightfilename)
-
-                print('***************************************')
-                print(f'Filepath: {lightfilepath}, basename: {lightbasename}')
-                print('***************************************')
-
+                lightfilepath = lightfilename # absolute path, path is name
+                lightbasename = os.path.basename(lightfilename) # get light file basename to store properly
                 lf = File(open(lightfilepath,'rb'))
-                loom.light_file.save(lightbasename,lf,save=False)  
+                loom.light_file.save(lightbasename,lf,save=False) # use basename and file connection lf
 
             loom.save()
-            
             
             #destination = os.path.join(settings.MEDIA_ROOT,get_upload_path(loom,filename))
             #print(destination)
