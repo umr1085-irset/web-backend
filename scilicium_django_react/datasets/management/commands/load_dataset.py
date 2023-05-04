@@ -190,12 +190,18 @@ def import_loom(dict_loom,user):
         #une fois l'instance loom créé, on enregistre le fichier
         #loom_dir = "data_to_import/loom"
         if filename != "" :
+            if not os.path.isfile(filename):
+                raise Exception(f"Loom file doesn't exist: {filename}")
+
             filepath = filename # absolute path, path is name
             basename = os.path.basename(filename) # get file basename to store properly
             f = File(open(filepath,'rb'))
             loom.file.save(basename,f,save=False) # use basename and file connection f
 
             if lightfilename != "":
+                if not os.path.isfile(lightfilename):
+                    raise Exception(f"Loom file doesn't exist: {lightfilename}")
+                    
                 lightfilepath = lightfilename # absolute path, path is name
                 lightbasename = os.path.basename(lightfilename) # get light file basename to store properly
                 lf = File(open(lightfilepath,'rb'))
