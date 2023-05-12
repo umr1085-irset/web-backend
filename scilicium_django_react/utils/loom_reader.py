@@ -216,23 +216,15 @@ def n_colors_old(n):
     
     return l[:n]
 
-def n_colors(NbColors,rgbonly=False):
-    pi = 3.14159265359
-    pid2 = pi/2
-    angle = 0
-    step = pi/(NbColors)
+def n_colors(NbColors):
     ListOfColors = []
-    for i in range(0,NbColors):
-        R = round((math.cos(angle)+1)/2 * 200)
-        G = round((math.cos(angle-pid2)+1)/2 * 200)
-        B = round((math.cos(angle-pi)+1)/2 * 200)
-        A = .4
-        angle = angle + step
-        if rgbonly:
-            ListOfColors.append('rgb('+str(R)+','+str(G)+','+str(B)+')')            
-        else:
-            ListOfColors.append('rgba('+str(R)+','+str(G)+','+str(B)+','+str(A)+')')
-    #print(ListOfColors)
+    phis = np.linspace(0, 2*np.pi, NbColors+1)
+    for phi in phis[:-1]:
+        R = round(.5*(1.+np.cos(phi))*255)
+        G = round(.5*(1.+np.cos(phi+2*np.pi/3))*255)
+        B = round(.5*(1.+np.cos(phi-2*np.pi/3))*255)
+        A = .7
+        ListOfColors.append('rgba('+str(R)+','+str(G)+','+str(B)+','+str(A)+')')
     return ListOfColors
 
 def n_colors_float(NbColors):
@@ -242,12 +234,12 @@ def n_colors_float(NbColors):
     step = pi/(NbColors)
     ListOfColors = []
     for i in range(0,NbColors):
-        R = round((math.cos(angle)+1)/2 * 200)
-        R = round(0.4*R + (1-0.4)*255)/255
-        G = round((math.cos(angle-pid2)+1)/2 * 200)
-        G = round(0.4*G + (1-0.4)*255)/255
-        B = round((math.cos(angle-pi)+1)/2 * 200)
-        B = round(0.4*B + (1-0.4)*255)/255
+        R = round(.5*(1.+np.cos(phi))*255)
+        R = round(0.7*R + (1-0.7)*255)/255
+        G = round(.5*(1.+np.cos(phi+2*np.pi/3))*255)
+        G = round(0.7*G + (1-0.7)*255)/255
+        B = round(.5*(1.+np.cos(phi-2*np.pi/3))*255)
+        B = round(0.7*B + (1-0.7)*255)/255
         A = 1
         angle = angle + step
         ListOfColors.append((R,G,B,A))
