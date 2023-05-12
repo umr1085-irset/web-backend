@@ -253,43 +253,10 @@ def n_colors_old(n):
 #    #print(ListOfColors)
 #    return ListOfColors
 
-#def n_colors(NbColors,rgbonly=False):
-#    ListOfColors = []
-#    phis = np.linspace(0, 2*np.pi, NbColors+1)
-#    for phi in phis[:-1]:
-#        R = round(.5*(1.+np.cos(phi))*255)
-#        G = round(.5*(1.+np.cos(phi+2*np.pi/3))*255)
-#        B = round(.5*(1.+np.cos(phi-2*np.pi/3))*255)
-#        A = .6
-#        if rgbonly:
-#            ListOfColors.append('rgb('+str(R)+','+str(G)+','+str(B)+')')            
-#        else:
-#            ListOfColors.append('rgba('+str(R)+','+str(G)+','+str(B)+','+str(A)+')')
-#    return ListOfColors
-#
-#def n_colors_float(NbColors):
-#    ListOfColors = []
-#    phis = np.linspace(0, 2*np.pi, NbColors+1)
-#    for phi in phis[:-1]:
-#        R = round(.5*(1.+np.cos(phi))*255)
-#        R = round(0.6*R + (1-0.6)*255)/255
-#        G = round(.5*(1.+np.cos(phi+2*np.pi/3))*255)
-#        G = round(0.6*G + (1-0.6)*255)/255
-#        B = round(.5*(1.+np.cos(phi-2*np.pi/3))*255)
-#        B = round(0.6*B + (1-0.6)*255)/255
-#        A = 1
-#        ListOfColors.append((R,G,B,A))
-#    #print(ListOfColors)
-#    return ListOfColors
-
 def n_colors(NbColors,rgbonly=False):
     ListOfColors = []
     phis = np.linspace(0, 2*np.pi, NbColors+1)
-    
-    greys = [0,80,120,160,200]
-    #greys = [0,80,145,200]
-    
-    for i,phi in enumerate(phis[:-1]):
+    for phi in phis[:-1]:
         R = round(.5*(1.+np.cos(phi))*255)
         G = round(.5*(1.+np.cos(phi+2*np.pi/3))*255)
         B = round(.5*(1.+np.cos(phi-2*np.pi/3))*255)
@@ -298,41 +265,74 @@ def n_colors(NbColors,rgbonly=False):
             ListOfColors.append('rgb('+str(R)+','+str(G)+','+str(B)+')')            
         else:
             ListOfColors.append('rgba('+str(R)+','+str(G)+','+str(B)+','+str(A)+')')
-        if i%6==0:
-            try:
-                ii = int(i/6)
-                gv = greys[ii]
-                if rgbonly:
-                    ListOfColors.append('rgb('+str(gv)+','+str(gv)+','+str(gv)+')')            
-                else:
-                    ListOfColors.append('rgba('+str(gv)+','+str(gv)+','+str(gv)+','+str(A)+')')
-            except:
-                pass
-    return ListOfColors[:NbColors]
+    return ListOfColors
 
 def n_colors_float(NbColors):
     ListOfColors = []
-    greys = [0,80,120,160,200]
     phis = np.linspace(0, 2*np.pi, NbColors+1)
-    for i,phi in enumerate(phis[:-1]):
+    A = 0.6
+    for phi in phis[:-1]:
         R = round(.5*(1.+np.cos(phi))*255)
-        R = round(0.6*R + (1-0.6)*255)/255
+        R = round(A*R + (1-A)*255)/255
         G = round(.5*(1.+np.cos(phi+2*np.pi/3))*255)
-        G = round(0.6*G + (1-0.6)*255)/255
+        G = round(A*G + (1-A)*255)/255
         B = round(.5*(1.+np.cos(phi-2*np.pi/3))*255)
-        B = round(0.6*B + (1-0.6)*255)/255
-        A = 1
-        ListOfColors.append((R,G,B,A))
-        
-        if i%6==0:
-            try:
-                ii = int(i/6)
-                gv = round(0.6*greys[ii] + (1-0.6)*255)/255
-                ListOfColors.append((gv,gv,gv,A))
-            except:
-                pass
+        B = round(A*B + (1-A)*255)/255
+        ListOfColors.append((R,G,B,1))
     #print(ListOfColors)
-    return ListOfColors[:NbColors]
+    return ListOfColors
+
+#def n_colors(NbColors,rgbonly=False):
+#    ListOfColors = []
+#    phis = np.linspace(0, 2*np.pi, NbColors+1)
+#    
+#    greys = [0,80,120,160,200]
+#    #greys = [0,80,145,200]
+#    
+#    for i,phi in enumerate(phis[:-1]):
+#        R = round(.5*(1.+np.cos(phi))*255)
+#        G = round(.5*(1.+np.cos(phi+2*np.pi/3))*255)
+#        B = round(.5*(1.+np.cos(phi-2*np.pi/3))*255)
+#        A = .6
+#        if rgbonly:
+#            ListOfColors.append('rgb('+str(R)+','+str(G)+','+str(B)+')')            
+#        else:
+#            ListOfColors.append('rgba('+str(R)+','+str(G)+','+str(B)+','+str(A)+')')
+#        if i%6==0:
+#            try:
+#                ii = int(i/6)
+#                gv = greys[ii]
+#                if rgbonly:
+#                    ListOfColors.append('rgb('+str(gv)+','+str(gv)+','+str(gv)+')')            
+#                else:
+#                    ListOfColors.append('rgba('+str(gv)+','+str(gv)+','+str(gv)+','+str(A)+')')
+#            except:
+#                pass
+#    return ListOfColors[:NbColors]
+#
+#def n_colors_float(NbColors):
+#    ListOfColors = []
+#    greys = [0,80,120,160,200]
+#    phis = np.linspace(0, 2*np.pi, NbColors+1)
+#    for i,phi in enumerate(phis[:-1]):
+#        R = round(.5*(1.+np.cos(phi))*255)
+#        R = round(0.6*R + (1-0.6)*255)/255
+#        G = round(.5*(1.+np.cos(phi+2*np.pi/3))*255)
+#        G = round(0.6*G + (1-0.6)*255)/255
+#        B = round(.5*(1.+np.cos(phi-2*np.pi/3))*255)
+#        B = round(0.6*B + (1-0.6)*255)/255
+#        A = 1
+#        ListOfColors.append((R,G,B,A))
+#        
+#        if i%6==0:
+#            try:
+#                ii = int(i/6)
+#                gv = round(0.6*greys[ii] + (1-0.6)*255)/255
+#                ListOfColors.append((gv,gv,gv,A))
+#            except:
+#                pass
+#    #print(ListOfColors)
+#    return ListOfColors[:NbColors]
 
 
 #def n_colors(NbColors,forcefloat=False):
