@@ -216,7 +216,7 @@ def n_colors_old(n):
     
     return l[:n]
 
-def n_colors(NbColors):
+def n_colors(NbColors,rgbonly=False):
     ListOfColors = []
     phis = np.linspace(0, 2*np.pi, NbColors+1)
     for phi in phis[:-1]:
@@ -224,7 +224,10 @@ def n_colors(NbColors):
         G = round(.5*(1.+np.cos(phi+2*np.pi/3))*255)
         B = round(.5*(1.+np.cos(phi-2*np.pi/3))*255)
         A = .6
-        ListOfColors.append('rgba('+str(R)+','+str(G)+','+str(B)+','+str(A)+')')
+        if rgbonly:
+            ListOfColors.append('rgb('+str(R)+','+str(G)+','+str(B)+')')            
+        else:
+            ListOfColors.append('rgba('+str(R)+','+str(G)+','+str(B)+','+str(A)+')')
     return ListOfColors
 
 def n_colors_float(NbColors):
