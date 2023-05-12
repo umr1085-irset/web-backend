@@ -223,7 +223,7 @@ def n_colors(NbColors):
         R = round(.5*(1.+np.cos(phi))*255)
         G = round(.5*(1.+np.cos(phi+2*np.pi/3))*255)
         B = round(.5*(1.+np.cos(phi-2*np.pi/3))*255)
-        A = .7
+        A = .4
         ListOfColors.append('rgba('+str(R)+','+str(G)+','+str(B)+','+str(A)+')')
     return ListOfColors
 
@@ -232,11 +232,11 @@ def n_colors_float(NbColors):
     phis = np.linspace(0, 2*np.pi, NbColors+1)
     for phi in phis[:-1]:
         R = round(.5*(1.+np.cos(phi))*255)
-        R = round(0.7*R + (1-0.7)*255)/255
+        R = round(0.4*R + (1-0.4)*255)/255
         G = round(.5*(1.+np.cos(phi+2*np.pi/3))*255)
-        G = round(0.7*G + (1-0.7)*255)/255
+        G = round(0.4*G + (1-0.4)*255)/255
         B = round(.5*(1.+np.cos(phi-2*np.pi/3))*255)
-        B = round(0.7*B + (1-0.7)*255)/255
+        B = round(0.4*B + (1-0.4)*255)/255
         A = 1
         ListOfColors.append((R,G,B,A))
     #print(ListOfColors)
