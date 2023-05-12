@@ -228,12 +228,9 @@ def n_colors(NbColors):
     return ListOfColors
 
 def n_colors_float(NbColors):
-    pi = 3.14159265359
-    pid2 = pi/2
-    angle = 0
-    step = pi/(NbColors)
     ListOfColors = []
-    for i in range(0,NbColors):
+    phis = np.linspace(0, 2*np.pi, NbColors+1)
+    for phi in phis[:-1]:
         R = round(.5*(1.+np.cos(phi))*255)
         R = round(0.7*R + (1-0.7)*255)/255
         G = round(.5*(1.+np.cos(phi+2*np.pi/3))*255)
@@ -241,7 +238,6 @@ def n_colors_float(NbColors):
         B = round(.5*(1.+np.cos(phi-2*np.pi/3))*255)
         B = round(0.7*B + (1-0.7)*255)/255
         A = 1
-        angle = angle + step
         ListOfColors.append((R,G,B,A))
     #print(ListOfColors)
     return ListOfColors
