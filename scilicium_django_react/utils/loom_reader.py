@@ -498,17 +498,24 @@ def json_scatOrSpat(loom_path,color=None,reduction=None,returnjson=True,cidx_fil
         if "spatial" in reduction:
             #print("viz method: spatial")
             result=json_spatial(loom_path,color,reduction,returnjson,cidx_filter)
-            return result
         else : 
             #print("viz method: scatter")
             result=json_scatter(loom_path,color,reduction,returnjson,cidx_filter)
-            return result
     else:
         #print("viz method: scatter 3d")
         result=json_scatter3d(loom_path,reduction,color,returnjson,cidx_filter)
-        return result
+    return result
  
-            
+def json_hexbinOrScat3d(loom_path, reduction=None, color=None, returnjson=True, cidx_filter=None):
+    if reduction==None :
+        reduction = get_available_reductions(loom_path)[0]
+    l = get_reduction_x_y(loom_path,reduction)
+    if len(l)==2:
+        result=json_hexbin(loom_path,reduction=reduction,color=color,returnjson=returnjson,cidx_filter=cidx_filter)
+    else:
+        result=json_scatter3d(loom_path,reduction,color,returnjson,cidx_filter)
+    return result
+
 def json_scatter(loom_path,color=None,reduction=None,returnjson=True,cidx_filter=None):
     '''
     Compute JSON from Plotly figure
