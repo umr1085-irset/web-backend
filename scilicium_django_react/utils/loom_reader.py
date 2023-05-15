@@ -755,7 +755,7 @@ def mpl_to_plotly(cmap, N):
         pl_colorscale.append([round(k*h,2), f'rgb({C[0]}, {C[1]}, {C[2]})'])
     return pl_colorscale
 
-def json_hexbin(loom_path,reduction=None,cmap=plt.cm.Greys,background='white',returnjson=True,cidx_filter=None):
+def json_hexbin(loom_path,reduction=None,color=None,gridsize=30,cmap=plt.cm.plasma,background='black',returnjson=True,cidx_filter=None):
     '''
     Generate hexbin plot from X,Y scatter coordinates
     
@@ -777,11 +777,24 @@ def json_hexbin(loom_path,reduction=None,cmap=plt.cm.Greys,background='white',re
     if reduction==None:
         reduction = get_available_reductions(loom_path)[0] # first reduction available
     X,Y = get_reduction_x_y(loom_path,reduction)
-    
+
     df = get_dataframe(loom_path,[X,Y],cidx_filter=cidx_filter)
-    x = df[X].values
-    y = df[Y].values
-    HB = plt.hexbin(x,y,gridsize=20,cmap=cmap)
+
+    if df.shape[0]>N_MAX_CELLS:
+        sub_idx = np.random.choice(df.shape[0], N_MAX_CELLS, replace=False) # select 20k cells randomly
+        x = df[X].values[sub_idx]
+        y = df[Y].values[sub_idx]
+    else:
+        x = df[X].values
+        y = df[Y].values
+    
+    if color is None:
+        HB = plt.hexbin(x,y,gridsize=gridsize,cmap=cmap)
+    else:
+        C = check_color(loom_path,color,cidx_filter=cidx_filter)
+        if len(C)>N_MAX_CELLS:
+            C=C[sub_idx]
+        HB = plt.hexbin(x,y,gridsize=gridsize,cmap=cmap,C=C)
     xx = plt.draw()
 
     hexagon_vertices, offsets, mpl_facecolors, counts = get_hexbin_attributes(HB)
@@ -833,6 +846,15 @@ def json_hexbin(loom_path,reduction=None,cmap=plt.cm.Greys,background='white',re
         hovermode='closest',
         shapes=shapes,
         plot_bgcolor=background)
+    
+    if "PCA" not in reduction.upper():
+        fig.update_yaxes(showticklabels=False)
+        fig.update_xaxes(showticklabels=False)
+    else:
+        fig.update_layout(
+            xaxis_title=X,
+            yaxis_title=Y,
+        )
     
     if returnjson:
         return json.loads(pio.to_json(fig, validate=True, pretty=False, remove_uids=True))
