@@ -1,41 +1,57 @@
-version: '3'
+version: '3.4'
 
 volumes:
   production_postgres_data: {}
   production_postgres_data_backups: {}
   production_traefik: {}
 
-services:
-  django: &django
+
+x-app: &django
     image: scilicium/geno_app_django:dev
+    build:
+      dockerfile: ./compose/production/django/Dockerfile
+      context: .
     depends_on:
       - postgres
       - redis
     env_file:
       - ./.envs/.production/.django
       - ./.envs/.production/.postgres
+    volumes:
+      - /groups/irset/archives/web/genoViewer/media:/app/scilicium_django_react/media
+      - /groups/irset/archives/web/genoViewer/data_to_import/loom:/loom
+      - /groups/irset/archives/web/genoViewer/data_to_import/csv:/csv
+    user: root
     command: /start
     labels:
       - traefik.enable=true
       - traefik.http.services.genoapp-back-static-prod.loadbalancer.server.port=5000
       - traefik.http.routers.genoapp-back-static-prod.rule=Host(`admin-genoapp.scilicium.com`)
       - traefik.http.routers.genoapp-back-static-prod.entryPoints=websecure
-
+    expose:
+      - 5000
     networks:
       - web
       - genoapp
-    expose:  # new
-      - 5000
 
+
+services:
+  django:
+    <<: *django
+    ports:
+      - 6549:5000
 
   postgres:
     image: scilicium/geno_app_postgres:dev
+    build: 
+      dockerfile: ./compose/production/postgres/Dockerfile
+      context: .
     container_name: postgres
     expose:
       - 5432
     volumes:
       - production_postgres_data:/var/lib/postgresql/data:Z
-      - production_postgres_data_backups:/backups:z
+      - ./backups:/backups
     env_file:
       - ./.envs/.production/.postgres
     networks:
