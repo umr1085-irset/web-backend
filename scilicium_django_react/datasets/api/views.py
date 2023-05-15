@@ -235,7 +235,7 @@ class GetLoomPlots(APIView):
         # Process any get params that you may need
         # If you don't need to process get params,
         # you can skip this part
-
+        print(request.data)
         post_data = request.data
         data_id = post_data['id']
         attrs = post_data['attrs']
