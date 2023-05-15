@@ -93,7 +93,7 @@ class DatasetViewSet(viewsets.ModelViewSet):
     def download(self, request, *args, **kwargs):
         dataset = self.get_object()
         if dataset.status == "PUBLIC" or dataset.created_by == self.request.user:
-            print(dataset.loom.name)
+            #print(dataset.loom.name)
             from scilicium_django_react.utils.utils import zip_results
             user_type = "user"
             if dataset.created_by and dataset.created_by.is_superuser:
@@ -235,7 +235,7 @@ class GetLoomPlots(APIView):
         # Process any get params that you may need
         # If you don't need to process get params,
         # you can skip this part
-        print(request.data)
+        #print(request.data)
         post_data = request.data
         data_id = post_data['id']
         attrs = post_data['attrs']
@@ -283,7 +283,7 @@ class GetLoomPlots(APIView):
         response_data["name"] = data.name
         response_data["classes"] = data.classes
         response_data['reduced'] = reduced
-        print(ridx_filter)
+        #print(ridx_filter)
         #print(filters['ra'])
         if genes_menu != 'undefined':
             response_data["genes_menu"] = get_ra(loomfile,unique=True,ridx_filter=ridx_filter)

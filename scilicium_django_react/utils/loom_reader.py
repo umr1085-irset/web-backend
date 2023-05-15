@@ -467,15 +467,15 @@ def json_scatOrSpat(loom_path,color=None,reduction=None,returnjson=True,cidx_fil
     l = get_reduction_x_y(loom_path,reduction)
     if len(l)==2:
         if "spatial" in reduction:
-            print("viz method: spatial")
+            #print("viz method: spatial")
             result=json_spatial(loom_path,color,reduction,returnjson,cidx_filter)
             return result
         else : 
-            print("viz method: scatter")
+            #print("viz method: scatter")
             result=json_scatter(loom_path,color,reduction,returnjson,cidx_filter)
             return result
     else:
-        print("viz method: scatter 3d")
+        #print("viz method: scatter 3d")
         result=json_scatter3d(loom_path,reduction,color,returnjson,cidx_filter)
         return result
  
@@ -575,9 +575,9 @@ def json_scatter(loom_path,color=None,reduction=None,returnjson=True,cidx_filter
 
     end = time.time()
     if returnjson:
-        print('#######################')
-        print(end - start)
-        print('#######################')
+        #print('#######################')
+        #print(end - start)
+        #print('#######################')
         try : 
             jsonD = json.loads(pio.to_json(fig, validate = True, pretty=False, remove_uids=True))
             #print(jsonD)
@@ -586,9 +586,9 @@ def json_scatter(loom_path,color=None,reduction=None,returnjson=True,cidx_filter
             print("String could not be converted to JSON")
             return json.loads('{}')
     else:
-        print('#######################')
-        print(end - start)
-        print('#######################')
+        #print('#######################')
+        #print(end - start)
+        #print('#######################')
         return fig
 
 def json_scatter3d(loom_path,reduction,color=None,returnjson=True,cidx_filter=None):
@@ -690,9 +690,9 @@ def json_scatter3d(loom_path,reduction,color=None,returnjson=True,cidx_filter=No
     #fig.update_xaxes(showticklabels=False)
     end = time.time()
     if returnjson:
-        print('#######################')
-        print(end - start)
-        print('#######################')
+        #print('#######################')
+        #print(end - start)
+        #print('#######################')
         try : 
             jsonD = json.loads(pio.to_json(fig, validate = True, pretty=False, remove_uids=True))
             #print(jsonD)
@@ -701,9 +701,9 @@ def json_scatter3d(loom_path,reduction,color=None,returnjson=True,cidx_filter=No
             print("String could not be converted to JSON")
             return json.loads('{}')
     else:
-        print('#######################')
-        print(end - start)
-        print('#######################')
+        #print('#######################')
+        #print(end - start)
+        #print('#######################')
         return fig
     
 def get_hexbin_attributes(hexbin):
@@ -1204,7 +1204,7 @@ def dotplot_json(loom_path,attribute='',symbols=[],cidx_filter=None,ridx_filter=
             ticktext = colors.index.values,
         )
     )
-    print('15')
+    #print('15')
     # hide subplot y-axis titles and x-axis titles
     for axis in fig.layout:
         if type(fig.layout[axis]) == go.layout.YAxis:
@@ -1497,5 +1497,5 @@ def json_spatial(loom_path, color=None, reduction=None,returnjson=True, cidx_fil
     if returnjson:
         return json.loads(pio.to_json(fig, validate=True, pretty=False, remove_uids=True))
     else:
-        print("return fig")
+        #print("return fig")
         return fig
