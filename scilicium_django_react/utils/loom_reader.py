@@ -787,6 +787,9 @@ def json_hexbin(loom_path,reduction=None,color=None,gridsize=40,cmap=plt.cm.plas
     else:
         x = df[X].values
         y = df[Y].values
+
+    if reduction == 'spatial':
+        y = -y
     
     if color is None:
         HB = plt.hexbin(x,y,gridsize=gridsize,cmap=cmap)
