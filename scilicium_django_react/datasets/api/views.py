@@ -277,7 +277,7 @@ class GetLoomPlots(APIView):
         #if data.status == "PRIVATE" and data.created_by != self.request.user :
         #    response = Response({"msg":"You are not allowed to access this ressource"}, status=status.HTTP_403_FORBIDDEN)
         #    return response
-        
+        # Bonjour PAul C'est Thomas qui te parle ;)
         
         response_data = dict()
         response_data["name"] = data.name
@@ -299,6 +299,7 @@ class GetLoomPlots(APIView):
         elif style=='hexbin':
             response_data['chart'] = json_hexbin(loom_path,reduction=reduction,color=None,gridsize=30,cmap=plt.cm.plasma,background='black',returnjson=True,cidx_filter=cidx_filter)
             response_data['style'] = 'hexbin'
+            print(response_data)
             response = Response(response_data, status=status.HTTP_200_OK)
             return response
 
