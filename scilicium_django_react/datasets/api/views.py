@@ -297,6 +297,7 @@ class GetLoomPlots(APIView):
             return response
 
         elif style=='hexbin':
+            print("hexbin-1")
             response_data['chart'] = json_hexbin(loom_path,reduction=reduction,color=None,gridsize=30,cmap=plt.cm.plasma,background='black',returnjson=True,cidx_filter=cidx_filter)
             response_data['style'] = 'hexbin'
             print("hexbin")
