@@ -1444,6 +1444,7 @@ def json_density(loom_path,reduction=None,symbol=None,returnjson=True,cidx_filte
     fig = density_symbols(loom_path,X,Y,symbol,cidx_filter=cidx_filter)
 
     fig.update_layout(
+        width=636, height=660,
         paper_bgcolor='rgba(0,0,0,0)',
         plot_bgcolor='rgba(0,0,0,0)',
         margin=dict(
