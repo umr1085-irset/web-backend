@@ -784,10 +784,12 @@ def json_scatter3d(loom_path,reduction,color=None,returnjson=True,cidx_filter=No
             y = y[idx]
             z = z[idx]
             fig.add_trace(continuous_scatter_gl_3d(x,y,z,tmpcolor,tracename=color))
+            fig.update_layout(plot_bgcolor='rgba(0,0,0,1)')
         else: # discrete
             fig.add_traces(discrete_scatter_gl_3d(x,y,z,tmpcolor))
     elif color==None and not isinstance(cidx_filter, np.ndarray): # fallback case
         fig.add_trace(continuous_scatter_gl_3d(x,y,z,tmpcolor))
+        fig.update_layout(plot_bgcolor='rgba(0,0,0,1)')
 
     fig.update_layout(
         # background color white
