@@ -869,8 +869,8 @@ def json_hexbin(loom_path,reduction=None,color=None,gridsize=40,cmap=plt.cm.plas
         width=636, height=660,
         xaxis=axis,
         yaxis=axis,
-        xaxis_title='UMAP1',
-        yaxis_title='UMAP2',
+        xaxis_title=X,
+        yaxis_title=Y,
         hovermode='closest',
         shapes=shapes,
         plot_bgcolor=background)
@@ -1452,11 +1452,18 @@ def json_density(loom_path,reduction=None,symbol=None,returnjson=True,cidx_filte
             b=0,
             t=0
         ),
-        xaxis_title='',
-        yaxis_title='',
+        xaxis_title=X,
+        yaxis_title=Y,
     )
-    fig.update_yaxes(showticklabels=False)
-    fig.update_xaxes(showticklabels=False)
+    
+    if "PCA" not in reduction.upper():
+        fig.update_yaxes(showticklabels=False)
+        fig.update_xaxes(showticklabels=False)
+    else:
+        fig.update_layout(
+            xaxis_title=X,
+            yaxis_title=Y,
+        )
 
     if 'spatial' in reduction:
         fig.update_yaxes(autorange="reversed")
