@@ -502,10 +502,7 @@ def json_scatOrSpat(style,loom_path,color=None,reduction=None,returnjson=True,ci
     elif len(l)==2 and style=='hexbin':
         result=json_hexbin(loom_path,reduction=reduction,color=color,returnjson=returnjson,cidx_filter=cidx_filter)
     elif len(l)==2 and style=='density':
-        print('density')
-        print(color)
         result=json_density(loom_path,reduction=reduction,symbol=color,cidx_filter=cidx_filter)
-        print('result ok')
     return result
 
 def json_scatter(loom_path,color=None,reduction=None,returnjson=True,cidx_filter=None):
@@ -1396,7 +1393,7 @@ def density_symbols(loom_path,X,Y,symbol,cidx_filter=None):
         y = df[Y].values,
         z=exp,
         colorscale=[[0,'rgba(255,255,255,0)'],[1,gene_color]],
-        histfunc='sum',
+        histfunc='avg',
         ncontours = 20,
         contours = dict(
             showlines=False
