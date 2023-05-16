@@ -1686,7 +1686,7 @@ def json_spatial(loom_path, color=None, reduction=None,returnjson=True, cidx_fil
             #mapper = cm.ScalarMappable(norm=norm, cmap=cm.magma)
             #mapper = cm.ScalarMappable(norm=norm, cmap=clr.ListedColormap([rgb2hex(x) for x in px.colors.sequential.matter], name='matter'))
             #mapper = cm.ScalarMappable(norm=norm, cmap=clr.ListedColormap([rgb2hex(x) for x in px.colors.sequential.Plasma], name='plasma'))
-            mapper = cm.ScalarMappable(norm=norm, cmap=cm.inferno)
+            mapper = cm.ScalarMappable(norm=norm, cmap=cm.plasma)
             points = spatial_points_continuous(x, y, colorvector, mapper,r=r)
         else:
             points = spatial_points_solid(x,y,colorvector,r=r)
