@@ -775,21 +775,6 @@ def json_scatter3d(loom_path,reduction,color=None,returnjson=True,cidx_filter=No
         x = df[X].values
         y = df[Y].values
         z = df[Z].values
-        
-    if color!=None:
-        if np.issubdtype(tmpcolor.dtype, np.number): # if color is None or type of color array is numerical
-            idx = np.argsort(tmpcolor)
-            tmpcolor = tmpcolor[idx]
-            x = x[idx]
-            y = y[idx]
-            z = z[idx]
-            fig.add_trace(continuous_scatter_gl_3d(x,y,z,tmpcolor,tracename=color))
-            fig.update_layout(plot_bgcolor='rgba(0,0,0,1)')
-        else: # discrete
-            fig.add_traces(discrete_scatter_gl_3d(x,y,z,tmpcolor))
-    elif color==None and not isinstance(cidx_filter, np.ndarray): # fallback case
-        fig.add_trace(continuous_scatter_gl_3d(x,y,z,tmpcolor))
-        fig.update_layout(plot_bgcolor='rgba(0,0,0,1)')
 
     fig.update_layout(
         # background color white
@@ -817,10 +802,59 @@ def json_scatter3d(loom_path,reduction,color=None,returnjson=True,cidx_filter=No
             zaxis_title=Z
         )
     )
+        
+    if color!=None:
+        if np.issubdtype(tmpcolor.dtype, np.number): # if color is None or type of color array is numerical
+            idx = np.argsort(tmpcolor)
+            tmpcolor = tmpcolor[idx]
+            x = x[idx]
+            y = y[idx]
+            z = z[idx]
+            fig.add_trace(continuous_scatter_gl_3d(x,y,z,tmpcolor,tracename=color))
+            linecolor = '#262626'
+            fig.update_layout(
+                scene = dict(
+                    xaxis = dict(
+                            backgroundcolor="rgba(0, 0, 0, 1)",
+                            gridcolor=linecolor,
+                            showbackground=True,
+                            zerolinecolor=linecolor,),
+                    yaxis = dict(
+                        backgroundcolor="rgba(0, 0, 0, 1)",
+                        gridcolor=linecolor,
+                        showbackground=True,
+                        zerolinecolor=linecolor),
+                    zaxis = dict(
+                        backgroundcolor="rgba(0, 0, 0, 1)",
+                        gridcolor=linecolor,
+                        showbackground=True,
+                        zerolinecolor=linecolor,),),
+            )
+            fig.update_layout(plot_bgcolor='rgba(0,0,0,1)')
+        else: # discrete
+            fig.add_traces(discrete_scatter_gl_3d(x,y,z,tmpcolor))
+    elif color==None and not isinstance(cidx_filter, np.ndarray): # fallback case
+        fig.add_trace(continuous_scatter_gl_3d(x,y,z,tmpcolor))
+        linecolor = '#262626'
+        fig.update_layout(
+            scene = dict(
+                xaxis = dict(
+                        backgroundcolor="rgba(0, 0, 0, 1)",
+                        gridcolor=linecolor,
+                        showbackground=True,
+                        zerolinecolor=linecolor,),
+                yaxis = dict(
+                    backgroundcolor="rgba(0, 0, 0, 1)",
+                    gridcolor=linecolor,
+                    showbackground=True,
+                    zerolinecolor=linecolor),
+                zaxis = dict(
+                    backgroundcolor="rgba(0, 0, 0, 1)",
+                    gridcolor=linecolor,
+                    showbackground=True,
+                    zerolinecolor=linecolor,),),
+        )
 
-    #fig.update_yaxes(showticklabels=False)
-    #fig.update_xaxes(showticklabels=False)
-    end = time.time()
     if returnjson:
         #print('#######################')
         #print(end - start)
