@@ -488,33 +488,50 @@ def check_color(loom_path,color,cidx_filter=None):
         except:
             raise Exception(f'color must be None, a valid gene symbol or a valid data attribute')
 
+def json_scatOrSpat(style,loom_path,color=None,reduction=None,returnjson=True,cidx_filter=None):
+    if reduction==None :
+        reduction = get_available_reductions(loom_path)[0]
+    l = get_reduction_x_y(loom_path,reduction)
 
-def json_scatOrSpat(loom_path,color=None,reduction=None,returnjson=True,cidx_filter=None):
-    
-    if reduction==None :
-        reduction = get_available_reductions(loom_path)[0]
-    l = get_reduction_x_y(loom_path,reduction)
-    if len(l)==2:
-        if "spatial" in reduction:
-            #print("viz method: spatial")
-            result=json_spatial(loom_path,color,reduction,returnjson,cidx_filter)
-        else : 
-            #print("viz method: scatter")
-            result=json_scatter(loom_path,color,reduction,returnjson,cidx_filter)
-    else:
-        #print("viz method: scatter 3d")
+    if len(l)==3:
         result=json_scatter3d(loom_path,reduction,color,returnjson,cidx_filter)
-    return result
- 
-def json_hexbinOrScat3d(loom_path, reduction=None, color=None, returnjson=True, cidx_filter=None):
-    if reduction==None :
-        reduction = get_available_reductions(loom_path)[0]
-    l = get_reduction_x_y(loom_path,reduction)
-    if len(l)==2:
+    elif len(l)==2 and 'spatial' in reduction:
+        result=json_spatial(loom_path,color,reduction,returnjson,cidx_filter)
+    elif len(l)==2 and style=='scatter':
+        result=json_scatter(loom_path,color,reduction,returnjson,cidx_filter)
+    elif len(l)==2 and style=='hexbin':
         result=json_hexbin(loom_path,reduction=reduction,color=color,returnjson=returnjson,cidx_filter=cidx_filter)
-    else:
-        result=json_scatter3d(loom_path,reduction,color,returnjson,cidx_filter)
+    #elif len(l)==2 and style=='density':
+    #    result,lgd=json_density(loomfile,reduction=reduction,ca=attrs,symbols=symbols,cidx_filter=cidx_filter)
+    #    return result,lgd
     return result
+
+# def json_scatOrSpat(loom_path,color=None,reduction=None,returnjson=True,cidx_filter=None):
+    
+#     if reduction==None :
+#         reduction = get_available_reductions(loom_path)[0]
+#     l = get_reduction_x_y(loom_path,reduction)
+#     if len(l)==2:
+#         if "spatial" in reduction:
+#             #print("viz method: spatial")
+#             result=json_spatial(loom_path,color,reduction,returnjson,cidx_filter)
+#         else : 
+#             #print("viz method: scatter")
+#             result=json_scatter(loom_path,color,reduction,returnjson,cidx_filter)
+#     else:
+#         #print("viz method: scatter 3d")
+#         result=json_scatter3d(loom_path,reduction,color,returnjson,cidx_filter)
+#     return result
+ 
+# def json_hexbinOrScat3d(loom_path, reduction=None, color=None, returnjson=True, cidx_filter=None):
+#     if reduction==None :
+#         reduction = get_available_reductions(loom_path)[0]
+#     l = get_reduction_x_y(loom_path,reduction)
+#     if len(l)==2:
+#         result=json_hexbin(loom_path,reduction=reduction,color=color,returnjson=returnjson,cidx_filter=cidx_filter)
+#     else:
+#         result=json_scatter3d(loom_path,reduction,color,returnjson,cidx_filter)
+#     return result
 
 def json_scatter(loom_path,color=None,reduction=None,returnjson=True,cidx_filter=None):
     '''
@@ -877,7 +894,7 @@ def json_hexbin(loom_path,reduction=None,color=None,gridsize=40,cmap=plt.cm.plas
     )
 
     fig.update_layout(
-        width=530, height=550,
+        width=636, height=660,
         xaxis=axis,
         yaxis=axis,
         xaxis_title='UMAP1',
