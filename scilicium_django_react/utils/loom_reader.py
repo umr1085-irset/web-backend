@@ -504,7 +504,7 @@ def json_scatOrSpat(style,loom_path,color=None,reduction=None,returnjson=True,ci
     elif len(l)==2 and style=='density':
         print('density')
         print(color)
-        result=json_density(loomfile,reduction=reduction,symbol=color,cidx_filter=cidx_filter)
+        result=json_density(loom_path,reduction=reduction,symbol=color,cidx_filter=cidx_filter)
         print('result ok')
     return result
 
@@ -1438,7 +1438,7 @@ def density_symbols(loom_path,X,Y,symbol,cidx_filter=None):
 #         return json.loads(pio.to_json(fig, validate=True, pretty=False, remove_uids=True)),lgd
 #     else:
 #         return fig
-
+    
 def json_density(loom_path,reduction=None,symbol=None,returnjson=True,cidx_filter=None):
     if reduction==None:
         reduction = get_available_reductions(loom_path)[0] # first reduction available
