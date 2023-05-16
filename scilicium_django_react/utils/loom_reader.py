@@ -501,37 +501,9 @@ def json_scatOrSpat(style,loom_path,color=None,reduction=None,returnjson=True,ci
         result=json_scatter(loom_path,color,reduction,returnjson,cidx_filter)
     elif len(l)==2 and style=='hexbin':
         result=json_hexbin(loom_path,reduction=reduction,color=color,returnjson=returnjson,cidx_filter=cidx_filter)
-    #elif len(l)==2 and style=='density':
-    #    result,lgd=json_density(loomfile,reduction=reduction,ca=attrs,symbols=symbols,cidx_filter=cidx_filter)
-    #    return result,lgd
+    elif len(l)==2 and style=='density':
+        result=json_density(loomfile,reduction=reduction,symbol=attrs,cidx_filter=cidx_filter)
     return result
-
-# def json_scatOrSpat(loom_path,color=None,reduction=None,returnjson=True,cidx_filter=None):
-    
-#     if reduction==None :
-#         reduction = get_available_reductions(loom_path)[0]
-#     l = get_reduction_x_y(loom_path,reduction)
-#     if len(l)==2:
-#         if "spatial" in reduction:
-#             #print("viz method: spatial")
-#             result=json_spatial(loom_path,color,reduction,returnjson,cidx_filter)
-#         else : 
-#             #print("viz method: scatter")
-#             result=json_scatter(loom_path,color,reduction,returnjson,cidx_filter)
-#     else:
-#         #print("viz method: scatter 3d")
-#         result=json_scatter3d(loom_path,reduction,color,returnjson,cidx_filter)
-#     return result
- 
-# def json_hexbinOrScat3d(loom_path, reduction=None, color=None, returnjson=True, cidx_filter=None):
-#     if reduction==None :
-#         reduction = get_available_reductions(loom_path)[0]
-#     l = get_reduction_x_y(loom_path,reduction)
-#     if len(l)==2:
-#         result=json_hexbin(loom_path,reduction=reduction,color=color,returnjson=returnjson,cidx_filter=cidx_filter)
-#     else:
-#         result=json_scatter3d(loom_path,reduction,color,returnjson,cidx_filter)
-#     return result
 
 def json_scatter(loom_path,color=None,reduction=None,returnjson=True,cidx_filter=None):
     '''
@@ -841,7 +813,7 @@ def json_hexbin(loom_path,reduction=None,color=None,gridsize=40,cmap=plt.cm.plas
         x = df[X].values
         y = df[Y].values
 
-    if reduction == 'spatial':
+    if 'spatial' in reduction:
         y = -y
     
     if color is None:
@@ -1367,7 +1339,43 @@ def density_ca(loom_path,X,Y,cidx_filter=None,ca=None):
         fig['data'][i]['ncontours'] = 20
     return fig,lgd
 
-def density_symbols(loom_path,X,Y,symbols,cidx_filter=None):
+# def density_symbols(loom_path,X,Y,symbols,cidx_filter=None):
+#     df = get_dataframe(loom_path,[X,Y],cidx_filter=None) # pandas dataframe
+
+#     fig = px.density_contour(df, x=X, y=Y)
+#     fig['data'][0]['line']['color'] = '#D3D3D3'
+#     for i,trace in enumerate(fig['data']):
+#         fig['data'][i]['ncontours'] = 20
+    
+#     lgd = dict()
+#     gene_colors = ['rgba(214,121,5,1)','rgba(239, 122, 4,1)','rgba(239, 239, 4,1)','rgba(122, 239, 4,1)','rgba(4, 239, 239,1)','rgba(4, 122, 239,1)','rgba(122, 4, 239,1)','rgba(239, 4, 239,1)','rgba(239, 4, 122,1)','rgba(4, 239, 4,1)']
+
+#     traces=[]
+#     if isinstance(cidx_filter, np.ndarray): # if filter exists
+#         df = get_dataframe(loom_path,[X,Y],cidx_filter=cidx_filter) # pandas dataframe
+#     for i,symbol in enumerate(symbols):
+#         gene_color = gene_colors[i]
+#         lgd[symbol] = gene_color
+#         exp = get_symbol_values(loom_path,symbol,cidx_filter=cidx_filter)
+#         trace = go.Histogram2dContour(
+#             x = df[X].values,
+#             y = df[Y].values,
+#             z=exp,
+#             colorscale=[[0,'rgba(255,255,255,0)'],[1,gene_color]],
+#             histfunc='sum',
+#             ncontours = 20,
+#             contours = dict(
+#                 showlines=False
+#             ),
+#             hoverinfo='none'
+#         )
+
+#         traces.append(trace)
+#     fig.add_traces(traces)
+        
+#     return fig,lgd
+
+def density_symbols(loom_path,X,Y,symbol,cidx_filter=None):
     df = get_dataframe(loom_path,[X,Y],cidx_filter=None) # pandas dataframe
 
     fig = px.density_contour(df, x=X, y=Y)
@@ -1375,43 +1383,65 @@ def density_symbols(loom_path,X,Y,symbols,cidx_filter=None):
     for i,trace in enumerate(fig['data']):
         fig['data'][i]['ncontours'] = 20
     
-    lgd = dict()
     gene_colors = ['rgba(214,121,5,1)','rgba(239, 122, 4,1)','rgba(239, 239, 4,1)','rgba(122, 239, 4,1)','rgba(4, 239, 239,1)','rgba(4, 122, 239,1)','rgba(122, 4, 239,1)','rgba(239, 4, 239,1)','rgba(239, 4, 122,1)','rgba(4, 239, 4,1)']
-
-    traces=[]
     if isinstance(cidx_filter, np.ndarray): # if filter exists
         df = get_dataframe(loom_path,[X,Y],cidx_filter=cidx_filter) # pandas dataframe
-    for i,symbol in enumerate(symbols):
-        gene_color = gene_colors[i]
-        lgd[symbol] = gene_color
-        exp = get_symbol_values(loom_path,symbol,cidx_filter=cidx_filter)
-        trace = go.Histogram2dContour(
-            x = df[X].values,
-            y = df[Y].values,
-            z=exp,
-            colorscale=[[0,'rgba(255,255,255,0)'],[1,gene_color]],
-            histfunc='sum',
-            ncontours = 20,
-            contours = dict(
-                showlines=False
-            ),
-            hoverinfo='none'
-        )
+    gene_color = gene_colors[0]
+    exp = get_symbol_values(loom_path,symbol,cidx_filter=cidx_filter)
+    trace = go.Histogram2dContour(
+        x = df[X].values,
+        y = df[Y].values,
+        z=exp,
+        colorscale=[[0,'rgba(255,255,255,0)'],[1,gene_color]],
+        histfunc='sum',
+        ncontours = 20,
+        contours = dict(
+            showlines=False
+        ),
+        hoverinfo='none'
+    )
+    fig.add_traces([trace])   
+    return fig
 
-        traces.append(trace)
-    fig.add_traces(traces)
-        
-    return fig,lgd
+# def json_density(loom_path,reduction=None,ca=None,symbols=[],returnjson=True,cidx_filter=None):
+#     if reduction==None:
+#         reduction = get_available_reductions(loom_path)[0] # first reduction available
+#     X,Y = get_reduction_x_y(loom_path,reduction)
+    
+#     if symbols==[]: # if no gene list provided
+#         fig,lgd = density_ca(loom_path,X,Y,cidx_filter=cidx_filter,ca=ca) # plot simple density contour or with categorical column attribute
+#     else:
+#         fig,lgd = density_symbols(loom_path,X,Y,symbols,cidx_filter=cidx_filter)
 
-def json_density(loom_path,reduction=None,ca=None,symbols=[],returnjson=True,cidx_filter=None):
+#     fig.update_layout(
+#         paper_bgcolor='rgba(0,0,0,0)',
+#         plot_bgcolor='rgba(0,0,0,0)',
+#         margin=dict(
+#             l=0,
+#             r=0,
+#             b=0,
+#             t=0
+#         ),
+#         xaxis_title='',
+#         yaxis_title='',
+#     )
+#     fig.update_yaxes(showticklabels=False)
+#     fig.update_xaxes(showticklabels=False)
+
+#     if 'spatial' in reduction:
+#         fig.update_yaxes(autorange="reversed")
+    
+#     if returnjson:
+#         return json.loads(pio.to_json(fig, validate=True, pretty=False, remove_uids=True)),lgd
+#     else:
+#         return fig
+
+def json_density(loom_path,reduction=None,symbol=None,returnjson=True,cidx_filter=None):
     if reduction==None:
         reduction = get_available_reductions(loom_path)[0] # first reduction available
     X,Y = get_reduction_x_y(loom_path,reduction)
     
-    if symbols==[]: # if no gene list provided
-        fig,lgd = density_ca(loom_path,X,Y,cidx_filter=cidx_filter,ca=ca) # plot simple density contour or with categorical column attribute
-    else:
-        fig,lgd = density_symbols(loom_path,X,Y,symbols,cidx_filter=cidx_filter)
+    fig,lgd = density_symbols(loom_path,X,Y,symbol,cidx_filter=cidx_filter)
 
     fig.update_layout(
         paper_bgcolor='rgba(0,0,0,0)',
@@ -1428,7 +1458,7 @@ def json_density(loom_path,reduction=None,ca=None,symbols=[],returnjson=True,cid
     fig.update_yaxes(showticklabels=False)
     fig.update_xaxes(showticklabels=False)
 
-    if reduction=='spatial':
+    if 'spatial' in reduction:
         fig.update_yaxes(autorange="reversed")
     
     if returnjson:

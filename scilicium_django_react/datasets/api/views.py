@@ -315,8 +315,8 @@ class GetLoomPlots(APIView):
             return response
         
         elif style=='density':
-            response_data['chart'],response_data['legend'] = json_density(loomfile,reduction=reduction,ca=attrs,symbols=symbols,cidx_filter=cidx_filter)
-            #response_data['chart'] = json_density(loomfile,reduction=reduction,ca=attrs,symbols=symbols,cidx_filter=cidx_filter)
+            #response_data['chart'],response_data['legend'] = json_density(loomfile,reduction=reduction,ca=attrs,symbols=symbols,cidx_filter=cidx_filter)
+            response_data['chart'] = json_scatOrSpat(style,loomfile,color=attrs,reduction=reduction,cidx_filter=cidx_filter)
             response_data['style'] = 'density'
             response = Response(response_data, status=status.HTTP_200_OK)
             return response
