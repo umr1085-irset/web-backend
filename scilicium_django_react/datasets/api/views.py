@@ -288,15 +288,12 @@ class GetLoomPlots(APIView):
         if genes_menu != 'undefined':
             response_data["genes_menu"] = get_ra(loomfile,unique=True,ridx_filter=ridx_filter)
         if style =="scatter":
-            #response_data['chart'] = json_scatOrSpat(loomfile,color=attrs,reduction=reduction,cidx_filter=cidx_filter)
             response_data['chart'] = json_scatOrSpat(style,loomfile,color=attrs,reduction=reduction,cidx_filter=cidx_filter)
             response_data['style'] = "scatter"
             response = Response(response_data, status=status.HTTP_200_OK)
             return response
 
         elif style=='hexbin':
-            #response_data['chart'] = json_hexbin(loomfile,reduction=reduction,color=attrs,cmap=plt.cm.plasma,background='black',returnjson=True,cidx_filter=cidx_filter)
-            #response_data['chart'] = json_hexbinOrScat3d(loomfile, reduction=reduction, color=attrs, returnjson=True, cidx_filter=cidx_filter)
             response_data['chart'] = json_scatOrSpat(style,loomfile, reduction=reduction, color=attrs, returnjson=True, cidx_filter=cidx_filter)
             response_data['style'] = 'hexbin'
             response = Response(response_data, status=status.HTTP_200_OK)
