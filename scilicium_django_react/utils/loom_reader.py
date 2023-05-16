@@ -502,7 +502,10 @@ def json_scatOrSpat(style,loom_path,color=None,reduction=None,returnjson=True,ci
     elif len(l)==2 and style=='hexbin':
         result=json_hexbin(loom_path,reduction=reduction,color=color,returnjson=returnjson,cidx_filter=cidx_filter)
     elif len(l)==2 and style=='density':
+        print('density')
+        print(color)
         result=json_density(loomfile,reduction=reduction,symbol=color,cidx_filter=cidx_filter)
+        print('result ok')
     return result
 
 def json_scatter(loom_path,color=None,reduction=None,returnjson=True,cidx_filter=None):
@@ -1441,7 +1444,7 @@ def json_density(loom_path,reduction=None,symbol=None,returnjson=True,cidx_filte
         reduction = get_available_reductions(loom_path)[0] # first reduction available
     X,Y = get_reduction_x_y(loom_path,reduction)
     
-    fig,lgd = density_symbols(loom_path,X,Y,symbol,cidx_filter=cidx_filter)
+    fig = density_symbols(loom_path,X,Y,symbol,cidx_filter=cidx_filter)
 
     fig.update_layout(
         paper_bgcolor='rgba(0,0,0,0)',
@@ -1462,7 +1465,7 @@ def json_density(loom_path,reduction=None,symbol=None,returnjson=True,cidx_filte
         fig.update_yaxes(autorange="reversed")
     
     if returnjson:
-        return json.loads(pio.to_json(fig, validate=True, pretty=False, remove_uids=True)),lgd
+        return json.loads(pio.to_json(fig, validate=True, pretty=False, remove_uids=True))
     else:
         return fig
 
