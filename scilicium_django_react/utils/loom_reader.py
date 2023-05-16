@@ -447,7 +447,8 @@ def continuous_scatter_gl_3d(x,y,z,color,tracename=''):
             #colorscale='matter',
             colorscale='plasma',
             size=3,
-            opacity=0.7
+            opacity=0.7,
+            colorbar=dict(thickness=20)
         ),
         name=tracename,
         hoverinfo=hoverinfo
