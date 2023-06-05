@@ -217,42 +217,71 @@ def n_colors_old(n):
     return l[:n]
 
 def n_colors(NbColors,rgbonly=False):
-    pi = 3.14159265359
-    pid2 = pi/2
-    angle = 0
-    step = pi/(NbColors)
     ListOfColors = []
-    for i in range(0,NbColors):
-        R = round((math.cos(angle)+1)/2 * 200)
-        G = round((math.cos(angle-pid2)+1)/2 * 200)
-        B = round((math.cos(angle-pi)+1)/2 * 200)
-        A = .4
-        angle = angle + step
+    phis = np.linspace(0, 2*np.pi, NbColors+1)
+    for phi in phis[:-1]:
+        R = round(.5*(1.+np.cos(phi))*255)
+        G = round(.5*(1.+np.cos(phi+2*np.pi/3))*255)
+        B = round(.5*(1.+np.cos(phi-2*np.pi/3))*255)
+        A = .6
         if rgbonly:
             ListOfColors.append('rgb('+str(R)+','+str(G)+','+str(B)+')')            
         else:
             ListOfColors.append('rgba('+str(R)+','+str(G)+','+str(B)+','+str(A)+')')
-    #print(ListOfColors)
     return ListOfColors
 
 def n_colors_float(NbColors):
-    pi = 3.14159265359
-    pid2 = pi/2
-    angle = 0
-    step = pi/(NbColors)
     ListOfColors = []
-    for i in range(0,NbColors):
-        R = round((math.cos(angle)+1)/2 * 200)
-        R = round(0.4*R + (1-0.4)*255)/255
-        G = round((math.cos(angle-pid2)+1)/2 * 200)
-        G = round(0.4*G + (1-0.4)*255)/255
-        B = round((math.cos(angle-pi)+1)/2 * 200)
-        B = round(0.4*B + (1-0.4)*255)/255
-        A = 1
-        angle = angle + step
-        ListOfColors.append((R,G,B,A))
+    phis = np.linspace(0, 2*np.pi, NbColors+1)
+    A = 0.6
+    for phi in phis[:-1]:
+        R = round(.5*(1.+np.cos(phi))*255)
+        R = round(A*R + (1-A)*255)/255
+        G = round(.5*(1.+np.cos(phi+2*np.pi/3))*255)
+        G = round(A*G + (1-A)*255)/255
+        B = round(.5*(1.+np.cos(phi-2*np.pi/3))*255)
+        B = round(A*B + (1-A)*255)/255
+        ListOfColors.append((R,G,B,1))
     #print(ListOfColors)
     return ListOfColors
+
+# def n_colors(NbColors,rgbonly=False):
+#     pi = 3.14159265359
+#     pid2 = pi/2
+#     angle = 0
+#     step = pi/(NbColors)
+#     ListOfColors = []
+#     for i in range(0,NbColors):
+#         R = round((math.cos(angle)+1)/2 * 200)
+#         G = round((math.cos(angle-pid2)+1)/2 * 200)
+#         B = round((math.cos(angle-pi)+1)/2 * 200)
+#         A = .4
+#         angle = angle + step
+#         if rgbonly:
+#             ListOfColors.append('rgb('+str(R)+','+str(G)+','+str(B)+')')            
+#         else:
+#             ListOfColors.append('rgba('+str(R)+','+str(G)+','+str(B)+','+str(A)+')')
+#     #print(ListOfColors)
+#     return ListOfColors
+
+# def n_colors_float(NbColors):
+#     pi = 3.14159265359
+#     pid2 = pi/2
+#     angle = 0
+#     step = pi/(NbColors)
+#     ListOfColors = []
+#     for i in range(0,NbColors):
+#         R = round((math.cos(angle)+1)/2 * 200)
+#         R = round(0.4*R + (1-0.4)*255)/255
+#         G = round((math.cos(angle-pid2)+1)/2 * 200)
+#         G = round(0.4*G + (1-0.4)*255)/255
+#         B = round((math.cos(angle-pi)+1)/2 * 200)
+#         B = round(0.4*B + (1-0.4)*255)/255
+#         A = 1
+#         angle = angle + step
+#         ListOfColors.append((R,G,B,A))
+#     #print(ListOfColors)
+#     return ListOfColors
 
 #def n_colors(NbColors,forcefloat=False):
 #    pi = 3.14159265359
@@ -371,8 +400,10 @@ def continuous_scatter_gl(x,y,color,tracename=''):
         mode='markers',
         marker=dict(
             color=color,
-            colorscale='matter',
-            size=4
+            #colorscale='matter',
+            colorscale='plasma',
+            size=4,
+            colorbar=dict(thickness=20)
         ),
         name=tracename,
         hoverinfo=hoverinfo
@@ -413,9 +444,11 @@ def continuous_scatter_gl_3d(x,y,z,color,tracename=''):
         mode='markers',
         marker=dict(
             color=color,
-            colorscale='matter',
+            #colorscale='matter',
+            colorscale='plasma',
             size=3,
-            opacity=0.4
+            opacity=0.7,
+            colorbar=dict(thickness=20)
         ),
         name=tracename,
         hoverinfo=hoverinfo
@@ -459,27 +492,131 @@ def check_color(loom_path,color,cidx_filter=None):
         except:
             raise Exception(f'color must be None, a valid gene symbol or a valid data attribute')
 
-
-def json_scatOrSpat(loom_path,color=None,reduction=None,returnjson=True,cidx_filter=None):
-    
+def json_scatOrSpat(style,loom_path,color=None,reduction=None,returnjson=True,cidx_filter=None):
     if reduction==None :
         reduction = get_available_reductions(loom_path)[0]
     l = get_reduction_x_y(loom_path,reduction)
-    if len(l)==2:
-        if "spatial" in reduction:
-            print("viz method: spatial")
-            result=json_spatial(loom_path,color,reduction,returnjson,cidx_filter)
-            return result
-        else : 
-            print("viz method: scatter")
-            result=json_scatter(loom_path,color,reduction,returnjson,cidx_filter)
-            return result
-    else:
-        print("viz method: scatter 3d")
+
+    if len(l)==3:
         result=json_scatter3d(loom_path,reduction,color,returnjson,cidx_filter)
-        return result
- 
-            
+    elif len(l)==2 and 'spatial' in reduction:
+        result=json_spatial(loom_path,color,reduction,returnjson,cidx_filter)
+    elif len(l)==2 and style=='scatter':
+        result=json_scatter(loom_path,color,reduction,returnjson,cidx_filter)
+    elif len(l)==2 and style=='hexbin':
+        result=json_hexbin(loom_path,reduction=reduction,color=color,returnjson=returnjson,cidx_filter=cidx_filter)
+    elif len(l)==2 and style=='density':
+        result=json_density(loom_path,reduction=reduction,symbol=color,cidx_filter=cidx_filter)
+    return result
+
+# def json_scatter(loom_path,color=None,reduction=None,returnjson=True,cidx_filter=None):
+#     '''
+#     Compute JSON from Plotly figure
+    
+#     Params
+#     ------
+#     loom_path: str
+#         path to Loom file
+#     color: str or None
+#         column attribute or gene symbol
+#     attrs: list
+#         List of up to two attributes to plot
+#     returnjson: bool
+#         return figure or its JSON form
+#     cidx_filter: array
+#         column indices filter
+        
+#     Return
+#     ------
+#     Plotly figure or its JSON form
+#     '''
+#     start = time.time()
+#     if reduction==None:
+#         reduction = get_available_reductions(loom_path)[0] # first reduction available
+
+#     X,Y = get_reduction_x_y(loom_path,reduction)
+    
+#     fig = go.Figure()
+#     if isinstance(cidx_filter, np.ndarray): # if filter exists, draw all points first as background
+#         df = get_dataframe(loom_path,[X,Y],cidx_filter=None) # all points
+#         if df.shape[0]>N_MAX_CELLS:
+#             sub_idx = np.random.choice(df.shape[0], N_MAX_CELLS, replace=False) # select 200 cells randomly
+#             x = df[X].values[sub_idx]
+#             y = df[Y].values[sub_idx]
+#         else:
+#             x = df[X].values
+#             y = df[Y].values
+#         tmpcolor = check_color(loom_path,None,cidx_filter=None) # None means default background color
+#         fig.add_trace(continuous_scatter_gl(x,y,tmpcolor,tracename='All cells'))
+
+#     df = get_dataframe(loom_path,[X,Y],cidx_filter=cidx_filter) # pandas dataframe
+#     tmpcolor = check_color(loom_path,color,cidx_filter=cidx_filter) # numpy array
+    
+#     if df.shape[0]>N_MAX_CELLS:
+#         sub_idx = np.random.choice(df.shape[0], N_MAX_CELLS, replace=False) # select 200 cells randomly
+#         x = df[X].values[sub_idx]
+#         y = df[Y].values[sub_idx]
+#         if isinstance(tmpcolor, np.ndarray): # if color is an array (numerical or strings)
+#             tmpcolor = tmpcolor[sub_idx]
+#     else:
+#         x = df[X].values
+#         y = df[Y].values
+
+#     if color!=None:
+#         if np.issubdtype(tmpcolor.dtype, np.number): # if color is None or type of color array is numerical
+#             idx = np.argsort(tmpcolor)
+#             tmpcolor = tmpcolor[idx]
+#             x = x[idx]
+#             y = y[idx]
+#             fig.add_trace(continuous_scatter_gl(x,y,tmpcolor,tracename=color))
+#         else: # discrete
+#             fig.add_traces(discrete_scatter_gl(x,y,tmpcolor))
+#     elif color==None and not isinstance(cidx_filter, np.ndarray): # fallback case
+#         fig.add_trace(continuous_scatter_gl(x,y,tmpcolor))
+
+#     fig.update_layout(
+#         # background color white
+#         paper_bgcolor='rgba(0,0,0,0)',
+#         plot_bgcolor='rgba(0,0,0,0)',
+#         xaxis_title=X,
+#         yaxis_title=Y,
+#         margin=dict(
+#             l=0,
+#             r=0,
+#             b=0,
+#             t=0
+#         ),
+#         legend = dict(
+#             yanchor ="bottom",
+#             y = 0,
+#             xanchor = "right",
+#             x = 1,
+#             bgcolor = "rgba(255,255,255,0.8)",
+#         )
+#     )
+
+#     if "PCA" not in reduction.upper():
+#         fig.update_yaxes(showticklabels=False)
+#         fig.update_xaxes(showticklabels=False)
+
+#     end = time.time()
+#     if returnjson:
+#         #print('#######################')
+#         #print(end - start)
+#         #print('#######################')
+#         try : 
+#             jsonD = json.loads(pio.to_json(fig, validate = True, pretty=False, remove_uids=True))
+#             #print(jsonD)
+#             return jsonD
+#         except json.decoder.JSONDecodeError:
+#             print("String could not be converted to JSON")
+#             return json.loads('{}')
+#     else:
+#         #print('#######################')
+#         #print(end - start)
+#         #print('#######################')
+#         return fig
+
 def json_scatter(loom_path,color=None,reduction=None,returnjson=True,cidx_filter=None):
     '''
     Compute JSON from Plotly figure
@@ -501,7 +638,6 @@ def json_scatter(loom_path,color=None,reduction=None,returnjson=True,cidx_filter
     ------
     Plotly figure or its JSON form
     '''
-    start = time.time()
     if reduction==None:
         reduction = get_available_reductions(loom_path)[0] # first reduction available
 
@@ -532,23 +668,13 @@ def json_scatter(loom_path,color=None,reduction=None,returnjson=True,cidx_filter
     else:
         x = df[X].values
         y = df[Y].values
-
-    if color!=None:
-        if np.issubdtype(tmpcolor.dtype, np.number): # if color is None or type of color array is numerical
-            idx = np.argsort(tmpcolor)
-            tmpcolor = tmpcolor[idx]
-            x = x[idx]
-            y = y[idx]
-            fig.add_trace(continuous_scatter_gl(x,y,tmpcolor,tracename=color))
-        else: # discrete
-            fig.add_traces(discrete_scatter_gl(x,y,tmpcolor))
-    elif color==None and not isinstance(cidx_filter, np.ndarray): # fallback case
-        fig.add_trace(continuous_scatter_gl(x,y,tmpcolor))
-
+        
     fig.update_layout(
         # background color white
         paper_bgcolor='rgba(0,0,0,0)',
         plot_bgcolor='rgba(0,0,0,0)',
+        xaxis_title=X,
+        yaxis_title=Y,
         margin=dict(
             l=0,
             r=0,
@@ -564,31 +690,36 @@ def json_scatter(loom_path,color=None,reduction=None,returnjson=True,cidx_filter
             )
     )
 
+    if color!=None:
+        if np.issubdtype(tmpcolor.dtype, np.number): # if color is None or type of color array is numerical
+            idx = np.argsort(tmpcolor)
+            tmpcolor = tmpcolor[idx]
+            x = x[idx]
+            y = y[idx]
+            fig.add_trace(continuous_scatter_gl(x,y,tmpcolor,tracename=color))
+            fig.update_xaxes(showgrid=False, zeroline=False)
+            fig.update_yaxes(showgrid=False, zeroline=False)
+            fig.update_layout(plot_bgcolor='rgba(0,0,0,1)')
+        else: # discrete
+            fig.add_traces(discrete_scatter_gl(x,y,tmpcolor))
+    elif color==None and not isinstance(cidx_filter, np.ndarray): # fallback case
+        fig.add_trace(continuous_scatter_gl(x,y,tmpcolor))
+        fig.update_xaxes(showgrid=False, zeroline=False)
+        fig.update_yaxes(showgrid=False, zeroline=False)
+        fig.update_layout(plot_bgcolor='rgba(0,0,0,1)')
+
     if "PCA" not in reduction.upper():
         fig.update_yaxes(showticklabels=False)
         fig.update_xaxes(showticklabels=False)
-    else:
-        fig.update_layout(
-            xaxis_title=X,
-            yaxis_title=Y,
-        )
 
-    end = time.time()
     if returnjson:
-        print('#######################')
-        print(end - start)
-        print('#######################')
         try : 
             jsonD = json.loads(pio.to_json(fig, validate = True, pretty=False, remove_uids=True))
-            #print(jsonD)
             return jsonD
         except json.decoder.JSONDecodeError:
             print("String could not be converted to JSON")
             return json.loads('{}')
     else:
-        print('#######################')
-        print(end - start)
-        print('#######################')
         return fig
 
 def json_scatter3d(loom_path,reduction,color=None,returnjson=True,cidx_filter=None):
@@ -645,19 +776,6 @@ def json_scatter3d(loom_path,reduction,color=None,returnjson=True,cidx_filter=No
         x = df[X].values
         y = df[Y].values
         z = df[Z].values
-        
-    if color!=None:
-        if np.issubdtype(tmpcolor.dtype, np.number): # if color is None or type of color array is numerical
-            idx = np.argsort(tmpcolor)
-            tmpcolor = tmpcolor[idx]
-            x = x[idx]
-            y = y[idx]
-            z = z[idx]
-            fig.add_trace(continuous_scatter_gl_3d(x,y,z,tmpcolor,tracename=color))
-        else: # discrete
-            fig.add_traces(discrete_scatter_gl_3d(x,y,z,tmpcolor))
-    elif color==None and not isinstance(cidx_filter, np.ndarray): # fallback case
-        fig.add_trace(continuous_scatter_gl_3d(x,y,z,tmpcolor))
 
     fig.update_layout(
         # background color white
@@ -685,14 +803,63 @@ def json_scatter3d(loom_path,reduction,color=None,returnjson=True,cidx_filter=No
             zaxis_title=Z
         )
     )
+        
+    if color!=None:
+        if np.issubdtype(tmpcolor.dtype, np.number): # if color is None or type of color array is numerical
+            idx = np.argsort(tmpcolor)
+            tmpcolor = tmpcolor[idx]
+            x = x[idx]
+            y = y[idx]
+            z = z[idx]
+            fig.add_trace(continuous_scatter_gl_3d(x,y,z,tmpcolor,tracename=color))
+            linecolor = '#262626'
+            fig.update_layout(
+                scene = dict(
+                    xaxis = dict(
+                            backgroundcolor="rgba(0, 0, 0, 1)",
+                            gridcolor=linecolor,
+                            showbackground=True,
+                            zerolinecolor=linecolor,),
+                    yaxis = dict(
+                        backgroundcolor="rgba(0, 0, 0, 1)",
+                        gridcolor=linecolor,
+                        showbackground=True,
+                        zerolinecolor=linecolor),
+                    zaxis = dict(
+                        backgroundcolor="rgba(0, 0, 0, 1)",
+                        gridcolor=linecolor,
+                        showbackground=True,
+                        zerolinecolor=linecolor,),),
+            )
+            fig.update_layout(plot_bgcolor='rgba(0,0,0,1)')
+        else: # discrete
+            fig.add_traces(discrete_scatter_gl_3d(x,y,z,tmpcolor))
+    elif color==None and not isinstance(cidx_filter, np.ndarray): # fallback case
+        fig.add_trace(continuous_scatter_gl_3d(x,y,z,tmpcolor))
+        linecolor = '#262626'
+        fig.update_layout(
+            scene = dict(
+                xaxis = dict(
+                        backgroundcolor="rgba(0, 0, 0, 1)",
+                        gridcolor=linecolor,
+                        showbackground=True,
+                        zerolinecolor=linecolor,),
+                yaxis = dict(
+                    backgroundcolor="rgba(0, 0, 0, 1)",
+                    gridcolor=linecolor,
+                    showbackground=True,
+                    zerolinecolor=linecolor),
+                zaxis = dict(
+                    backgroundcolor="rgba(0, 0, 0, 1)",
+                    gridcolor=linecolor,
+                    showbackground=True,
+                    zerolinecolor=linecolor,),),
+        )
 
-    #fig.update_yaxes(showticklabels=False)
-    #fig.update_xaxes(showticklabels=False)
-    end = time.time()
     if returnjson:
-        print('#######################')
-        print(end - start)
-        print('#######################')
+        #print('#######################')
+        #print(end - start)
+        #print('#######################')
         try : 
             jsonD = json.loads(pio.to_json(fig, validate = True, pretty=False, remove_uids=True))
             #print(jsonD)
@@ -701,9 +868,9 @@ def json_scatter3d(loom_path,reduction,color=None,returnjson=True,cidx_filter=No
             print("String could not be converted to JSON")
             return json.loads('{}')
     else:
-        print('#######################')
-        print(end - start)
-        print('#######################')
+        #print('#######################')
+        #print(end - start)
+        #print('#######################')
         return fig
     
 def get_hexbin_attributes(hexbin):
@@ -755,7 +922,7 @@ def mpl_to_plotly(cmap, N):
         pl_colorscale.append([round(k*h,2), f'rgb({C[0]}, {C[1]}, {C[2]})'])
     return pl_colorscale
 
-def json_hexbin(loom_path,reduction=None,cmap=plt.cm.Greys,background='white',returnjson=True,cidx_filter=None):
+def json_hexbin(loom_path,reduction=None,color=None,gridsize=40,cmap=plt.cm.plasma,background='black',returnjson=True,cidx_filter=None):
     '''
     Generate hexbin plot from X,Y scatter coordinates
     
@@ -777,11 +944,27 @@ def json_hexbin(loom_path,reduction=None,cmap=plt.cm.Greys,background='white',re
     if reduction==None:
         reduction = get_available_reductions(loom_path)[0] # first reduction available
     X,Y = get_reduction_x_y(loom_path,reduction)
-    
+
     df = get_dataframe(loom_path,[X,Y],cidx_filter=cidx_filter)
-    x = df[X].values
-    y = df[Y].values
-    HB = plt.hexbin(x,y,gridsize=20,cmap=cmap)
+
+    if df.shape[0]>N_MAX_CELLS:
+        sub_idx = np.random.choice(df.shape[0], N_MAX_CELLS, replace=False) # select 20k cells randomly
+        x = df[X].values[sub_idx]
+        y = df[Y].values[sub_idx]
+    else:
+        x = df[X].values
+        y = df[Y].values
+
+    if 'spatial' in reduction:
+        y = -y
+    
+    if color is None:
+        HB = plt.hexbin(x,y,gridsize=gridsize,cmap=cmap)
+    else:
+        C = check_color(loom_path,color,cidx_filter=cidx_filter)
+        if len(C)>N_MAX_CELLS:
+            C=C[sub_idx]
+        HB = plt.hexbin(x,y,gridsize=gridsize,cmap=cmap,C=C)
     xx = plt.draw()
 
     hexagon_vertices, offsets, mpl_facecolors, counts = get_hexbin_attributes(HB)
@@ -825,14 +1008,18 @@ def json_hexbin(loom_path,reduction=None,cmap=plt.cm.Greys,background='white',re
     )
 
     fig.update_layout(
-        width=530, height=550,
+        width=636, height=660,
         xaxis=axis,
         yaxis=axis,
-        xaxis_title='UMAP1',
-        yaxis_title='UMAP2',
+        xaxis_title=X,
+        yaxis_title=Y,
         hovermode='closest',
         shapes=shapes,
         plot_bgcolor=background)
+    
+    if "PCA" not in reduction.upper():
+        fig.update_yaxes(showticklabels=False)
+        fig.update_xaxes(showticklabels=False)
     
     if returnjson:
         return json.loads(pio.to_json(fig, validate=True, pretty=False, remove_uids=True))
@@ -1182,7 +1369,7 @@ def dotplot_json(loom_path,attribute='',symbols=[],cidx_filter=None,ridx_filter=
             ticktext = colors.index.values,
         )
     )
-    print('15')
+    #print('15')
     # hide subplot y-axis titles and x-axis titles
     for axis in fig.layout:
         if type(fig.layout[axis]) == go.layout.YAxis:
@@ -1289,7 +1476,43 @@ def density_ca(loom_path,X,Y,cidx_filter=None,ca=None):
         fig['data'][i]['ncontours'] = 20
     return fig,lgd
 
-def density_symbols(loom_path,X,Y,symbols,cidx_filter=None):
+# def density_symbols(loom_path,X,Y,symbols,cidx_filter=None):
+#     df = get_dataframe(loom_path,[X,Y],cidx_filter=None) # pandas dataframe
+
+#     fig = px.density_contour(df, x=X, y=Y)
+#     fig['data'][0]['line']['color'] = '#D3D3D3'
+#     for i,trace in enumerate(fig['data']):
+#         fig['data'][i]['ncontours'] = 20
+    
+#     lgd = dict()
+#     gene_colors = ['rgba(214,121,5,1)','rgba(239, 122, 4,1)','rgba(239, 239, 4,1)','rgba(122, 239, 4,1)','rgba(4, 239, 239,1)','rgba(4, 122, 239,1)','rgba(122, 4, 239,1)','rgba(239, 4, 239,1)','rgba(239, 4, 122,1)','rgba(4, 239, 4,1)']
+
+#     traces=[]
+#     if isinstance(cidx_filter, np.ndarray): # if filter exists
+#         df = get_dataframe(loom_path,[X,Y],cidx_filter=cidx_filter) # pandas dataframe
+#     for i,symbol in enumerate(symbols):
+#         gene_color = gene_colors[i]
+#         lgd[symbol] = gene_color
+#         exp = get_symbol_values(loom_path,symbol,cidx_filter=cidx_filter)
+#         trace = go.Histogram2dContour(
+#             x = df[X].values,
+#             y = df[Y].values,
+#             z=exp,
+#             colorscale=[[0,'rgba(255,255,255,0)'],[1,gene_color]],
+#             histfunc='sum',
+#             ncontours = 20,
+#             contours = dict(
+#                 showlines=False
+#             ),
+#             hoverinfo='none'
+#         )
+
+#         traces.append(trace)
+#     fig.add_traces(traces)
+        
+#     return fig,lgd
+
+def density_symbols(loom_path,X,Y,symbol,cidx_filter=None):
     df = get_dataframe(loom_path,[X,Y],cidx_filter=None) # pandas dataframe
 
     fig = px.density_contour(df, x=X, y=Y)
@@ -1297,43 +1520,65 @@ def density_symbols(loom_path,X,Y,symbols,cidx_filter=None):
     for i,trace in enumerate(fig['data']):
         fig['data'][i]['ncontours'] = 20
     
-    lgd = dict()
     gene_colors = ['rgba(214,121,5,1)','rgba(239, 122, 4,1)','rgba(239, 239, 4,1)','rgba(122, 239, 4,1)','rgba(4, 239, 239,1)','rgba(4, 122, 239,1)','rgba(122, 4, 239,1)','rgba(239, 4, 239,1)','rgba(239, 4, 122,1)','rgba(4, 239, 4,1)']
-
-    traces=[]
     if isinstance(cidx_filter, np.ndarray): # if filter exists
         df = get_dataframe(loom_path,[X,Y],cidx_filter=cidx_filter) # pandas dataframe
-    for i,symbol in enumerate(symbols):
-        gene_color = gene_colors[i]
-        lgd[symbol] = gene_color
-        exp = get_symbol_values(loom_path,symbol,cidx_filter=cidx_filter)
-        trace = go.Histogram2dContour(
-            x = df[X].values,
-            y = df[Y].values,
-            z=exp,
-            colorscale=[[0,'rgba(255,255,255,0)'],[1,gene_color]],
-            histfunc='sum',
-            ncontours = 20,
-            contours = dict(
-                showlines=False
-            ),
-            hoverinfo='none'
-        )
+    gene_color = gene_colors[0]
+    exp = get_symbol_values(loom_path,symbol,cidx_filter=cidx_filter)
+    trace = go.Histogram2dContour(
+        x = df[X].values,
+        y = df[Y].values,
+        z=exp,
+        colorscale='inferno',#[[0,'rgba(255,255,255,0)'],[1,gene_color]],
+        histfunc='avg',
+        ncontours = 20,
+        contours = dict(
+            showlines=False
+        ),
+        hoverinfo='none'
+    )
+    fig.add_traces([trace])   
+    return fig
 
-        traces.append(trace)
-    fig.add_traces(traces)
-        
-    return fig,lgd
+# def json_density(loom_path,reduction=None,ca=None,symbols=[],returnjson=True,cidx_filter=None):
+#     if reduction==None:
+#         reduction = get_available_reductions(loom_path)[0] # first reduction available
+#     X,Y = get_reduction_x_y(loom_path,reduction)
+    
+#     if symbols==[]: # if no gene list provided
+#         fig,lgd = density_ca(loom_path,X,Y,cidx_filter=cidx_filter,ca=ca) # plot simple density contour or with categorical column attribute
+#     else:
+#         fig,lgd = density_symbols(loom_path,X,Y,symbols,cidx_filter=cidx_filter)
 
-def json_density(loom_path,reduction=None,ca=None,symbols=[],returnjson=True,cidx_filter=None):
+#     fig.update_layout(
+#         paper_bgcolor='rgba(0,0,0,0)',
+#         plot_bgcolor='rgba(0,0,0,0)',
+#         margin=dict(
+#             l=0,
+#             r=0,
+#             b=0,
+#             t=0
+#         ),
+#         xaxis_title='',
+#         yaxis_title='',
+#     )
+#     fig.update_yaxes(showticklabels=False)
+#     fig.update_xaxes(showticklabels=False)
+
+#     if 'spatial' in reduction:
+#         fig.update_yaxes(autorange="reversed")
+    
+#     if returnjson:
+#         return json.loads(pio.to_json(fig, validate=True, pretty=False, remove_uids=True)),lgd
+#     else:
+#         return fig
+    
+def json_density(loom_path,reduction=None,symbol=None,returnjson=True,cidx_filter=None):
     if reduction==None:
         reduction = get_available_reductions(loom_path)[0] # first reduction available
     X,Y = get_reduction_x_y(loom_path,reduction)
     
-    if symbols==[]: # if no gene list provided
-        fig,lgd = density_ca(loom_path,X,Y,cidx_filter=cidx_filter,ca=ca) # plot simple density contour or with categorical column attribute
-    else:
-        fig,lgd = density_symbols(loom_path,X,Y,symbols,cidx_filter=cidx_filter)
+    fig = density_symbols(loom_path,X,Y,symbol,cidx_filter=cidx_filter)
 
     fig.update_layout(
         paper_bgcolor='rgba(0,0,0,0)',
@@ -1344,17 +1589,19 @@ def json_density(loom_path,reduction=None,ca=None,symbols=[],returnjson=True,cid
             b=0,
             t=0
         ),
-        xaxis_title='',
-        yaxis_title='',
+        xaxis_title=X,
+        yaxis_title=Y,
     )
-    fig.update_yaxes(showticklabels=False)
-    fig.update_xaxes(showticklabels=False)
+    
+    if "PCA" not in reduction.upper():
+        fig.update_yaxes(showticklabels=False)
+        fig.update_xaxes(showticklabels=False)
 
-    if reduction=='spatial':
+    if 'spatial' in reduction:
         fig.update_yaxes(autorange="reversed")
     
     if returnjson:
-        return json.loads(pio.to_json(fig, validate=True, pretty=False, remove_uids=True)),lgd
+        return json.loads(pio.to_json(fig, validate=True, pretty=False, remove_uids=True))
     else:
         return fig
 
@@ -1437,7 +1684,9 @@ def json_spatial(loom_path, color=None, reduction=None,returnjson=True, cidx_fil
             maxima = max(colorvector)
             norm = matplotlib.colors.Normalize(vmin=minima, vmax=maxima, clip=True)
             #mapper = cm.ScalarMappable(norm=norm, cmap=cm.magma)
-            mapper = cm.ScalarMappable(norm=norm, cmap=clr.ListedColormap([rgb2hex(x) for x in px.colors.sequential.matter], name='matter'))
+            #mapper = cm.ScalarMappable(norm=norm, cmap=clr.ListedColormap([rgb2hex(x) for x in px.colors.sequential.matter], name='matter'))
+            #mapper = cm.ScalarMappable(norm=norm, cmap=clr.ListedColormap([rgb2hex(x) for x in px.colors.sequential.Plasma], name='plasma'))
+            mapper = cm.ScalarMappable(norm=norm, cmap=cm.plasma)
             points = spatial_points_continuous(x, y, colorvector, mapper,r=r)
         else:
             points = spatial_points_solid(x,y,colorvector,r=r)
@@ -1475,5 +1724,5 @@ def json_spatial(loom_path, color=None, reduction=None,returnjson=True, cidx_fil
     if returnjson:
         return json.loads(pio.to_json(fig, validate=True, pretty=False, remove_uids=True))
     else:
-        print("return fig")
+        #print("return fig")
         return fig

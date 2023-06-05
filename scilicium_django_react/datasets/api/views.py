@@ -93,7 +93,7 @@ class DatasetViewSet(viewsets.ModelViewSet):
     def download(self, request, *args, **kwargs):
         dataset = self.get_object()
         if dataset.status == "PUBLIC" or dataset.created_by == self.request.user:
-            print(dataset.loom.name)
+            #print(dataset.loom.name)
             from scilicium_django_react.utils.utils import zip_results
             user_type = "user"
             if dataset.created_by and dataset.created_by.is_superuser:
@@ -235,7 +235,7 @@ class GetLoomPlots(APIView):
         # Process any get params that you may need
         # If you don't need to process get params,
         # you can skip this part
-
+        #print(request.data)
         post_data = request.data
         data_id = post_data['id']
         attrs = post_data['attrs']
@@ -277,27 +277,24 @@ class GetLoomPlots(APIView):
         #if data.status == "PRIVATE" and data.created_by != self.request.user :
         #    response = Response({"msg":"You are not allowed to access this ressource"}, status=status.HTTP_403_FORBIDDEN)
         #    return response
-        
+        # Bonjour PAul C'est Thomas qui te parle ;)
         
         response_data = dict()
         response_data["name"] = data.name
         response_data["classes"] = data.classes
         response_data['reduced'] = reduced
-        print(ridx_filter)
+        #print(ridx_filter)
         #print(filters['ra'])
         if genes_menu != 'undefined':
             response_data["genes_menu"] = get_ra(loomfile,unique=True,ridx_filter=ridx_filter)
         if style =="scatter":
-            #print("scatter")
-            #print(attrs)
-            response_data['chart'] = json_scatOrSpat(loomfile,color=attrs,reduction=reduction,cidx_filter=cidx_filter)
-            #print(response_data['chart'])
+            response_data['chart'] = json_scatOrSpat(style,loomfile,color=attrs,reduction=reduction,cidx_filter=cidx_filter)
             response_data['style'] = "scatter"
             response = Response(response_data, status=status.HTTP_200_OK)
             return response
 
         elif style=='hexbin':
-            response_data['chart'] = json_hexbin(loomfile,reduction=reduction,cmap=plt.cm.Greys,background='white',cidx_filter=cidx_filter)
+            response_data['chart'] = json_scatOrSpat(style,loomfile, reduction=reduction, color=attrs, returnjson=True, cidx_filter=cidx_filter)
             response_data['style'] = 'hexbin'
             response = Response(response_data, status=status.HTTP_200_OK)
             return response
@@ -315,7 +312,8 @@ class GetLoomPlots(APIView):
             return response
         
         elif style=='density':
-            response_data['chart'],response_data['legend'] = json_density(loomfile,reduction=reduction,ca=attrs,symbols=symbols,cidx_filter=cidx_filter)
+            #response_data['chart'],response_data['legend'] = json_density(loomfile,reduction=reduction,ca=attrs,symbols=symbols,cidx_filter=cidx_filter)
+            response_data['chart'] = json_scatOrSpat(style,loomfile,color=attrs,reduction=reduction,cidx_filter=cidx_filter)
             response_data['style'] = 'density'
             response = Response(response_data, status=status.HTTP_200_OK)
             return response
