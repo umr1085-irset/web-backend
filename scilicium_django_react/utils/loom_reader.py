@@ -922,7 +922,7 @@ def mpl_to_plotly(cmap, N):
         pl_colorscale.append([round(k*h,2), f'rgb({C[0]}, {C[1]}, {C[2]})'])
     return pl_colorscale
 
-def json_hexbin(loom_path,reduction=None,color=None,gridsize=40,cmap=plt.cm.plasma,background='black',returnjson=True,cidx_filter=None):
+def json_hexbin(loom_path,reduction=None,color=None,gridsize=50,cmap=plt.cm.plasma,background='black',returnjson=True,cidx_filter=None):
     '''
     Generate hexbin plot from X,Y scatter coordinates
     
