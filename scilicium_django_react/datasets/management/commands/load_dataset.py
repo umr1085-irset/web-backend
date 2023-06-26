@@ -280,8 +280,8 @@ def import_data_from_list(infofile):
             elif not Dataset.objects.filter(title=row_data["Dataset.title"]).exists() : 
                 print("Creating dataset")
                 loomName = row_data["Loom.file"].split(".loom")[0]
-                bioMetaName = loomName + "_bioMeta"
-                sopName = loomName + "_sopMeta"
+                bioMetaName = os.path.basename(loomName) + "_bioMeta"
+                sopName = os.path.basename(loomName) + "_sopMeta"
                 dict_loom={}
                 dict_bioMeta = {}
                 dict_sop = {}
