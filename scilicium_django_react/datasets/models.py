@@ -143,8 +143,10 @@ class Dataset(models.Model):
 
 @receiver(models.signals.pre_delete, sender=Dataset)
 def auto_delete_loomfile_on_delete(sender, instance, **kwargs):
+    print(f'triggered: {instance.datasetId}')
     # Delete the folder
-    local_path = f"{instance.datasetId}"
+    local_path = f"{instance.loom.loomId}"
     unix_path = settings.MEDIA_ROOT + "/datasets/loom/admin/" + local_path
+    print(unix_path)
     if(os.path.exists(unix_path)):
         shutil.rmtree(unix_path)
