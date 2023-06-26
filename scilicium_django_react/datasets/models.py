@@ -3,6 +3,10 @@ from django.db import models
 from django.conf import settings
 from django.contrib.postgres.fields import JSONField
 from django_better_admin_arrayfield.models.fields import ArrayField
+from django.dispatch import receiver
+
+import os
+import shutil
 
 # Create your models here.
 from django.contrib.auth.models import  User
