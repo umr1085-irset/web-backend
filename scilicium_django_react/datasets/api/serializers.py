@@ -262,8 +262,13 @@ class DatasetSerializer(serializers.ModelSerializer):
            # columns = dataset.loom.classes[0:6]
         #else :
             #columns = dataset.loom.classes
+
+        if dataset.loom.light_file:
+            loomfile = dataset.loom.light_file.path
+        else:
+            loomfile = dataset.loom.file.path
     
-        metadata = get_ca_metalist(dataset.loom.file.path,metadata)
+        metadata = get_ca_metalist(loomfile,metadata)
     
         #for col in columns :
            #metadata['filters'][col] = {'name':col,'values':get_ca(dataset.loom.file.path,key=col,unique=True),'attributes':'ca'}

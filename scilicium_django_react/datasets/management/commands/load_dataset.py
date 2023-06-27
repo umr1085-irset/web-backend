@@ -151,7 +151,7 @@ def import_bioMeta(dict_bioMeta,user):
     
 
 
-def import_loom(dict_loom,user,loom_dir):
+def import_loom(dict_loom,user):
     """
         Import loom
         dict_loom : dictionary
@@ -170,9 +170,14 @@ def import_loom(dict_loom,user,loom_dir):
         
         #on stocke les infos sur le fichier mais on sauve d'abord l'object sans cette info
         filename=dict_loom["file"]
+        basename = os.path.basename(filename)
+        lightfilename=dict_loom["light_file"]
         del dict_loom["file"]
+        del dict_loom["light_file"]
         #adding temporary but compulsory value
-        loom = Loom(name = dict_loom["name"], rowEntity = ["Symbol"], colEntity = ["Age"], reductions = ["Umap"], classes = ["Age"], row_name = row, col_name = col, created_by = user)
+        #loom = Loom(name = dict_loom["name"], rowEntity = ["Symbol"], colEntity = ["Age"], reductions = ["Umap"], classes = ["Age"], row_name = row, col_name = col, created_by = user)            
+        loom = Loom(name = basename, rowEntity = ["Symbol"], colEntity = ["Age"], reductions = ["Umap"], classes = ["Age"], row_name = row, col_name = col, created_by = user)
+
         #loom = Loom.objects.create(**dict_loom)
         loom.save()
         #loom.created_by.add(user)
@@ -180,16 +185,27 @@ def import_loom(dict_loom,user,loom_dir):
         
         #une fois l'instance loom créé, on enregistre le fichier
         #loom_dir = "data_to_import/loom"
-        if filename != "" : 
-            filepath = os.path.join(settings.ROOT_DIR,loom_dir,filename)
-            #filepath = os.path.join(loom_dir,filename)
+        if filename != "" :
+            if not os.path.isfile(filename):
+                loom.delete() # delete loom object from db
+                raise Exception(f"Loom file doesn't exist: {filename}")
 
-            
+            filepath = filename # absolute path, path is name
+            basename = os.path.basename(filename) # get file basename to store properly
             f = File(open(filepath,'rb'))
-            #TO CHECK : save:True sans sp.save()
-            loom.file.save(filename,f,save=False)     
+            loom.file.save(basename,f,save=False) # use basename and file connection f
+
+            if lightfilename != "":
+                if not os.path.isfile(lightfilename):
+                    loom.delete()
+                    raise Exception(f"Loom file doesn't exist: {lightfilename}")
+
+                lightfilepath = lightfilename # absolute path, path is name
+                lightbasename = os.path.basename(lightfilename) # get light file basename to store properly
+                lf = File(open(lightfilepath,'rb'))
+                loom.light_file.save(lightbasename,lf,save=False) # use basename and file connection lf
+
             loom.save()
-            
             
             #destination = os.path.join(settings.MEDIA_ROOT,get_upload_path(loom,filename))
             #print(destination)
@@ -233,7 +249,7 @@ def import_dataset(dict_dataset,admin_user,loomId,bioMetaId,sopId) :
     ds.save()
 
 
-def import_data_from_list(infofile, loom_dir):
+def import_data_from_list(infofile):
 
 
     admin_user = User.objects.filter(is_superuser=True)
@@ -264,8 +280,8 @@ def import_data_from_list(infofile, loom_dir):
             elif not Dataset.objects.filter(title=row_data["Dataset.title"]).exists() : 
                 print("Creating dataset")
                 loomName = row_data["Loom.file"].split(".loom")[0]
-                bioMetaName = loomName + "_bioMeta"
-                sopName = loomName + "_sopMeta"
+                bioMetaName = os.path.basename(loomName) + "_bioMeta"
+                sopName = os.path.basename(loomName) + "_sopMeta"
                 dict_loom={}
                 dict_bioMeta = {}
                 dict_sop = {}
@@ -295,7 +311,7 @@ def import_data_from_list(infofile, loom_dir):
             
 
 
-                loomId = import_loom(dict_loom, admin_user, loom_dir)
+                loomId = import_loom(dict_loom, admin_user)
                 bioMetaId = import_bioMeta(dict_bioMeta, admin_user)
                 sopId = import_sop(dict_sop, admin_user)
                 import_dataset(dict_dataset, admin_user, loomId, bioMetaId, sopId)
@@ -303,8 +319,8 @@ def import_data_from_list(infofile, loom_dir):
                 print("Dataset already exists: " + row_data["Dataset.title"])
 
 
-def launch_import(infofile,loom_dir):
-    import_data_from_list(infofile, loom_dir)
+def launch_import(infofile):
+    import_data_from_list(infofile)
 
 
 class Command(BaseCommand):
@@ -315,8 +331,6 @@ class Command(BaseCommand):
     def add_arguments(self, parser):
         #Positional arguments
         parser.add_argument('infofile', type=str, help="Filepath to the file containing the dataset info")
-        parser.add_argument('loom_dir', type=str, help="Path to the directory containing the loom file")
-
 
     def handle(self, *args, **options):
-        launch_import(options['infofile'], options['loom_dir'])
+        launch_import(options['infofile'])
