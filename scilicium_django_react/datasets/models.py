@@ -3,6 +3,10 @@ from django.db import models
 from django.conf import settings
 from django.contrib.postgres.fields import JSONField
 from django_better_admin_arrayfield.models.fields import ArrayField
+from django.dispatch import receiver
+
+import os
+import shutil
 
 # Create your models here.
 from django.contrib.auth.models import  User
@@ -136,3 +140,12 @@ class Dataset(models.Model):
         super(Dataset, self).save(*args, **kwargs)
         self.datasetId = "d" + str(self.id)
         super(Dataset, self).save()
+
+@receiver(models.signals.pre_delete, sender=Dataset)
+def auto_delete_loomfile_on_delete(sender, instance, **kwargs):
+    # Delete the folder
+    local_path = f"{instance.loom.loomId.replace('l','')}"
+    unix_path = settings.MEDIA_ROOT + "/datasets/loom/admin/" + local_path
+    if(os.path.exists(unix_path)):
+       shutil.rmtree(unix_path)
+    Loom.objects.filter(loomId=instance.loom.loomId).delete()
