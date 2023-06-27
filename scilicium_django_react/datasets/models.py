@@ -147,5 +147,5 @@ def auto_delete_loomfile_on_delete(sender, instance, **kwargs):
     local_path = f"{instance.loom.loomId.replace('l','')}"
     unix_path = settings.MEDIA_ROOT + "/datasets/loom/admin/" + local_path
     if(os.path.exists(unix_path)):
-       shutil.rmtree(unix_path)
-    Loom.objects.filter(loomId=instance.loom.loomId).delete()
+       shutil.rmtree(unix_path) # delete loom folder
+    Loom.objects.filter(loomId=instance.loom.loomId).delete() # delete Loom entry in Django DB
