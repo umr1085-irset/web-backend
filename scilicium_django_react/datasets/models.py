@@ -134,7 +134,7 @@ class Dataset(models.Model):
     def __str__(self):
         return self.title
     
-    Override save method to auto increment dataset custom id
+    # Override save method to auto increment dataset custom id
     def save(self, *args, **kwargs):
         force = kwargs.pop('force', False)
         super(Dataset, self).save(*args, **kwargs)
