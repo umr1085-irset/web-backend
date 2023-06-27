@@ -147,4 +147,4 @@ def auto_delete_loomfile_on_delete(sender, instance, **kwargs):
     local_path = f"{instance.loom.loomId.replace('l','')}"
     unix_path = settings.MEDIA_ROOT + "/datasets/loom/admin/" + local_path
     if(os.path.exists(unix_path)):
-        os.system(shutil.rmtree(unix_path))
+        shutil.rmtree(unix_path, ignore_errors=True)
