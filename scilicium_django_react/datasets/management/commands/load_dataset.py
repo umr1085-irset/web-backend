@@ -56,9 +56,10 @@ def check_ontoLabels(dict_meta) :
             #le nom du model d'onto est stocke avant displayLabel
             model = key.split(".displayLabel")[0]
             #il peut y avoir plusieurs valeurs à ajouter, on fait un split sur la virgule
-            if "," in value : 
+            if "," or "|" in value :
                 print("splitting " + value)
-                value_list = value.split(",")
+                splitchar = ',' if ',' in value else '|'
+                value_list = value.split(splitchar)
                 onto_list = []
                 for item in value_list : 
                     ontoTerm = get_ontoTerm(model,item)
