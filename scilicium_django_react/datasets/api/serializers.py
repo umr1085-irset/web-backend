@@ -39,7 +39,7 @@ class LoomBasicSerializer(serializers.ModelSerializer):
     file = serializers.FileField(required=False, allow_null=True)
     class Meta:
         model = Loom
-        fields = ["file","cellNumber","geneNumber","loomId","id","col_name","row_name"]
+        fields = ["file","cellNumber","cellNumber_light","geneNumber","loomId","id","col_name","row_name"]
 
 
 
@@ -284,6 +284,7 @@ class DatasetSerializer(serializers.ModelSerializer):
         metadata['row_name'] = dataset.loom.row_name
         metadata['col_name'] = dataset.loom.col_name
         metadata['cell_number'] = dataset.loom.cellNumber
+        metadata['cell_number_light'] = dataset.loom.cellNumber_light
         metadata['gene_number'] = dataset.loom.geneNumber
         return metadata
     
