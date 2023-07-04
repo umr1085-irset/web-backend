@@ -79,6 +79,7 @@ class Loom(models.Model):
     colEntity = ArrayField(models.CharField(max_length=200, blank=True), default=list)
     reductions = ArrayField(models.CharField(max_length=200, blank=True), default=list)
     cellNumber =  models.IntegerField(blank=True, null=True)
+    cellNumber_light =  models.IntegerField(blank=True, null=True)
     geneNumber = models.IntegerField(blank=True, null=True)
     row_name = models.CharField(max_length=200, blank=True, null=True)
     col_name = models.CharField(max_length=200, blank=True, null=True)
@@ -103,6 +104,9 @@ class Loom(models.Model):
             self.classes = get_classes(self.file.path)
             self.cellNumber = shape[1]
             self.geneNumber = shape[0]
+            if self.light_file and self.light_file.name:
+                shape_light = get_shape(self.light_file.path)
+                self.cellNumber_light = shape_light[1]
         self.loomId = "l" + str(self.id)
         super(Loom, self).save()
 
