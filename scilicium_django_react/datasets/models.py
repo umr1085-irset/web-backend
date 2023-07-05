@@ -72,7 +72,7 @@ class sopMeta(models.Model):
         return self.name
 
 class Loom(models.Model):
-    name = models.CharField(max_length=200,unique=True)
+    name = models.CharField(max_length=200,unique=False)
     loomId = models.CharField(max_length=200,unique=True)
     created_by = models.ForeignKey(settings.AUTH_USER_MODEL, blank=True, null=True, on_delete=models.CASCADE, related_name='loom_upload_created_by')
     rowEntity = ArrayField(models.CharField(max_length=200, blank=True), default=list)
