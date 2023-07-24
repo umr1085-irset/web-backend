@@ -35,7 +35,7 @@ def genome_browser(request):
         dict = {
             'name': key,
             'short': value,
-            'image': 'images/species/' + value + '.png',
+            'image': 'images/species/genome_' + value + '.png',
             'rgv_url': base_rgv_url + value,
             'ucsc_url': base_ucsc_url + value,
         }
