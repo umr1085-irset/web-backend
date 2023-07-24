@@ -11,6 +11,7 @@ urlpatterns = [
     path("", admin.site.urls),
     # Django Admin, use {% url 'admin:index' %}
     path(settings.ADMIN_URL, admin.site.urls),
+    path( "genome_browser/", views.genome_browser, name="genome_browser"),
     # User management
     # Your stuff: custom urls includes go here
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

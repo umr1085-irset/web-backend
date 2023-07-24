@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% load static i18n %}
+
+
+{% block content %}
+    <script>
+       gtag('config', 'UA-158824695-1', {
+        'page_title' : 'genome browser',
+        'page_path': '/genome_browser'
+      });
+    </script>
+    <div class="container">
+        <h2><i class="fa fa-indent"></i> Genome browser</h1>
+        <p> Current Genomes </p>
+        <div class="table-responsive-xl">
+          <table class="table table-hover">
+            <thead>
+              <tr style="text-align:center;">
+                <th scope="col">Genome</th>
+                <th scope="col">UCSC genome release</th>
+                <th scope="col">RGV genome browser</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for specie in species %}
+              <tr style="text-align:center;">
+                <td><img src="{% static specie.image %}" height="50" title="{{specie.name}}" alt="{{specie.name}}"></td>
+                <td><a href="{{specie.ucsc_url}}">{{specie.short}}</a></td>
+                <td>
+                  <a class="btn btn-info select_study"href="{{specie.rgv_url}}">
+                    <i class="fa fa-external-link-alt" aria-hidden="true"></i>
+                  </a>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+    </div>
+{% endblock %}

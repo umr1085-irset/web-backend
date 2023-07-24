@@ -7,7 +7,7 @@ from scilicium_django_react.users.api.views import UserViewSet, UserActivationVi
 from scilicium_django_react.studies.api.urls import *
 from scilicium_django_react.datasets.api.views import *
 from scilicium_django_react.studies.api.views import GetPublicStudies,StudyViewSet, ProjectViewSet
-
+from scilicium_django_react.genomebrowser.api.views import GetGenomeBrowser
 
 if settings.DEBUG:
     router = DefaultRouter()
@@ -32,4 +32,5 @@ urlpatterns += [
     url(r'^v1/dataset/genes/', GetLoomGenes.as_view(),name="dataset_genes" ),
     url(r'^v1/public/studies/', GetPublicStudies.as_view(),name="public_studies" ),
     url(r'^v1/public/datasets/', GetPublicDatasets.as_view(),name="public_datasets" ),
+    #url(r'^v1/public/genome_browser', GetGenomeBrowser.as_view(), name="genome_browser")
 ]
