@@ -7,7 +7,6 @@ from scilicium_django_react.users.api.views import UserViewSet, UserActivationVi
 from scilicium_django_react.studies.api.urls import *
 from scilicium_django_react.datasets.api.views import *
 from scilicium_django_react.studies.api.views import GetPublicStudies,StudyViewSet, ProjectViewSet
-from scilicium_django_react.genomebrowser.api.views import GetGenomeBrowser
 
 if settings.DEBUG:
     router = DefaultRouter()
