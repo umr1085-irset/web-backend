@@ -24,7 +24,7 @@ from scilicium_django_react.utils.chartjsCreator import *
 from scilicium_django_react.utils.plotlyCreator import *
 
 class GetGenomeBrowser(APIView):
-    def get(self, request, *args, **kw):
+    def post(self, request, *args, **kw):
         species = {
             'Homo sapiens': 'hg38',
             'Macaca mulatta': 'rheMac8',
