@@ -25,6 +25,7 @@ from scilicium_django_react.utils.plotlyCreator import *
 
 class GetGenomeBrowser(APIView):
     def post(self, request, *args, **kw):
+        print('test')
         species = {
             'Homo sapiens': 'hg38',
             'Macaca mulatta': 'rheMac8',
@@ -42,7 +43,7 @@ class GetGenomeBrowser(APIView):
         base_ucsc_url = "https://genome.ucsc.edu/cgi-bin/hgTracks?db="
 
         for key, value in species.items():
-            dict = {
+            d = {
                 'name': key,
                 'short': value,
                 'image': 'images/species/genome_' + value + '.png',
@@ -50,9 +51,9 @@ class GetGenomeBrowser(APIView):
                 'ucsc_url': base_ucsc_url + value,
             }
 
-            #dict['studies'], dict['samples'] = _get_count(key)
-            data.append(dict)
-            print(data)
+            #d['studies'], d['samples'] = _get_count(key)
+            data.append(d)
+        print(data)
         return Response(data)
 
 
