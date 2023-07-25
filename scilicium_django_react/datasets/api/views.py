@@ -52,6 +52,7 @@ class GetGenomeBrowser(APIView):
 
             #dict['studies'], dict['samples'] = _get_count(key)
             data.append(dict)
+            print(data)
         return Response(data)
 
 
