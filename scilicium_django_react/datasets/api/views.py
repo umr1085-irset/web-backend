@@ -46,15 +46,15 @@ class GetGenomeBrowser(APIView):
             d = {
                 'name': key,
                 'short': value,
-                'image': 'images/species/genome_' + value + '.png',
-                'rgv_url': base_rgv_url + value,
-                'ucsc_url': base_ucsc_url + value,
+                #'image': 'images/species/genome_' + value + '.png',
+                #'rgv_url': base_rgv_url + value,
+                #'ucsc_url': base_ucsc_url + value,
             }
 
             #d['studies'], d['samples'] = _get_count(key)
             data.append(d)
         print(data)
-        return Response(data)
+        return Response(data, status=status.HTTP_200_OK)
 
 
 class GetPublicDatasets(APIView):
