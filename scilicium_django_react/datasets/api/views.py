@@ -49,9 +49,9 @@ class GetGenomeBrowser(APIView):
             d = {
                 'name': key,
                 'short': value,
-                'image': '../../assets/img/species/' + value + '.png',
                 'rgv_url': base_rgv_url + value,
-                #'ucsc_url': base_ucsc_url + value,
+                'ucsc_url': base_ucsc_url + value,
+                #'image': '../../assets/img/species/' + value + '.png',
             }
 
             #d['studies'], d['samples'] = _get_count(key)
