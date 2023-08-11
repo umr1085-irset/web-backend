@@ -23,6 +23,43 @@ from scilicium_django_react.utils.loom_reader import *
 from scilicium_django_react.utils.chartjsCreator import *
 from scilicium_django_react.utils.plotlyCreator import *
 
+class GetGenomeBrowser(APIView):
+    permission_classes = (permissions.AllowAny,)
+    authentication_classes = ()
+
+    def get(self, request, *args, **kw):
+        print('test')
+        species = {
+            'Homo sapiens': 'hg38',
+            'Macaca mulatta': 'rheMac8',
+            'Mus musculus':'mm10',
+            'Rattus norvegicus':'rn6',
+            'Canis lupus familiaris': 'canFam3',
+            'Bos taurus': 'bosTau8',
+            'Sus scrofa': 'susScr3',
+            'Gallus gallus': 'galGal5',
+            'Danio rerio': 'danRer10'
+        }
+
+        data = []
+        base_rgv_url = "https://jbrowse-rgv.genouest.org/?data=data/sample_data/json/"
+        base_ucsc_url = "https://genome.ucsc.edu/cgi-bin/hgTracks?db="
+
+        for key, value in species.items():
+            d = {
+                'name': key,
+                'short': value,
+                'rgv_url': base_rgv_url + value,
+                'ucsc_url': base_ucsc_url + value,
+                #'image': '../../assets/img/species/' + value + '.png',
+            }
+
+            #d['studies'], d['samples'] = _get_count(key)
+            data.append(d)
+        print(data)
+        return Response(data, status=status.HTTP_200_OK)
+
+
 class GetPublicDatasets(APIView):
     # Allow anyone to access
     # For test only
